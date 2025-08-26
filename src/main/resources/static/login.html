@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Iniciar sesión - SIExT </title>
+    <link rel="icon" href="Logo del sistema SIExT.png">
+    <style>
+        :root {
+            --negro: rgb(0, 0, 0);
+            --gris-oscuro: rgb(33, 37, 41);
+            --blanco: rgb(255, 255, 255);
+            --azul: rgb(0, 123, 255);
+            --gris-claro: rgb(102, 102, 102);
+            --fondo: rgb(241, 244, 249);
+            --borde-input: rgb(153, 153, 153);
+            --fondo-input: rgb(249, 249, 249);
+            --texto-secundario: rgb(116, 119, 117);
+            --azul-profundo: rgb(0, 102, 204);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--fondo);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: var(--gris-oscuro);
+        }
+
+        .login-container {
+            background-color: var(--blanco);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 320px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--gris-oscuro);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid var(--borde-input);
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            background-color: var(--fondo-input);
+            font-size: 0.95rem;
+            color: var(--gris-oscuro);
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: var(--azul);
+            outline: none;
+            background-color: var(--blanco);
+        }
+
+        button {
+            width: 100%;
+            padding: 0.7rem;
+            background-color: var(--azul);
+            border: none;
+            border-radius: 4px;
+            color: var(--blanco);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: var(--azul-profundo);
+        }
+
+        .footer-text {
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--texto-secundario);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-container">
+        <h1>Iniciar sesión</h1>
+        <form id="loginForm">
+            <label for="user">Usuario</label>
+            <input type="text" id="user" name="user" placeholder="Ingrese su usuario" required />
+
+            <label for="pass">Contraseña</label>
+            <input type="password" id="pass" name="pass" placeholder="Ingrese su contraseña" required />
+
+            <button type="submit">Iniciar sesión</button>
+        </form>
+        <div class="footer-text"> SIExT </div>
+    </div>
+
+    <script>
+        // Simulación de login sin validación real
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            window.location.href = 'panel.html';
+        });
+    </script>
+
+</body>
+
+</html>

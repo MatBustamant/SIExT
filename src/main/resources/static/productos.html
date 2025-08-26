@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Agregar Productos - SIExT</title>
+    <link href="icons/bootstrap-icons.css" rel="stylesheet">
+    <link rel="icon" href="Logo del sistema SIExT.png">
+    <style>
+        :root {
+            --negro: #000;
+            --gris-oscuro: #212529;
+            --blanco: #fff;
+            --azul: #007bff;
+            --azul-profundo: #0066cc;
+            --gris-claro: #666;
+            --fondo: #f1f4f9;
+            --texto-secundario: #747775;
+            --rojo: #dc3545;
+            --rojo-profundo: #a61b26;
+            --modificar-bg: #e9f0ff;
+            --modificar-border: #8ab4f8;
+        }
+
+        #grupoMinimoReposicion {
+            display: block;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--fondo);
+            color: var(--gris-oscuro);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--gris-oscuro);
+            color: var(--blanco);
+            padding: 1rem 2rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        main {
+            flex: 1;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        h2 {
+            margin-bottom: 1rem;
+        }
+
+        section {
+            background: var(--blanco);
+            padding: 1.5rem;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            display: block;
+        }
+
+        input,
+        select {
+            padding: 0.6rem;
+            width: 100%;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1.2rem;
+            height: 42px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            background-color: var(--azul);
+            color: var(--blanco);
+            transition: background 0.25s ease;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        .btn:hover {
+            background-color: var(--azul-profundo);
+        }
+
+        .btn-danger {
+            background-color: var(--rojo);
+        }
+
+        .btn-danger:hover {
+            background-color: var(--rojo-profundo);
+        }
+
+        .cabecera {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .modificar-container {
+            margin-top: 1rem;
+            padding: 1.5rem;
+            background-color: var(--modificar-bg);
+            border: 2px solid var(--modificar-border);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(27, 84, 255, 0.15);
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.8rem;
+            color: var(--texto-secundario);
+        }
+
+        #datosProductoEncontrado {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem 1rem;
+        }
+
+        #datosProductoEncontrado p {
+            margin: 0;
+        }
+
+        .modificar-container h3 {
+            margin-bottom: 1rem;
+        }
+
+        .acciones-producto {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+            justify-content: flex-start;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header>SIExT | Gestionar Productos</header>
+
+    <main>
+        <section class="cabecera">
+            <h2>Acciones rápidas</h2>
+            <div>
+                <a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver al Panel</a>
+                <a href="inventario.html" class="btn"><i class="bi bi-card-list"></i></i>Listar Inventario</a>
+                <a href="categorias.html" class="btn"><i class="bi bi-tags"></i>Editar Categorías</a>
+            </div>
+        </section>
+
+        <section>
+            <h2>Registrar producto nuevo</h2>
+            <form id="productoForm" class="form-grid">
+                <div>
+                    <label>Clase</label>
+                    <select id="claseProducto" required>
+                        <option value="">Seleccionar</option>
+                        <option>Insumo Oficina</option>
+                        <option>Insumo Limpieza</option>
+                        <option>Insumo Eléctrico</option>
+                        <option>Bien</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Categoría</label>
+                    <select id="categoriaProducto" disabled required>
+                        <option value="">Seleccionar clase primero</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Nombre</label>
+                    <input type="text" id="nombreProducto" required>
+                </div>
+                <div>
+                    <label>Stock inicial</label>
+                    <input type="number" id="stockInicial" min="1" value="1" required>
+                </div>
+                <div id="grupoMinimoReposicion">
+                    <label>Mínimo reposición</label>
+                    <input type="number" id="minimoReposicion" min="0" value="0">
+                </div>
+                <div style="align-self: flex-end;">
+                    <button type="submit" class="btn"><i class="bi bi-plus-circle"></i>Registrar</button>
+                </div>
+            </form>
+        </section>
+
+        <section>
+            <h2>Actualizar producto</h2>
+            <form id="busquedaForm" style="display: flex; gap: 1rem; flex-direction: column;">
+                <div>
+                    <label>ID producto</label>
+                    <input type="number" id="buscarId" required>
+                </div>
+                <div>
+                    <button type="submit" class="btn"><i class="bi bi-search"></i>Buscar</button>
+                </div>
+            </form>
+
+            <div class="modificar-container" style="display:none;" id="modificarContenedor">
+                <h3 id="tituloProductoEncontrado">Producto encontrado</h3>
+
+                <!-- Datos actuales del producto -->
+                <div id="datosProductoEncontrado" style="margin-bottom: 1rem; line-height: 1.5;"></div>
+
+                <!-- Botones de acción -->
+                <div class="acciones-producto">
+                    <button type="button" class="btn" id="btnEditarDatos"><i class="bi bi-pencil-square"></i>Modificar
+                        Datos</button>
+                    <button type="button" class="btn" id="btnAgregarStock"><i class="bi bi-plus-circle"></i>Agregar
+                        Stock</button>
+                    <button type="button" class="btn btn-danger" id="eliminarProducto"><i
+                            class="bi bi-trash"></i>Eliminar</button>
+                </div>
+
+                <!-- Formulario Modificar Datos Generales -->
+                <form id="formModificarDatos" style="display:none; margin-top: 1rem;">
+                    <div>
+                        <label>Nombre</label>
+                        <input type="text" id="modNombre" required>
+                    </div>
+                    <div>
+                        <label>Clase</label>
+                        <select id="modClase" required></select>
+                    </div>
+                    <div>
+                        <label>Categoría</label>
+                        <select id="modCategoria" required></select>
+                    </div>
+                    <div id="grupoModMinimo">
+                        <label>Mínimo reposición</label>
+                        <input type="number" id="modMinimo" min="0" required>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
+                        <button type="button" class="btn" id="cancelarEdicionBtn"><i
+                                class="bi bi-x-circle"></i>Cancelar</button>
+                    </div>
+                </form>
+
+                <!-- Formulario Agregar Stock -->
+                <form id="formAgregarStock" style="display:none; margin-top: 1rem;">
+                    <div>
+                        <label>Agregar stock</label>
+                        <input type="number" id="modStockAgregar" min="1" value="1" required>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
+                        <button type="button" class="btn" id="cancelarIngresoBtn"><i
+                                class="bi bi-x-circle"></i>Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer>SIExT | 2025</footer>
+
+    <script>
+        if (!localStorage.getItem("categorias")) {
+            const categoriasPredef = [
+                { id: 1, nombre: "LAPICERAS", clase: "Insumo Oficina", detalle: {} },
+                { id: 2, nombre: "RESMAS", clase: "Insumo Oficina", detalle: {} },
+                { id: 3, nombre: "DESINFECTANTES", clase: "Insumo Limpieza", detalle: {} },
+                { id: 4, nombre: "ESCOBAS", clase: "Insumo Limpieza", detalle: {} },
+                { id: 5, nombre: "CABLES", clase: "Insumo Eléctrico", detalle: {} },
+                { id: 6, nombre: "LÁMPARAS", clase: "Insumo Eléctrico", detalle: {} },
+                { id: 7, nombre: "SILLAS", clase: "Bien", detalle: { minimoReposicion: 10 } },
+                { id: 8, nombre: "PROYECTORES", clase: "Bien", detalle: { minimoReposicion: 10 } }
+            ];
+            localStorage.setItem("categorias", JSON.stringify(categoriasPredef));
+        }
+
+        if (!localStorage.getItem("productos")) {
+            const productosPredef = [
+                { id: 1, nombre: "RESMA A4", clase: "Insumo Oficina", categoria: "RESMAS", stock: 50, minimoReposicion: 10, estado: "En condiciones", ubicacion: "Depósito" },
+                { id: 2, nombre: "LÁMPARA LED", clase: "Insumo Eléctrico", categoria: "LÁMPARAS", stock: 20, minimoReposicion: 5, estado: "En condiciones", ubicacion: "Depósito" },
+                { id: 3, nombre: "DESINFECTANTE MULTIUSO", clase: "Insumo Limpieza", categoria: "DESINFECTANTES", stock: 15, minimoReposicion: 3, estado: "En condiciones", ubicacion: "Depósito" },
+                { id: 4, nombre: "CABLE HDMI", clase: "Insumo Eléctrico", categoria: "CABLES", stock: 10, minimoReposicion: 2, estado: "En condiciones", ubicacion: "Depósito" },
+                { id: 5, nombre: "SILLA ERGONÓMICA", clase: "Bien", categoria: "SILLAS", estado: "En condiciones", ubicacion: "Depósito" },
+                { id: 6, nombre: "SILLA ERGONÓMICA", clase: "Bien", categoria: "SILLAS", estado: "En condiciones", ubicacion: "Depósito" },
+                { id: 7, nombre: "SILLA ERGONÓMICA", clase: "Bien", categoria: "SILLAS", estado: "En condiciones", ubicacion: "Depósito" },
+            ];
+            localStorage.setItem("productos", JSON.stringify(productosPredef));
+        }
+
+        if (!localStorage.getItem("ingresos")) {
+            const ingresosPredef = [
+                { id: 1, productoId: 1, cantidad: 50, fecha: "2025-01-01" },
+                { id: 2, productoId: 2, cantidad: 20, fecha: "2025-01-03" },
+                { id: 3, productoId: 3, cantidad: 15, fecha: "2025-01-04" },
+                { id: 4, productoId: 4, cantidad: 10, fecha: "2025-01-05" },
+                { id: 5, productoId: 5, cantidad: 3, fecha: "2025-01-02" }
+
+            ];
+            localStorage.setItem("ingresos", JSON.stringify(ingresosPredef));
+        }
+    </script>
+
+    <script>
+        const claseProducto = document.getElementById("claseProducto");
+        const categoriaProducto = document.getElementById("categoriaProducto");
+        const modClaseSel = document.getElementById("modClase");
+        const modNombre = document.getElementById("modNombre");
+        const modCategoria = document.getElementById("modCategoria");
+        const modMinimo = document.getElementById("modMinimo");
+        const modificarForm = document.getElementById("modificarForm");
+        const modificarContenedor = document.getElementById("modificarContenedor");
+
+        // Cargar clases en el select de modificación
+        const clases = ["Insumo Oficina", "Insumo Limpieza", "Insumo Eléctrico", "Bien"];
+        clases.forEach(c => {
+            const opt = document.createElement("option");
+            opt.textContent = c;
+            modClaseSel.appendChild(opt);
+        });
+
+        function cargarCategorias(clase, idSelect) {
+            const sel = document.getElementById(idSelect);
+            sel.innerHTML = "";
+            const cats = JSON.parse(localStorage.getItem("categorias")) || [];
+            const filtradas = cats.filter(c => c.clase === clase);
+            if (filtradas.length === 0) {
+                sel.disabled = true;
+                sel.innerHTML = "<option>Sin categorías</option>";
+                return;
+            }
+            filtradas.forEach(c => {
+                const o = document.createElement("option");
+                o.textContent = c.nombre;
+                sel.appendChild(o);
+            });
+            sel.disabled = false;
+        }
+
+        claseProducto.addEventListener("change", () => {
+            if (!claseProducto.value) {
+                categoriaProducto.innerHTML = "<option>Seleccionar clase primero</option>";
+                categoriaProducto.disabled = true;
+                return;
+            }
+            // Mostrar/ocultar campo de mínimo reposición según clase
+            const grupoMinimo = document.getElementById("grupoMinimoReposicion");
+            if (claseProducto.value === "Bien") {
+                grupoMinimo.style.display = "none";
+            } else {
+                grupoMinimo.style.display = "block";
+            }
+            cargarCategorias(claseProducto.value, "categoriaProducto");
+        });
+
+        modClaseSel.addEventListener("change", () => {
+            cargarCategorias(modClaseSel.value, "modCategoria");
+        });
+
+        document.getElementById("productoForm").onsubmit = e => {
+            e.preventDefault();
+            const prods = JSON.parse(localStorage.getItem("productos")) || [];
+            const ingresos = JSON.parse(localStorage.getItem("ingresos")) || [];
+
+            const nombre = document.getElementById("nombreProducto").value.toUpperCase();
+            const clase = claseProducto.value;
+            const categoria = categoriaProducto.value;
+            const stockInicial = +document.getElementById("stockInicial").value;
+            const minimoReposicion = +document.getElementById("minimoReposicion").value;
+
+            // Validación básica
+            if (!nombre || !clase || !categoria || stockInicial < 1) {
+                alert("Datos incompletos.");
+                return;
+            }
+
+            if (clase === "Bien") {
+                // Crear N bienes individuales
+                for (let i = 0; i < stockInicial; i++) {
+                    const bien = {
+                        id: Date.now() + i,
+                        nombre,
+                        clase,
+                        categoria,
+                        estado: "En condiciones",
+                        ubicacion: "Depósito"
+                        // No se guarda minimoReposicion en Bien
+                    };
+                    prods.push(bien);
+                }
+                if (stockInicial > 0) {
+                    // Registrar ingreso inicial de bienes
+                    const ing = {
+                        id: Date.now(),
+                        productoId: prods[prods.length - 1].id, // ID del último bien agregado
+                        cantidad: stockInicial,
+                        fecha: new Date().toLocaleDateString('es-AR', {
+                            timeZone: 'America/Argentina/Buenos_Aires',
+                            year: 'numeric', month: '2-digit', day: '2-digit'
+                        }).split('/').reverse().join('-')
+                    };
+                    ingresos.push(ing);
+                    localStorage.setItem("ingresos", JSON.stringify(ingresos));
+                }
+                alert(`${stockInicial} bienes registrados.`);
+            } else {
+                // Verificar duplicado exacto en insumos
+                const existe = prods.some(p =>
+                    p.nombre === nombre && p.clase === clase && p.categoria === categoria
+                );
+                if (existe) {
+                    alert("Ese insumo ya existe.");
+                    return;
+                }
+
+                // Crear insumo único con stock
+                const insumo = {
+                    id: Date.now(),
+                    nombre,
+                    clase,
+                    categoria,
+                    stock: stockInicial,
+                    minimoReposicion,
+                    estado: "En condiciones",
+                    ubicacion: "Depósito"
+                };
+                prods.push(insumo);
+
+                // Registrar ingreso inicial
+                const ing = {
+                    id: Date.now(),
+                    productoId: insumo.id,
+                    cantidad: stockInicial,
+                    fecha: new Date().toLocaleDateString('es-AR', {
+                        timeZone: 'America/Argentina/Buenos_Aires',
+                        year: 'numeric', month: '2-digit', day: '2-digit'
+                    }).split('/').reverse().join('-')
+                };
+                ingresos.push(ing);
+                localStorage.setItem("ingresos", JSON.stringify(ingresos));
+
+                alert("Insumo registrado.");
+            }
+
+            localStorage.setItem("productos", JSON.stringify(prods));
+            e.target.reset();
+            categoriaProducto.disabled = true;
+        };
+    </script>
+
+    <script>
+        // Al buscar producto:
+        document.getElementById("busquedaForm").onsubmit = e => {
+            e.preventDefault();
+            const id = +document.getElementById("buscarId").value;
+            const prods = JSON.parse(localStorage.getItem("productos")) || [];
+            const p = prods.find(x => x.id === id);
+            if (!p) {
+                alert("Producto no encontrado.");
+                modificarContenedor.style.display = "none";
+                return;
+            }
+
+            modificarContenedor.style.display = "block";
+            // Mostrar todos los datos actuales
+            if (p.clase === "Insumo Oficina" || p.clase === "Insumo Limpieza" || p.clase === "Insumo Eléctrico") {
+                const datosHTML = `
+                <p><strong>ID:</strong> ${p.id}</p>
+                <p><strong>Nombre:</strong> ${p.nombre}</p>
+                <p><strong>Clase:</strong> ${p.clase}</p>
+                <p><strong>Categoría:</strong> ${p.categoria}</p>
+                <p><strong>Stock actual:</strong> ${p.stock}</p>
+                <p><strong>Mínimo de reposición:</strong> ${p.minimoReposicion}</p>
+                `;
+                document.getElementById("datosProductoEncontrado").innerHTML = datosHTML;
+
+            } else {
+                const datosHTML = `
+                <p><strong>ID:</strong> ${p.id}</p>
+                <p><strong>Nombre:</strong> ${p.nombre}</p>
+                <p><strong>Clase:</strong> ${p.clase}</p>
+                <p><strong>Categoría:</strong> ${p.categoria}</p>
+                `;
+                document.getElementById("datosProductoEncontrado").innerHTML = datosHTML;
+
+            }
+
+
+            modNombre.value = p.nombre;
+            modClaseSel.value = p.clase;
+            cargarCategorias(p.clase, "modCategoria");
+            modCategoria.value = p.categoria;
+            modMinimo.value = p.minimoReposicion;
+
+            const grupoModMinimo = document.getElementById("grupoModMinimo");
+            if (p.clase === "Bien") {
+                grupoModMinimo.style.display = "none";
+            } else {
+                grupoModMinimo.style.display = "block";
+            }
+
+            // Ocultar formularios
+            document.getElementById("formModificarDatos").style.display = "none";
+            document.getElementById("formAgregarStock").style.display = "none";
+
+            // Botón eliminar producto
+            document.getElementById("eliminarProducto").onclick = () => {
+                if (!confirm("¿Eliminar producto?")) return;
+                const nuevos = prods.filter(x => x.id !== id);
+                localStorage.setItem("productos", JSON.stringify(nuevos));
+                alert("Producto eliminado.");
+                modificarContenedor.style.display = "none";
+            };
+
+            // Mostrar form de edición de datos
+            document.getElementById("btnEditarDatos").onclick = () => {
+                document.getElementById("formModificarDatos").style.display = "block";
+                document.getElementById("formAgregarStock").style.display = "none";
+                document.getElementById("tituloProductoEncontrado").textContent = "Modificar Datos del Producto";
+                ocultarInfoYAcciones();
+            };
+
+            // Mostrar form de agregar stock
+            document.getElementById("btnAgregarStock").onclick = () => {
+                document.getElementById("formAgregarStock").style.display = "block";
+                document.getElementById("formModificarDatos").style.display = "none";
+                document.getElementById("tituloProductoEncontrado").textContent = "Agregar Stock al Producto";
+                ocultarInfoYAcciones();
+            };
+
+            // Guardar cambios de datos generales
+            document.getElementById("formModificarDatos").onsubmit = ev => {
+                ev.preventDefault();
+
+                const existeDuplicado = prods.some(prod =>
+                    prod.id !== p.id &&
+                    prod.nombre === modNombre.value.toUpperCase() &&
+                    prod.clase === modClaseSel.value &&
+                    prod.categoria === modCategoria.value
+                );
+                if (existeDuplicado) {
+                    alert("Ya existe otro producto con esos datos.");
+                    return;
+                }
+
+                p.nombre = modNombre.value.toUpperCase();
+                p.clase = modClaseSel.value;
+                p.categoria = modCategoria.value;
+                p.minimoReposicion = +modMinimo.value;
+
+                localStorage.setItem("productos", JSON.stringify(prods));
+                alert("Datos actualizados.");
+                modificarContenedor.style.display = "none";
+            };
+
+            // Cancelar edición de datos
+            document.getElementById("cancelarEdicionBtn").onclick = () => {
+                if (confirm("¿Deseás cancelar la edición? Se perderán los cambios no guardados.")) {
+                    document.getElementById("formModificarDatos").style.display = "none";
+                    mostrarInfoYAcciones();
+                }
+            };
+
+            // Confirmar ingreso de stock
+            document.getElementById("formAgregarStock").onsubmit = ev => {
+                ev.preventDefault();
+                const cantidad = +document.getElementById("modStockAgregar").value;
+                if (cantidad <= 0) {
+                    alert("Cantidad inválida.");
+                    return;
+                }
+
+                if (p.clase === "Bien") {
+                    // Crear nuevas unidades individuales
+                    for (let i = 0; i < cantidad; i++) {
+                        const nuevoBien = {
+                            id: Date.now() + i, // aseguramos id único
+                            nombre: p.nombre,
+                            clase: p.clase,
+                            categoria: p.categoria,
+                            estado: "En condiciones",
+                            ubicacion: "Depósito"
+                        };
+                        prods.push(nuevoBien);
+                    }
+                    const ingresos = JSON.parse(localStorage.getItem("ingresos")) || [];
+                    ingresos.push({
+                        id: Date.now(),
+                        productoId: p.id,
+                        cantidad: cantidad,
+                        fecha: new Date().toLocaleDateString('es-AR', {
+                            timeZone: 'America/Argentina/Buenos_Aires',
+                            year: 'numeric', month: '2-digit', day: '2-digit'
+                        }).split('/').reverse().join('-')
+                    });
+                    localStorage.setItem("ingresos", JSON.stringify(ingresos));
+
+                } else {
+                    // Insumo: sumar stock al producto existente
+                    p.stock += cantidad;
+
+                    const ingresos = JSON.parse(localStorage.getItem("ingresos")) || [];
+                    const ing = {
+                        id: Date.now(),
+                        productoId: p.id,
+                        cantidad: cantidad,
+                        fecha: new Date().toLocaleDateString('es-AR', {
+                            timeZone: 'America/Argentina/Buenos_Aires',
+                            year: 'numeric', month: '2-digit', day: '2-digit'
+                        }).split('/').reverse().join('-')
+                    };
+                    ingresos.push(ing);
+                    localStorage.setItem("ingresos", JSON.stringify(ingresos));
+                }
+
+                localStorage.setItem("productos", JSON.stringify(prods));
+                alert("Stock ingresado.");
+                modificarContenedor.style.display = "none";
+            };
+        };
+
+        // Cancelar ingreso de stock
+        document.getElementById("cancelarIngresoBtn").onclick = () => {
+            if (confirm("¿Deseás cancelar el ingreso de stock? Se perderán los cambios no guardados.")) {
+                document.getElementById("formAgregarStock").style.display = "none";
+                mostrarInfoYAcciones();
+            }
+        };
+
+    </script>
+
+    <script>
+        function ocultarInfoYAcciones() {
+            document.getElementById("datosProductoEncontrado").style.display = "none";
+            document.querySelector(".acciones-producto").style.display = "none";
+        }
+
+        function mostrarInfoYAcciones() {
+            document.getElementById("datosProductoEncontrado").style.display = "grid";
+            document.querySelector(".acciones-producto").style.display = "flex";
+            document.getElementById("tituloProductoEncontrado").textContent = "Producto encontrado";
+        }
+    </script>
+</body>
+
+</html>

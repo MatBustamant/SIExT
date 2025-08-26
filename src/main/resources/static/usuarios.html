@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gestión de Usuarios - SIExT</title>
+    <link href="icons/bootstrap-icons.css" rel="stylesheet">
+    <link rel="icon" href="Logo del sistema SIExT.png">
+    <style>
+        :root {
+            --negro: #000;
+            --gris-oscuro: #212529;
+            --blanco: #fff;
+            --azul: #007bff;
+            --azul-profundo: #0066cc;
+            --fondo: #f1f4f9;
+            --texto-secundario: #747775;
+            --rojo: #dc3545;
+            --rojo-profundo: #a61b26;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--fondo);
+            color: var(--gris-oscuro);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--gris-oscuro);
+            color: var(--blanco);
+            padding: 1rem 2rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        main {
+            flex: 1;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        section {
+            background: var(--blanco);
+            padding: 1.5rem;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            display: block;
+        }
+
+        input,
+        select {
+            padding: 0.6rem;
+            width: 100%;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1.2rem;
+            height: 42px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            background-color: var(--azul);
+            color: var(--blanco);
+            transition: background 0.25s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--azul-profundo);
+        }
+
+        .btn-danger {
+            background-color: var(--rojo);
+        }
+
+        .btn-danger:hover {
+            background-color: var(--rojo-profundo);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th,
+        td {
+            padding: 0.8rem;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--gris-oscuro);
+            color: var(--blanco);
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.8rem;
+            color: var(--texto-secundario);
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>SIExT | Gestión de Usuarios</header>
+
+    <main>
+        <section class="cabecera" style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Usuarios</h2>
+            <a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver al Panel</a>
+        </section>
+
+        <section>
+            <h2>Registrar nuevo usuario</h2>
+            <form id="formNuevoUsuario">
+                <label>Nombre de usuario</label>
+                <input type="text" id="nuevoUsuario" required>
+
+                <label>Contraseña</label>
+                <input type="password" id="nuevoPassword" required>
+
+                <label>Rol</label>
+                <select id="nuevoRol" required>
+                    <option value="">Seleccionar</option>
+                    <option>Administrativo</option>
+                    <option>Supervisor</option>
+                    <option>Depósito</option>
+                </select>
+
+                <button type="submit" class="btn"><i class="bi bi-plus-circle"></i>Registrar</button>
+            </form>
+        </section>
+
+        <section>
+            <h2>Usuarios registrados</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Usuario</th>
+                        <th>Rol</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaUsuarios">
+                    <tr>
+                        <td>1</td>
+                        <td>admin</td>
+                        <td>Administrativo</td>
+                        <td>
+                            <button class="btn btn-editar"><i class="bi bi-pencil"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="modificarUsuarioSection" class="hidden">
+            <h2>Modificar usuario</h2>
+            <form id="formModificarUsuario">
+                <input type="hidden" id="modUsuarioId">
+
+                <label>Nombre de usuario</label>
+                <input type="text" id="modNombreUsuario" required>
+
+                <label>Contraseña</label>
+                <input type="password" id="modPasswordUsuario" required>
+
+                <label>Rol</label>
+                <select id="modRolUsuario" required>
+                    <option value="">Seleccionar</option>
+                    <option>Administrativo</option>
+                    <option>Supervisor</option>
+                    <option>Depósito</option>
+                </select>
+
+                <div class="btn-row">
+                    <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
+                    <button type="button" class="btn" id="btnCancelarEdicion"><i
+                            class="bi bi-x-circle"></i>Cancelar</button>
+
+                    <button type="button" class="btn btn-danger" id="btnEliminarUsuario"><i
+                            class="bi bi-trash"></i>Deshabilitar</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <footer>SIExT | 2025</footer>
+
+    <script>
+        // Registro nuevo usuario (simulado)
+        document.getElementById("formNuevoUsuario").addEventListener("submit", e => {
+            e.preventDefault();
+            const usuario = document.getElementById("nuevoUsuario").value;
+            const rol = document.getElementById("nuevoRol").value;
+            const tabla = document.getElementById("tablaUsuarios");
+            const id = tabla.rows.length + 1;
+
+            const fila = document.createElement("tr");
+            fila.innerHTML = `
+        <td>${id}</td>
+        <td>${usuario}</td>
+        <td>${rol}</td>
+        <td>
+          <button class="btn btn-editar"><i class="bi bi-pencil"></i></button>
+        </td>
+      `;
+            tabla.appendChild(fila);
+            document.getElementById("formNuevoUsuario").reset();
+        });
+
+        // Abrir edición de usuario
+        document.addEventListener("click", e => {
+            if (e.target.closest(".btn-editar")) {
+                const fila = e.target.closest("tr");
+                document.getElementById("modUsuarioId").value = fila.cells[0].textContent;
+                document.getElementById("modNombreUsuario").value = fila.cells[1].textContent;
+                document.getElementById("modPasswordUsuario").value = ""; // No mostrar contraseña real
+                document.getElementById("modRolUsuario").value = fila.cells[2].textContent;
+                document.getElementById("modificarUsuarioSection").classList.remove("hidden");
+            }
+        });
+
+        // Cancelar edición
+        document.getElementById("btnCancelarEdicion").addEventListener("click", () => {
+            document.getElementById("modificarUsuarioSection").classList.add("hidden");
+        });
+
+        // Guardar cambios (simulado)
+        document.getElementById("formModificarUsuario").addEventListener("submit", e => {
+            e.preventDefault();
+            alert("Usuario actualizado (simulado)");
+            document.getElementById("modificarUsuarioSection").classList.add("hidden");
+        });
+
+        // Deshabilitar usuario (simulado)
+        document.getElementById("btnEliminarUsuario").addEventListener("click", () => {
+            if (confirm("¿Deshabilitar este usuario?")) {
+                alert("Usuario deshabilitado (simulado)");
+                document.getElementById("modificarUsuarioSection").classList.add("hidden");
+            }
+        });
+    </script>
+</body>
+
+</html>

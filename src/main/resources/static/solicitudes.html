@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Solicitudes - SIExT</title>
+    <link href="icons/bootstrap-icons.css" rel="stylesheet">
+    <link rel="icon" href="Logo del sistema SIExT.png">
+    <style>
+        :root {
+            --negro: rgb(0, 0, 0);
+            --gris-oscuro: rgb(33, 37, 41);
+            --blanco: rgb(255, 255, 255);
+            --azul: rgb(0, 123, 255);
+            --fondo: rgb(241, 244, 249);
+            --texto-secundario: rgb(116, 119, 117);
+            --azul-profundo: rgb(0, 102, 204);
+            --rojo: #dc3545;
+            --rojo-profundo: #a61b26;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        body {
+            background-color: var(--fondo);
+            color: var(--gris-oscuro);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--gris-oscuro);
+            padding: 1rem 2rem;
+            color: var(--blanco);
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        main {
+            padding: 2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        section {
+            background: var(--blanco);
+            padding: 1.5rem;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.4rem;
+        }
+
+        input,
+        select,
+        textarea {
+            padding: 0.6rem;
+            width: 100%;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: var(--azul);
+            color: var(--blanco);
+            padding: 0.7rem 1.2rem;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.25s ease;
+            border: none;
+            height: 42px;
+        }
+
+        .btn:hover {
+            background-color: var(--azul-profundo);
+        }
+
+        .btn-danger {
+            background-color: var(--rojo);
+        }
+
+        .btn-danger:hover {
+            background-color: var(--rojo-profundo);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th,
+        td {
+            padding: 0.8rem;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background-color: var(--gris-oscuro);
+            color: var(--blanco);
+            cursor: pointer;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.8rem;
+            color: var(--texto-secundario);
+        }
+
+        .cabecera {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            /* margin-bottom: 1rem; */
+        }
+    </style>
+</head>
+
+<body>
+    <header>SIExT | Solicitudes</header>
+    <main>
+        <section class="cabecera">
+            <h2>Acciones rápidas</h2>
+            <div>
+                <a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver a Panel</a>
+                <a href="inventario.html" class="btn"><i class="bi bi-card-list"></i></i>Listar Inventario</a>
+                <a href="informes.html" class="btn"><i class="bi bi-file-earmark-text"></i>Generar Informes</a>
+            </div>
+        </section>
+        <section>
+            <h2>Registrar nueva solicitud</h2>
+            <form id="solicitudForm">
+                <label>Fecha</label>
+                <input type="date" id="fecha" required>
+                <label>Legajo solicitante</label>
+                <input type="text" id="legajo" required>
+                <label>Ubicación destino</label>
+                <input type="text" id="ubicacion" required>
+                <label>Estado</label>
+                <select id="estado" required>
+                    <option>Pendiente de aprobación</option>
+                    <option>Aprobada</option>
+                    <option>No aprobada</option>
+                    <option>Completada</option>
+                </select>
+                <label>Descripción</label>
+                <textarea id="descripcion" rows="4" required></textarea>
+                <button type="submit" class="btn"><i class="bi bi-plus-circle"></i>Registrar</button>
+            </form>
+        </section>
+
+        <section>
+            <h2>Solicitudes registradas</h2>
+            <table id="tablaSolicitudes">
+                <thead>
+                    <tr>
+                        <th>N° Solicitud</th>
+                        <th>Fecha</th>
+                        <th>Legajo</th>
+                        <th>Ubicación</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+
+        <section id="modificarSolicitudSection" class="hidden">
+            <h2>Editar solicitud</h2>
+            <form id="modificarSolicitudForm">
+                <input type="hidden" id="modSolicitudId">
+                <label>Fecha</label>
+                <input type="date" id="modFecha" required>
+                <label>Legajo solicitante</label>
+                <input type="text" id="modLegajo" required>
+                <label>Ubicación destino</label>
+                <input type="text" id="modUbicacion" required>
+                <label>Estado</label>
+                <select id="modEstado" required>
+                    <option>Pendiente de aprobación</option>
+                    <option>Aprobada</option>
+                    <option>No aprobada</option>
+                    <option>Completada</option>
+                </select>
+                <label>Descripción</label>
+                <textarea id="modDescripcion" rows="4" required></textarea>
+                <div class="actions">
+                    <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
+                    <button type="button" class="btn" id="cancelarBtn"><i class="bi bi-x-circle"></i>Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="eliminarSolicitudBtn"><i
+                            class="bi bi-trash"></i>Eliminar</button>
+                </div>
+            </form>
+        </section>
+
+    </main>
+
+    <footer>SIExT | 2025</footer>
+
+    <script>
+        if (!localStorage.getItem("solicitudes")) {
+            const solicitudesIniciales = [
+                {
+                    id: 1,
+                    fecha: "2025-06-15",
+                    legajo: "12345",
+                    ubicacion: "GAME",
+                    estado: "Pendiente de aprobación",
+                    descripcion: "5 resmas A4, 2 toners HP 85A"
+                },
+                {
+                    id: 2,
+                    fecha: "2025-06-16",
+                    legajo: "67890",
+                    ubicacion: "Parque Industrial",
+                    estado: "Aprobada",
+                    descripcion: "20 metros cable 2,5mm, 5 tubos LED 18W"
+                },
+                {
+                    id: 3,
+                    fecha: "2025-06-17",
+                    legajo: "54321",
+                    ubicacion: "Bedelía",
+                    estado: "Aprobada",
+                    descripcion: "1 Mouse"
+                }
+            ];
+            localStorage.setItem("solicitudes", JSON.stringify(solicitudesIniciales));
+        }
+    </script>
+    <script>
+        function renderSolicitudes() {
+            const solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
+            const tbody = document.querySelector("#tablaSolicitudes tbody");
+            tbody.innerHTML = "";
+            solicitudes.forEach(sol => {
+                const fila = document.createElement("tr");
+                fila.innerHTML = `
+                    <td>${sol.id}</td>
+                    <td>${sol.fecha}</td>
+                    <td>${sol.legajo}</td>
+                    <td>${sol.ubicacion}</td>
+                    <td>${sol.estado}</td>
+                    <td>
+                        <button class="btn" onclick="editarSolicitud(${sol.id})"><i class="bi bi-pencil"></i></button>
+                    </td>`;
+                tbody.appendChild(fila);
+            });
+        }
+
+        document.getElementById("solicitudForm").addEventListener("submit", e => {
+            e.preventDefault();
+            const solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
+            solicitudes.push({
+                id: Date.now(),
+                fecha: document.getElementById("fecha").value,
+                legajo: document.getElementById("legajo").value.trim(),
+                ubicacion: document.getElementById("ubicacion").value.trim(),
+                estado: document.getElementById("estado").value,
+                descripcion: document.getElementById("descripcion").value.trim()
+            });
+            localStorage.setItem("solicitudes", JSON.stringify(solicitudes));
+            alert("Solicitud registrada correctamente");
+            e.target.reset();
+            renderSolicitudes();
+        });
+
+        function editarSolicitud(id) {
+            const solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
+            const sol = solicitudes.find(s => s.id === id);
+            if (!sol) return;
+            document.getElementById("modSolicitudId").value = sol.id;
+            document.getElementById("modFecha").value = sol.fecha;
+            document.getElementById("modLegajo").value = sol.legajo;
+            document.getElementById("modUbicacion").value = sol.ubicacion;
+            document.getElementById("modEstado").value = sol.estado;
+            document.getElementById("modDescripcion").value = sol.descripcion;
+            document.getElementById("modificarSolicitudSection").classList.remove("hidden");
+        }
+
+        document.getElementById("modificarSolicitudForm").addEventListener("submit", e => {
+            e.preventDefault();
+            const id = +document.getElementById("modSolicitudId").value;
+            const solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
+            const sol = solicitudes.find(s => s.id === id);
+            if (!sol) return;
+            sol.fecha = document.getElementById("modFecha").value;
+            sol.legajo = document.getElementById("modLegajo").value.trim();
+            sol.ubicacion = document.getElementById("modUbicacion").value.trim();
+            sol.estado = document.getElementById("modEstado").value;
+            sol.descripcion = document.getElementById("modDescripcion").value.trim();
+            localStorage.setItem("solicitudes", JSON.stringify(solicitudes));
+            document.getElementById("modificarSolicitudSection").classList.add("hidden");
+            renderSolicitudes();
+        });
+
+        document.getElementById("eliminarSolicitudBtn").addEventListener("click", () => {
+            const id = +document.getElementById("modSolicitudId").value;
+            if (!confirm("¿Eliminar esta solicitud?")) return;
+            let solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
+            solicitudes = solicitudes.filter(s => s.id !== id);
+            localStorage.setItem("solicitudes", JSON.stringify(solicitudes));
+            document.getElementById("modificarSolicitudSection").classList.add("hidden");
+            renderSolicitudes();
+        });
+
+        renderSolicitudes();
+    </script>
+</body>
+
+</html>

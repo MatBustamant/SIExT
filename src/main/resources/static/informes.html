@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Informes - SIExT</title>
+  <link href="icons/bootstrap-icons.css" rel="stylesheet">
+  <link rel="icon" href="Logo del sistema SIExT.png">
+
+  <style>
+    :root {
+      --negro: #000;
+      --gris-oscuro: #212529;
+      --blanco: #fff;
+      --azul: #007bff;
+      --azul-profundo: #0066cc;
+      --gris-claro: #666;
+      --fondo: #f1f4f9;
+      --texto-secundario: #747775;
+      --modificar-bg: #e9f0ff;
+      --modificar-border: #8ab4f8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--fondo);
+      color: var(--gris-oscuro);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background-color: var(--gris-oscuro);
+      color: var(--blanco);
+      padding: 1rem 2rem;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+
+    main {
+      padding: 2rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    h2 {
+      margin-bottom: 1rem;
+    }
+
+    section {
+      background: var(--blanco);
+      padding: 1.5rem;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: var(--azul);
+      color: var(--blanco);
+      padding: 0.7rem 1.2rem;
+      border-radius: 5px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.25s ease;
+      border: none;
+    }
+
+    .btn:hover {
+      background-color: var(--azul-profundo);
+    }
+
+    .btn i {
+      font-size: 1rem;
+    }
+
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+
+    .cabecera {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      margin-top: 1rem;
+    }
+
+    label {
+      font-weight: 600;
+    }
+
+    input[type="date"] {
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.8rem;
+      color: var(--texto-secundario);
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>SIExT | Informes</header>
+
+  <main>
+
+    <section class="cabecera">
+      <h2>Generar Informes</h2>
+      <a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver al Panel</a>
+    </section>
+
+    <section>
+      <div class="btn-group">
+        <a href="#" class="btn"><i class="bi bi-card-list"></i>Listado completo de inventario</a>
+        <a href="#" class="btn" id="btnIngresos"><i class="bi bi-box-arrow-in-down-left"></i></i>Total de ingresos en un
+          período</a>
+        <form id="formIngresos" style="display:none;">
+          <label>Desde:</label>
+          <input type="date" id="desde" required>
+          <label>Hasta:</label>
+          <input type="date" id="hasta" required>
+          <button type="submit" class="btn"><i class="bi bi-search"></i>Ver Informe</button>
+        </form>
+        <a href="informe_minimo.html" class="btn"><i class="bi bi-exclamation-triangle"></i>Inventario bajo mínimo de
+          reposición</a>
+        <a href="#" class="btn"><i class="bi bi-file-bar-graph"></i>Total de solicitudes por departamento</a>
+        <a href="#" class="btn"><i class="bi bi-box-arrow-up-right"></i>Total de salidas por departamento</a>
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer>SIExT | 2025</footer>
+
+  <script>
+    const btnIngresos = document.getElementById("btnIngresos");
+    const formIngresos = document.getElementById("formIngresos");
+
+    btnIngresos.addEventListener("click", () => {
+      formIngresos.style.display = formIngresos.style.display === "none" ? "flex" : "none";
+      btnIngresos.style.backgroundColor = formIngresos.style.display === "none" ? "var(--azul)" : "var(--azul-profundo)";
+    });
+
+    document.getElementById("formIngresos").onsubmit = e => {
+      e.preventDefault();
+      const desde = document.getElementById("desde").value;
+      const hasta = document.getElementById("hasta").value;
+      if (!desde || !hasta) {
+        alert("Seleccioná ambas fechas.");
+        return;
+      }
+      window.location.href = `informe_ingresos.html?desde=${desde}&hasta=${hasta}`;
+    };
+  </script>
+
+</body>
+
+</html>

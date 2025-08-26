@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Informe | Inventario Bajo Mínimo</title>
+  <link href="icons/bootstrap-icons.css" rel="stylesheet">
+  <link rel="icon" href="Logo del sistema SIExT.png">
+  <style>
+    :root {
+      --gris-oscuro: rgb(33, 37, 41);
+      --blanco: rgb(255, 255, 255);
+      --fondo: rgb(241, 244, 249);
+      --azul: rgb(0, 123, 255);
+      --texto-secundario: rgb(116, 119, 117);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--fondo);
+      color: var(--gris-oscuro);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .fecha {
+      font-size: 0.9rem;
+      color: var(--texto-secundario);
+      margin-bottom: 1rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: var(--azul);
+      color: var(--blanco);
+      padding: 0.6rem 1.1rem;
+      border-radius: 5px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.25s ease;
+      border: none;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn:hover {
+      background-color: rgb(0, 102, 204);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    th, td {
+      padding: 0.7rem;
+      border: 1px solid #ddd;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+
+    th {
+      background-color: var(--gris-oscuro);
+      color: var(--blanco);
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    @media print {
+      .btn, footer {
+        display: none !important;
+      }
+
+      body {
+        background: var(--blanco);
+        padding: 0;
+      }
+
+      h1 {
+        margin-top: 0;
+      }
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.8rem;
+      color: var(--texto-secundario);
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Informe de Reposición</h1>
+  <div class="fecha">Generado: <span id="fechaActual"></span></div>
+
+  <button class="btn" onclick="window.print()"><i class="bi bi-printer"></i>Imprimir</button>
+  <a href="informes.html" class="btn"><i class="bi bi-arrow-left"></i>Volver a Informes</a>
+
+  <table id="tablaMinimos">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Producto</th>
+        <th>Clase</th>
+        <th>Categoría</th>
+        <th>Stock</th>
+        <th>Mínimo</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <footer>SIExT | 2025</footer>
+
+  <script>
+    document.getElementById("fechaActual").textContent = new Date().toLocaleString();
+
+    const productos = JSON.parse(localStorage.getItem("productos")) || [];
+    const tbody = document.querySelector("#tablaMinimos tbody");
+
+    productos.forEach(p => {
+      if (p.stock < p.minimoReposicion) {
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+          <td>${p.id}</td>
+          <td>${p.nombre}</td>
+          <td>${p.clase}</td>
+          <td>${p.categoria}</td>
+          <td>${p.stock}</td>
+          <td>${p.minimoReposicion}</td>
+        `;
+        tbody.appendChild(fila);
+      }
+    });
+
+    if (tbody.rows.length === 0) {
+      const fila = document.createElement("tr");
+      fila.innerHTML = `<td colspan="8" style="text-align:center; padding:1rem;">No hay productos bajo mínimo actualmente.</td>`;
+      tbody.appendChild(fila);
+    }
+  </script>
+
+</body>
+
+</html>
