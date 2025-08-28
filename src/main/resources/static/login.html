@@ -6,34 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Iniciar sesión - SIExT </title>
     <link rel="icon" href="images\icon.png">
+    <link rel="stylesheet" href="css/global.css" />
     <style>
         :root {
-            --negro: rgb(0, 0, 0);
-            --gris-oscuro: rgb(33, 37, 41);
-            --blanco: rgb(255, 255, 255);
-            --azul: rgb(0, 123, 255);
-            --gris-claro: rgb(102, 102, 102);
-            --fondo: rgb(241, 244, 249);
-            --borde-input: rgb(153, 153, 153);
-            --fondo-input: rgb(249, 249, 249);
-            --texto-secundario: rgb(116, 119, 117);
-            --azul-profundo: rgb(0, 102, 204);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --borde-input: #999999;
+            --fondo-input: #f9f9f9;
         }
 
         body {
-            background-color: var(--fondo);
-            display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            color: var(--gris-oscuro);
         }
 
         .login-container {
@@ -42,20 +25,6 @@
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             width: 320px;
-        }
-
-        h1 {
-            text-align: center;
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            color: var(--gris-oscuro);
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            font-size: 0.9rem;
         }
 
         input[type="text"],
@@ -94,11 +63,8 @@
             background-color: var(--azul-profundo);
         }
 
-        .footer-text {
-            margin-top: 1rem;
-            text-align: center;
-            font-size: 0.8rem;
-            color: var(--texto-secundario);
+        .footer {
+            padding: 1rem 0 0 0;
         }
     </style>
 </head>
@@ -116,7 +82,7 @@
 
             <button type="submit">Iniciar sesión</button>
         </form>
-        <div class="footer-text"> SIExT </div>
+        <div class="footer"> SIExT </div>
     </div>
 
     <script>

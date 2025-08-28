@@ -1,0 +1,33 @@
+    body {
+      padding: 2rem;
+    }
+
+    .fecha, .periodo {
+      font-size: 0.9rem;
+      color: var(--texto-secundario);
+      margin-bottom: 1rem;
+    }
+
+    .btn {
+      margin-bottom: 1.5rem;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    .grupo-clase {
+      background-color: #e5e5e5 !important;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    @media print {
+      .btn, footer {
+        display: none !important;
+      }
+      body {
+        background: var(--blanco);
+        padding: 0;
+      }
+    }

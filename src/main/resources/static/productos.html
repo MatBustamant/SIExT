@@ -6,130 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Agregar Productos - SIExT</title>
     <link href="icons/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css" />
     <link rel="icon" href="images\icon.png">
     <style>
         :root {
-            --negro: #000;
-            --gris-oscuro: #212529;
-            --blanco: #fff;
-            --azul: #007bff;
-            --azul-profundo: #0066cc;
-            --gris-claro: #666;
-            --fondo: #f1f4f9;
-            --texto-secundario: #747775;
-            --rojo: #dc3545;
-            --rojo-profundo: #a61b26;
             --modificar-bg: #e9f0ff;
             --modificar-border: #8ab4f8;
         }
 
         #grupoMinimoReposicion {
             display: block;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background-color: var(--fondo);
-            color: var(--gris-oscuro);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        header {
-            background-color: var(--gris-oscuro);
-            color: var(--blanco);
-            padding: 1rem 2rem;
-            font-size: 1.3rem;
-            font-weight: 600;
-        }
-
-        main {
-            flex: 1;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        h2 {
-            margin-bottom: 1rem;
-        }
-
-        section {
-            background: var(--blanco);
-            padding: 1.5rem;
-            border-radius: 6px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        label {
-            font-weight: 600;
-            margin-bottom: 0.4rem;
-            display: block;
-        }
-
-        input,
-        select {
-            padding: 0.6rem;
-            width: 100%;
-            margin-bottom: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.7rem 1.2rem;
-            height: 42px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            background-color: var(--azul);
-            color: var(--blanco);
-            transition: background 0.25s ease;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-top: 1.5rem;
-        }
-
-        .btn:hover {
-            background-color: var(--azul-profundo);
-        }
-
-        .btn-danger {
-            background-color: var(--rojo);
-        }
-
-        .btn-danger:hover {
-            background-color: var(--rojo-profundo);
-        }
-
-        .cabecera {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
         }
 
         .modificar-container {
@@ -139,13 +25,6 @@
             border: 2px solid var(--modificar-border);
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(27, 84, 255, 0.15);
-        }
-
-        footer {
-            text-align: center;
-            padding: 1rem;
-            font-size: 0.8rem;
-            color: var(--texto-secundario);
         }
 
         #datosProductoEncontrado {
@@ -162,12 +41,9 @@
             margin-bottom: 1rem;
         }
 
-        .acciones-producto {
+        .actions {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.7rem;
-            justify-content: flex-start;
-            margin-bottom: 1.5rem;
         }
     </style>
 </head>
@@ -241,7 +117,7 @@
                 <div id="datosProductoEncontrado" style="margin-bottom: 1rem; line-height: 1.5;"></div>
 
                 <!-- Botones de acción -->
-                <div class="acciones-producto">
+                <div class="actions">
                     <button type="button" class="btn" id="btnEditarDatos"><i class="bi bi-pencil-square"></i>Modificar
                         Datos</button>
                     <button type="button" class="btn" id="btnAgregarStock"><i class="bi bi-plus-circle"></i>Agregar
@@ -268,7 +144,7 @@
                         <label>Mínimo reposición</label>
                         <input type="number" id="modMinimo" min="0" required>
                     </div>
-                    <div>
+                    <div class="actions">
                         <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
                         <button type="button" class="btn" id="cancelarEdicionBtn"><i
                                 class="bi bi-x-circle"></i>Cancelar</button>
@@ -281,7 +157,7 @@
                         <label>Agregar stock</label>
                         <input type="number" id="modStockAgregar" min="1" value="1" required>
                     </div>
-                    <div>
+                    <div class="actions">
                         <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
                         <button type="button" class="btn" id="cancelarIngresoBtn"><i
                                 class="bi bi-x-circle"></i>Cancelar</button>
@@ -665,12 +541,12 @@
     <script>
         function ocultarInfoYAcciones() {
             document.getElementById("datosProductoEncontrado").style.display = "none";
-            document.querySelector(".acciones-producto").style.display = "none";
+            document.querySelector(".actions").style.display = "none";
         }
 
         function mostrarInfoYAcciones() {
             document.getElementById("datosProductoEncontrado").style.display = "grid";
-            document.querySelector(".acciones-producto").style.display = "flex";
+            document.querySelector(".actions").style.display = "flex";
             document.getElementById("tituloProductoEncontrado").textContent = "Producto encontrado";
         }
     </script>
