@@ -1,0 +1,23 @@
+[33mcommit 2fcbba123cfa39d92daafa3e860dc46e284260e9[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mramaSecundaria[m[33m)[m
+Author: Gero <gerojpec@gmail.com>
+Date:   Mon Sep 1 10:41:32 2025 -0300
+
+    Creacion de todas las clases con sus constructores y geters y seters
+
+[33mcommit 851aafdf5f11e81786c321892e587234160ea382[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m
+Author: MatBustamant <matexequiel.2012@gmail.com>
+Date:   Tue Aug 26 12:00:13 2025 -0300
+
+    Estado inicial de proyecto
+
+[33mcommit c82600c0039183490be485595689df433d0a3a33[m
+Author: Matias Exequiel Bustamante <93621463+MatBustamant@users.noreply.github.com>
+Date:   Tue Aug 26 10:26:32 2025 -0300
+
+    Update .gitignore
+
+[33mcommit a8a9e61c5cab3753db769331026c648268de47ec[m
+Author: Matias Exequiel Bustamante <93621463+MatBustamant@users.noreply.github.com>
+Date:   Tue Aug 26 10:25:37 2025 -0300
+
+    Initial commit

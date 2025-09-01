@@ -1,15 +1,15 @@
-package PaqueteDeEntidades;
+package com.grupocapa8.siext.DTO;
 
 /**
  *
  * @author geroj
  */
-public class Bien {
+public class BienDTO {
     private String UbicacionBien;
     private String EstadoBien;
     private String NombreCatBienes;
 
-    public Bien(String UbicacionBien, String EstadoBien, String NombreCatBienes) {
+    public BienDTO(String UbicacionBien, String EstadoBien, String NombreCatBienes) {
         this.UbicacionBien = UbicacionBien;
         this.EstadoBien = EstadoBien;
         this.NombreCatBienes = NombreCatBienes;

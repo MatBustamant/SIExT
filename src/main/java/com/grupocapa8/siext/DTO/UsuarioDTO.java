@@ -1,15 +1,15 @@
-package PaqueteDeEntidades;
+package com.grupocapa8.siext.DTO;
 
 /**
  *
  * @author geroj
  */
-public class Usuario {
+public class UsuarioDTO {
     private String Nombre;
     private String Contraseña;
     private String Rol;
 
-    public Usuario(String Nombre, String Contraseña, String Rol) {
+    public UsuarioDTO(String Nombre, String Contraseña, String Rol) {
         this.Nombre = Nombre;
         this.Contraseña = Contraseña;
         this.Rol = Rol;

@@ -1,17 +1,17 @@
-package PaqueteDeEntidades;
+package com.grupocapa8.siext.DTO;
 
 /**
  *
  * @author geroj
  */
-public class Ingreso {
+public class IngresoDTO {
     private int ID_Ingreso;
     private String Fecha_Ingreso;
     private String Hora_Ingreso;
     private int Cantidad;
     private int Producto_Ingresado;
 
-    public Ingreso(int ID_Ingreso, String Fecha_Ingreso, String Hora_Ingreso, int Cantidad, int Producto_Ingresado) {
+    public IngresoDTO(int ID_Ingreso, String Fecha_Ingreso, String Hora_Ingreso, int Cantidad, int Producto_Ingresado) {
         this.ID_Ingreso = ID_Ingreso;
         this.Fecha_Ingreso = Fecha_Ingreso;
         this.Hora_Ingreso = Hora_Ingreso;

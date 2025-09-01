@@ -1,17 +1,17 @@
-package PaqueteDeEntidades;
+package com.grupocapa8.siext.DTO;
 
 /**
  *
  * @author geroj
  */
-public class Solicitud {
+public class SolicitudDTO {
     private int numSolicitud;
     private String FechaInicioSolicitud;
     private String DestinoProductos;
     private String Estado;
     private String LegSolicitante;
 
-    public Solicitud(int numSolicitud, String FechaInicioSolicitud, String DestinoProductos, String Estado, String LegSolicitante) {
+    public SolicitudDTO(int numSolicitud, String FechaInicioSolicitud, String DestinoProductos, String Estado, String LegSolicitante) {
         this.numSolicitud = numSolicitud;
         this.FechaInicioSolicitud = FechaInicioSolicitud;
         this.DestinoProductos = DestinoProductos;

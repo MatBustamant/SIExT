@@ -1,10 +1,10 @@
-package PaqueteDeEntidades;
+package com.grupocapa8.siext.DTO;
 
 /**
  *
  * @author geroj
  */
-public class Salida {
+public class SalidaDTO {
     private int IdSalidaProducto;
     private String LegRetirador;
     private String DestinoProducto;
@@ -12,7 +12,7 @@ public class Salida {
     private String HorarioSalida;
     private int NumSolicitudAsociado;
 
-    public Salida(int IdSalidaProducto, String LegRetirador, String DestinoProducto, String FechaSalida, String HorarioSalida, int NumSolicitudAsociado) {
+    public SalidaDTO(int IdSalidaProducto, String LegRetirador, String DestinoProducto, String FechaSalida, String HorarioSalida, int NumSolicitudAsociado) {
         this.IdSalidaProducto = IdSalidaProducto;
         this.LegRetirador = LegRetirador;
         this.DestinoProducto = DestinoProducto;

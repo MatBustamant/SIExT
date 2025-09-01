@@ -1,17 +1,17 @@
-package PaqueteDeEntidades;
+package com.grupocapa8.siext.DTO;
 
 /**
  *
  * @author geroj
  */
-public class EventoTrazabilidad {
+public class EventoTrazabilidadDTO {
     private int IdEvento;
     private String FechaEvento;
     private String HorarioEvento;
     private int BienAsociado;
     private String TipoEvento;
 
-    public EventoTrazabilidad(int IdEvento, String FechaEvento, String HorarioEvento, int BienAsociado, String TipoEvento) {
+    public EventoTrazabilidadDTO(int IdEvento, String FechaEvento, String HorarioEvento, int BienAsociado, String TipoEvento) {
         this.IdEvento = IdEvento;
         this.FechaEvento = FechaEvento;
         this.HorarioEvento = HorarioEvento;

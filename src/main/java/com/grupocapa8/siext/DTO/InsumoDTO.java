@@ -1,15 +1,15 @@
-package PaqueteDeEntidades;
+package com.grupocapa8.siext.DTO;
 
 /**
  *
  * @author geroj
  */
-public class Insumo {
+public class InsumoDTO {
     private int Stock;
     private int MinReposicion;
     private String NombreCatInsumo;
 
-    public Insumo(int Stock, int MinReposicion, String NombreCatInsumo) {
+    public InsumoDTO(int Stock, int MinReposicion, String NombreCatInsumo) {
         this.Stock = Stock;
         this.MinReposicion = MinReposicion;
         this.NombreCatInsumo = NombreCatInsumo;

@@ -1,14 +1,14 @@
-package PaqueteDeEntidades;
+package com.grupocapa8.siext.DTO;
 
 /**
  *
  * @author geroj
  */
-public class CategoriaBien {
+public class CategoriaBienDTO {
     private int MinReposicion;
     private int Stock;
 
-    public CategoriaBien(int MinReposicion, int Stock) {
+    public CategoriaBienDTO(int MinReposicion, int Stock) {
         this.MinReposicion = MinReposicion;
         this.Stock = Stock;
     }

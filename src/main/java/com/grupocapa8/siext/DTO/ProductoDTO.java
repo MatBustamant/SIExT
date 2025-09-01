@@ -1,12 +1,12 @@
-package PaqueteDeEntidades;
+package com.grupocapa8.siext.DTO;
 
-public class Producto {
+public class ProductoDTO {
 
     private int IdProducto;
     private String Nombre;
     private String ClaseProducto;
 
-    public Producto(int Id, String Nom, String ClaseP) {
+    public ProductoDTO(int Id, String Nom, String ClaseP) {
         IdProducto = Id;
         Nombre = Nom;
         ClaseProducto = ClaseP;

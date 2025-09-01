@@ -1,13 +1,13 @@
-package PaqueteDeEntidades;
+package com.grupocapa8.siext.DTO;
 
 /**
  *
  * @author geroj
  */
-public class CategoriaInsumo {
+public class CategoriaInsumoDTO {
     private String ClaseInsumo;
 
-    public CategoriaInsumo(String ClaseInsumo) {
+    public CategoriaInsumoDTO(String ClaseInsumo) {
         this.ClaseInsumo = ClaseInsumo;
     }
 
