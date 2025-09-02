@@ -39,14 +39,14 @@ public class BienService {
         if (!bienDAO.BuscarBien(idBien)){
             throw new IllegalArgumentException("No existe el Bien");
         }
-        com.grupocapa8.siext.DTO.BienDTO dto = bienDAO.obtenerBien(idBien);
+        BienDTO dto = bienDAO.obtenerBien(idBien);
         boolean V = confirmacionEliminarBien(dto); //enviando el dto a la capa de presentacion para que lo muestre y me devuelva verdadero o falso para continuar con la eliminacion
         if(V){
             bienDAO.eliminarBien(idBien);
         }   
     } 
     public void validarUbicacionBien(String ubi){
-         if (ubi== null ||ubi.isBlank()){
+        if (ubi== null ||ubi.isBlank()){
              throw new IllegalArgumentException("La ubicacion del bien es obligatoria, no debe estar vacio");
         }
         if (ubi.length() < 3 || ubi.length() > 80) {
