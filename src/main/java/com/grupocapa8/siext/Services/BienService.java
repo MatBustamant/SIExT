@@ -15,7 +15,7 @@ public class BienService {
         validarUbicacionBien(dto.getUbicacionBien());
         claseProducto(dto.getClaseProducto());
         // Convertir DTO a entidad y guardarlo en BD
-        ConvertirGuardarDTO(dto);
+        bienDAO.guardar(dto);
     } 
     
     public void modificarBien(int idBien){
@@ -33,7 +33,7 @@ public class BienService {
         }
         
         // Convertir DTO a entidad y guardarlo en BD
-        ConvertirGuardarDTO(dto);
+        bienDAO.guardar(dto);
     } 
     public void eliminarBien(int idBien){
         if (!bienDAO.BuscarBien(idBien)){
@@ -68,17 +68,5 @@ public class BienService {
         if (CP== null || CP.isBlank()){
             throw new IllegalArgumentException("La clase del producto es obligatoria, no debe estar vacio");
         }
-    }
-    public void ConvertirGuardarDTO(BienDTO dto){
-        EntidadBien Bien = new EntidadBien();
-        Bien.setNombre(dto.getNombre());
-        Bien.setClaseProducto(dto.getClaseProducto());
-        Bien.setEstadoBien(dto.getEstadoBien());
-        Bien.setNombreCatBien(dto.getNombreCatBienes());
-        Bien.setUbicacionBien(dto.getUbicacionBien());
-
-        // Guardar en BD
-        bienDAO.guardar(Bien);
-    }
-    
+    }  
 }
