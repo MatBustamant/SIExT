@@ -1,4 +1,4 @@
-package com.grupocapa8.siext.DTO.Services;
+package com.grupocapa8.siext.Services;
 
 /**
  *
