@@ -5,26 +5,16 @@ package com.grupocapa8.siext.DTO;
  * @author geroj
  */
 public class IngresoDTO {
-    private int ID_Ingreso;
     private String Fecha_Ingreso;
     private String Hora_Ingreso;
     private int Cantidad;
     private int Producto_Ingresado;
 
-    public IngresoDTO(int ID_Ingreso, String Fecha_Ingreso, String Hora_Ingreso, int Cantidad, int Producto_Ingresado) {
-        this.ID_Ingreso = ID_Ingreso;
+    public IngresoDTO(String Fecha_Ingreso, String Hora_Ingreso, int Cantidad, int Producto_Ingresado) {
         this.Fecha_Ingreso = Fecha_Ingreso;
         this.Hora_Ingreso = Hora_Ingreso;
         this.Cantidad = Cantidad;
         this.Producto_Ingresado = Producto_Ingresado;
-    }
-
-    public int getID_Ingreso() {
-        return ID_Ingreso;
-    }
-
-    public void setID_Ingreso(int ID_Ingreso) {
-        this.ID_Ingreso = ID_Ingreso;
     }
 
     public String getFecha_Ingreso() {

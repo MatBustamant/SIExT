@@ -5,26 +5,16 @@ package com.grupocapa8.siext.DTO;
  * @author geroj
  */
 public class EventoTrazabilidadDTO {
-    private int IdEvento;
     private String FechaEvento;
     private String HorarioEvento;
     private int BienAsociado;
     private String TipoEvento;
 
-    public EventoTrazabilidadDTO(int IdEvento, String FechaEvento, String HorarioEvento, int BienAsociado, String TipoEvento) {
-        this.IdEvento = IdEvento;
+    public EventoTrazabilidadDTO(String FechaEvento, String HorarioEvento, int BienAsociado, String TipoEvento) {
         this.FechaEvento = FechaEvento;
         this.HorarioEvento = HorarioEvento;
         this.BienAsociado = BienAsociado;
         this.TipoEvento = TipoEvento;
-    }
-
-    public int getIdEvento() {
-        return IdEvento;
-    }
-
-    public void setIdEvento(int IdEvento) {
-        this.IdEvento = IdEvento;
     }
 
     public String getFechaEvento() {

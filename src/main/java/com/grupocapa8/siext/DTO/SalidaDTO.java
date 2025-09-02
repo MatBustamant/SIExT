@@ -5,28 +5,18 @@ package com.grupocapa8.siext.DTO;
  * @author geroj
  */
 public class SalidaDTO {
-    private int IdSalidaProducto;
     private String LegRetirador;
     private String DestinoProducto;
     private String FechaSalida;
     private String HorarioSalida;
     private int NumSolicitudAsociado;
 
-    public SalidaDTO(int IdSalidaProducto, String LegRetirador, String DestinoProducto, String FechaSalida, String HorarioSalida, int NumSolicitudAsociado) {
-        this.IdSalidaProducto = IdSalidaProducto;
+    public SalidaDTO(String LegRetirador, String DestinoProducto, String FechaSalida, String HorarioSalida, int NumSolicitudAsociado) {
         this.LegRetirador = LegRetirador;
         this.DestinoProducto = DestinoProducto;
         this.FechaSalida = FechaSalida;
         this.HorarioSalida = HorarioSalida;
         this.NumSolicitudAsociado = NumSolicitudAsociado;
-    }
-
-    public int getIdSalidaProducto() {
-        return IdSalidaProducto;
-    }
-
-    public void setIdSalidaProducto(int IdSalidaProducto) {
-        this.IdSalidaProducto = IdSalidaProducto;
     }
 
     public String getLegRetirador() {
