@@ -2,61 +2,65 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Agregar Productos - SIExT</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Editar categorías - SIExT</title>
     <link href="icons/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/tablas.css">
     <link rel="icon" href="images\icon.png">
 </head>
 
 <body>
     <header>SIExT | Editar categorías</header>
 
-    <main>
-
-        <section class="cabecera">
+    <div class="default-block-container">
+        <nav>
             <h2>Acciones rápidas</h2>
-            <div>
-                <a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver a Panel</a>
-                <a href="inventario.html" class="btn"><i class="bi bi-card-list"></i></i>Listar Inventario</a>
-                <a href="productos.html" class="btn"><i class="bi bi-box-seam"></i>Gestionar Productos</a>
-            </div>
-        </section>
+            <ul>
+                <li><a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver a Panel</a></li>
+                <li><a href="inventario.html" class="btn"><i class="bi bi-card-list"></i></i>Ver Inventario</a></li>
+                <li><a href="productos.html" class="btn"><i class="bi bi-box-seam"></i>Gestionar Productos</a></li>
+            </ul>
+        </nav>
+    </div>
 
+    <main class="default-block-container">
         <!-- Formulario para agregar nueva categoría -->
         <section>
-            <div id="formAgregarCategoria" class="form-section">
-                <h2>Agregar nueva categoría</h2>
-                <form id="categoriaForm">
-                    <label>Nombre de Categoría</label>
-                    <input type="text" id="nombreCategoria" required>
-                    <label>Clase de Producto</label>
-                    <select id="claseCategoria" required>
-                        <option value="">Seleccionar</option>
-                        <option>Insumo Oficina</option>
-                        <option>Insumo Limpieza</option>
-                        <option>Insumo Eléctrico</option>
-                        <option>Bien</option>
-                    </select>
-                    <button type="submit" class="btn"><i class="bi bi-plus-circle"></i>Registrar</button>
-                </form>
-            </div>
-        </section>
-
-        <!-- Gestión de categorías -->
-        <section id="gestionCategoriasSection" class="form-section">
-            <h2>Categorías registradas</h2>
-
-            <div class="filters">
-                <input type="text" id="filterNombreCat" placeholder="Filtrar por nombre...">
-                <select id="filterClaseCat">
-                    <option value="">Todas las clases</option>
+            <h2>Agregar nueva categoría</h2>
+            <form id="categoriaForm">
+                <label>Nombre de Categoría</label>
+                <input type="text" id="nombreCategoria" required>
+                <label>Clase de Producto</label>
+                <select id="claseCategoria" required>
+                    <option value="">Seleccionar</option>
                     <option>Insumo Oficina</option>
                     <option>Insumo Limpieza</option>
                     <option>Insumo Eléctrico</option>
                     <option>Bien</option>
                 </select>
+                <button type="submit" class="btn"><i class="bi bi-plus-circle"></i>Registrar</button>
+            </form>
+        </section>
+
+        <!-- Gestión de categorías -->
+        <section>
+            <h2>Categorías registradas</h2>
+            <!-- Filtros -->
+            <div class="form-grid">
+                <div>
+                    <input type="text" id="filterNombreCat" placeholder="Filtrar por nombre...">
+                </div>
+                <div>
+                    <select id="filterClaseCat">
+                        <option value="">Todas las clases</option>
+                        <option>Insumo Oficina</option>
+                        <option>Insumo Limpieza</option>
+                        <option>Insumo Eléctrico</option>
+                        <option>Bien</option>
+                    </select>
+                </div>
             </div>
 
             <table id="tablaCategorias">
@@ -70,10 +74,11 @@
                 <tbody></tbody>
             </table>
 
-            <div class="counter" id="contadorCategorias"></div>
+            <div class="informativo" id="contadorCategorias"></div>
         </section>
 
-        <section id="modificarCategoriaSection" class="form-section hidden">
+        <!-- Formulario para modificar categoría seleccionada -->
+        <section id="modificarCategoriaSection" class="hidden">
             <h2>Actualizar categoría</h2>
             <form id="modificarCategoriaForm">
                 <input type="hidden" id="modCategoriaId">
@@ -89,8 +94,7 @@
                 </select>
                 <div class="btn-row">
                     <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
-                    <button type="button" class="btn" id="cancelarBtn"><i
-                            class="bi bi-x-circle"></i>Cancelar</button>
+                    <button type="button" class="btn" id="cancelarBtn"><i class="bi bi-x-circle"></i>Cancelar</button>
                     <button type="button" class="btn btn-danger" id="eliminarCategoriaBtn"><i
                             class="bi bi-trash"></i>Eliminar</button>
                 </div>

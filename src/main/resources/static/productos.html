@@ -2,20 +2,16 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Agregar Productos - SIExT</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gestionar productos - SIExT</title>
     <link href="icons/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/global.css">
     <link rel="icon" href="images\icon.png">
     <style>
         :root {
             --modificar-bg: #e9f0ff;
             --modificar-border: #8ab4f8;
-        }
-
-        #grupoMinimoReposicion {
-            display: block;
         }
 
         .modificar-container {
@@ -49,75 +45,77 @@
 </head>
 
 <body>
-    <header>SIExT | Gestionar Productos</header>
+    <header>SIExT | Gestionar productos</header>
 
-    <main>
-        <section class="cabecera">
+    <div class="default-block-container">
+        <nav>
             <h2>Acciones rápidas</h2>
-            <div>
-                <a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver al Panel</a>
-                <a href="inventario.html" class="btn"><i class="bi bi-card-list"></i></i>Listar Inventario</a>
-                <a href="categorias.html" class="btn"><i class="bi bi-tags"></i>Editar Categorías</a>
-            </div>
-        </section>
+            <ul>
+                <li><a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver al Panel</a></li>
+                <li><a href="inventario.html" class="btn"><i class="bi bi-card-list"></i></i>Listar Inventario</a></li>
+                <li><a href="categorias.html" class="btn"><i class="bi bi-tags"></i>Editar Categorías</a></li>
+            </ul>
+        </nav>
+    </div>
 
+    <main class="default-block-container">
+        <!-- Formulario registrar producto nuevo -->
         <section>
             <h2>Registrar producto nuevo</h2>
-            <form id="productoForm" class="form-grid">
-                <div>
-                    <label>Clase</label>
-                    <select id="claseProducto" required>
-                        <option value="">Seleccionar</option>
-                        <option>Insumo Oficina</option>
-                        <option>Insumo Limpieza</option>
-                        <option>Insumo Eléctrico</option>
-                        <option>Bien</option>
-                    </select>
+            <form id="productoForm">
+                <div class="form-grid">
+                    <div>
+                        <label>Clase</label>
+                        <select id="claseProducto" required>
+                            <option value="">Seleccionar</option>
+                            <option>Insumo Oficina</option>
+                            <option>Insumo Limpieza</option>
+                            <option>Insumo Eléctrico</option>
+                            <option>Bien</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Categoría</label>
+                        <select id="categoriaProducto" disabled required>
+                            <option value="">Seleccionar clase primero</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Nombre</label>
+                        <input type="text" id="nombreProducto" required>
+                    </div>
+                    <div>
+                        <label>Stock inicial</label>
+                        <input type="number" id="stockInicial" min="1" value="1" required>
+                    </div>
+                    <div id="grupoMinimoReposicion">
+                        <label>Mínimo reposición</label>
+                        <input type="number" id="minimoReposicion" min="0" value="0">
+                    </div>
                 </div>
                 <div>
-                    <label>Categoría</label>
-                    <select id="categoriaProducto" disabled required>
-                        <option value="">Seleccionar clase primero</option>
-                    </select>
-                </div>
-                <div>
-                    <label>Nombre</label>
-                    <input type="text" id="nombreProducto" required>
-                </div>
-                <div>
-                    <label>Stock inicial</label>
-                    <input type="number" id="stockInicial" min="1" value="1" required>
-                </div>
-                <div id="grupoMinimoReposicion">
-                    <label>Mínimo reposición</label>
-                    <input type="number" id="minimoReposicion" min="0" value="0">
-                </div>
-                <div style="align-self: flex-end;">
                     <button type="submit" class="btn"><i class="bi bi-plus-circle"></i>Registrar</button>
                 </div>
             </form>
         </section>
 
+        <!-- Formulario buscar y modificar producto existente -->
         <section>
             <h2>Actualizar producto</h2>
-            <form id="busquedaForm" style="display: flex; gap: 1rem; flex-direction: column;">
-                <div>
-                    <label>ID producto</label>
-                    <input type="number" id="buscarId" required>
-                </div>
-                <div>
-                    <button type="submit" class="btn"><i class="bi bi-search"></i>Buscar</button>
-                </div>
+            <form id="busquedaForm">
+                <label>ID producto</label>
+                <input type="number" id="buscarId" required>
+                <button type="submit" class="btn"><i class="bi bi-search"></i>Buscar</button>
             </form>
 
-            <div class="modificar-container" style="display:none;" id="modificarContenedor">
+            <div class="modificar-container hidden" id="modificarContenedor">
                 <h3 id="tituloProductoEncontrado">Producto encontrado</h3>
 
                 <!-- Datos actuales del producto -->
                 <div id="datosProductoEncontrado" style="margin-bottom: 1rem; line-height: 1.5;"></div>
 
                 <!-- Botones de acción -->
-                <div class="actions">
+                <div class="btn-row">
                     <button type="button" class="btn" id="btnEditarDatos"><i class="bi bi-pencil-square"></i>Modificar
                         Datos</button>
                     <button type="button" class="btn" id="btnAgregarStock"><i class="bi bi-plus-circle"></i>Agregar
@@ -127,7 +125,7 @@
                 </div>
 
                 <!-- Formulario Modificar Datos Generales -->
-                <form id="formModificarDatos" style="display:none; margin-top: 1rem;">
+                <form id="formModificarDatos" class="hidden" style="margin-top: 1rem;">
                     <div>
                         <label>Nombre</label>
                         <input type="text" id="modNombre" required>
@@ -144,7 +142,7 @@
                         <label>Mínimo reposición</label>
                         <input type="number" id="modMinimo" min="0" required>
                     </div>
-                    <div class="actions">
+                    <div class="btn-row">
                         <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
                         <button type="button" class="btn" id="cancelarEdicionBtn"><i
                                 class="bi bi-x-circle"></i>Cancelar</button>
@@ -152,12 +150,12 @@
                 </form>
 
                 <!-- Formulario Agregar Stock -->
-                <form id="formAgregarStock" style="display:none; margin-top: 1rem;">
+                <form id="formAgregarStock" class="hidden" style="margin-top: 1rem;">
                     <div>
                         <label>Agregar stock</label>
                         <input type="number" id="modStockAgregar" min="1" value="1" required>
                     </div>
-                    <div class="actions">
+                    <div class="btn-row">
                         <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
                         <button type="button" class="btn" id="cancelarIngresoBtn"><i
                                 class="bi bi-x-circle"></i>Cancelar</button>
@@ -255,9 +253,9 @@
             // Mostrar/ocultar campo de mínimo reposición según clase
             const grupoMinimo = document.getElementById("grupoMinimoReposicion");
             if (claseProducto.value === "Bien") {
-                grupoMinimo.style.display = "none";
+                grupoMinimo.classList.add("hidden");
             } else {
-                grupoMinimo.style.display = "block";
+                grupoMinimo.classList.remove("hidden");
             }
             cargarCategorias(claseProducto.value, "categoriaProducto");
         });
@@ -366,11 +364,11 @@
             const p = prods.find(x => x.id === id);
             if (!p) {
                 alert("Producto no encontrado.");
-                modificarContenedor.style.display = "none";
+                modificarContenedor.classList.add("hidden");
                 return;
             }
 
-            modificarContenedor.style.display = "block";
+            modificarContenedor.classList.remove("hidden");
             // Mostrar todos los datos actuales
             if (p.clase === "Insumo Oficina" || p.clase === "Insumo Limpieza" || p.clase === "Insumo Eléctrico") {
                 const datosHTML = `
@@ -403,14 +401,14 @@
 
             const grupoModMinimo = document.getElementById("grupoModMinimo");
             if (p.clase === "Bien") {
-                grupoModMinimo.style.display = "none";
+                grupoModMinimo.classList.add("hidden");
             } else {
-                grupoModMinimo.style.display = "block";
+                grupoModMinimo.classList.remove("hidden");
             }
 
             // Ocultar formularios
-            document.getElementById("formModificarDatos").style.display = "none";
-            document.getElementById("formAgregarStock").style.display = "none";
+            document.getElementById("formModificarDatos").classList.add("hidden");
+            document.getElementById("formAgregarStock").classList.add("hidden");
 
             // Botón eliminar producto
             document.getElementById("eliminarProducto").onclick = () => {
@@ -418,21 +416,21 @@
                 const nuevos = prods.filter(x => x.id !== id);
                 localStorage.setItem("productos", JSON.stringify(nuevos));
                 alert("Producto eliminado.");
-                modificarContenedor.style.display = "none";
+                modificarContenedor.classList.add("hidden");
             };
 
             // Mostrar form de edición de datos
             document.getElementById("btnEditarDatos").onclick = () => {
-                document.getElementById("formModificarDatos").style.display = "block";
-                document.getElementById("formAgregarStock").style.display = "none";
+                document.getElementById("formModificarDatos").classList.remove("hidden");
+                document.getElementById("formAgregarStock").classList.add("hidden");
                 document.getElementById("tituloProductoEncontrado").textContent = "Modificar Datos del Producto";
                 ocultarInfoYAcciones();
             };
 
             // Mostrar form de agregar stock
             document.getElementById("btnAgregarStock").onclick = () => {
-                document.getElementById("formAgregarStock").style.display = "block";
-                document.getElementById("formModificarDatos").style.display = "none";
+                document.getElementById("formAgregarStock").classList.remove("hidden");
+                document.getElementById("formModificarDatos").classList.add("hidden");
                 document.getElementById("tituloProductoEncontrado").textContent = "Agregar Stock al Producto";
                 ocultarInfoYAcciones();
             };
@@ -459,13 +457,13 @@
 
                 localStorage.setItem("productos", JSON.stringify(prods));
                 alert("Datos actualizados.");
-                modificarContenedor.style.display = "none";
+                modificarContenedor.classList.add("hidden");
             };
 
             // Cancelar edición de datos
             document.getElementById("cancelarEdicionBtn").onclick = () => {
                 if (confirm("¿Deseás cancelar la edición? Se perderán los cambios no guardados.")) {
-                    document.getElementById("formModificarDatos").style.display = "none";
+                    document.getElementById("formModificarDatos").classList.add("hidden");
                     mostrarInfoYAcciones();
                 }
             };
@@ -524,14 +522,14 @@
 
                 localStorage.setItem("productos", JSON.stringify(prods));
                 alert("Stock ingresado.");
-                modificarContenedor.style.display = "none";
+                modificarContenedor.classList.add("hidden");
             };
         };
 
         // Cancelar ingreso de stock
         document.getElementById("cancelarIngresoBtn").onclick = () => {
             if (confirm("¿Deseás cancelar el ingreso de stock? Se perderán los cambios no guardados.")) {
-                document.getElementById("formAgregarStock").style.display = "none";
+                document.getElementById("formAgregarStock").classList.add("hidden");
                 mostrarInfoYAcciones();
             }
         };
@@ -540,13 +538,13 @@
 
     <script>
         function ocultarInfoYAcciones() {
-            document.getElementById("datosProductoEncontrado").style.display = "none";
-            document.querySelector(".actions").style.display = "none";
+            document.getElementById("datosProductoEncontrado").classList.add("hidden");
+            document.querySelector(".btn-row").classList.add("hidden");
         }
 
         function mostrarInfoYAcciones() {
-            document.getElementById("datosProductoEncontrado").style.display = "grid";
-            document.querySelector(".actions").style.display = "flex";
+            document.getElementById("datosProductoEncontrado").classList.remove("hidden");
+            document.querySelector(".btn-row").classList.remove("hidden");
             document.getElementById("tituloProductoEncontrado").textContent = "Producto encontrado";
         }
     </script>

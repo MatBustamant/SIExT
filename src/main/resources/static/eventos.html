@@ -2,28 +2,32 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Registrar Eventos - SIExT</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Registrar otros eventos - SIExT</title>
     <link href="icons/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/tablas.css">
     <link rel="icon" href="images\icon.png">
 </head>
 
 <body>
 
-    <header>SIExT | Registrar Evento</header>
+    <header>SIExT | Registrar otros eventos</header>
 
-    <main>
-        <section class="cabecera">
+    <div class="default-block-container">
+        <nav>
             <h2>Acciones rápidas</h2>
-            <div>
-                <a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver a Panel</a>
-                <a href="inventario.html" class="btn"><i class="bi bi-card-list"></i></i>Listar Inventario</a>
-                <a href="informes.html" class="btn"><i class="bi bi-file-earmark-text"></i>Generar Informes</a>
-            </div>
-        </section>
+            <ul>
+                <li><a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver al Panel</a></li>
+                <li><a href="inventario.html" class="btn"><i class="bi bi-card-list"></i>Ver Inventario</a></li>
+                <li><a href="informes.html" class="btn"><i class="bi bi-file-earmark-text"></i>Generar Informes</a></li>
+            </ul>
+        </nav>
+    </div>
 
+    <main class="default-block-container">
+        <!-- Formulario para agregar nuevo evento -->
         <section>
             <h2>Registrar evento sobre un bien</h2>
             <form>
@@ -32,7 +36,6 @@
                         <label>ID del bien</label>
                         <input type="number" required>
                     </div>
-
                     <div>
                         <label>Tipo de evento</label>
                         <select id="tipoEvento" required>
@@ -45,15 +48,17 @@
                     </div>
                 </div>
 
-                <div>
-                    <label>Fecha</label>
-                    <input type="date" required>
+                <div class="form-grid">
+                    <div>
+                        <label>Fecha</label>
+                        <input type="date" required>
+                    </div>
+                    <div>
+                        <label>Hora</label>
+                        <input type="time" required>
+                    </div>
                 </div>
 
-                <div>
-                    <label>Hora</label>
-                    <input type="time" required>
-                </div>
                 <div id="despiecePiezasSection" class="hidden">
                     <div
                         style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
@@ -64,25 +69,32 @@
                     <div id="piezasContainer"></div>
                 </div>
 
-                <div class="btn-group">
+                <div class="btn-row">
                     <button type="submit" class="btn"><i class="bi bi-plus-circle"></i>Registrar</button>
                 </div>
             </form>
         </section>
 
+        <!-- Gestión de eventos -->
         <section>
             <h2>Eventos registrados</h2>
-
-            <div class="filters">
-                <input type="number" placeholder="Filtrar por ID de bien">
-                <select>
-                    <option value="">Todos</option>
-                    <option>Avería</option>
-                    <option>Reparación</option>
-                    <option>Devolución</option>
-                    <option>Despiece</option>
-                </select>
-                <input type="date">
+            <!-- Filtros -->
+            <div class="form-grid">
+                <div>
+                    <input type="number" placeholder="Filtrar por ID de bien">
+                </div>
+                <div>
+                    <select>
+                        <option value="">Todos</option>
+                        <option>Avería</option>
+                        <option>Reparación</option>
+                        <option>Devolución</option>
+                        <option>Despiece</option>
+                    </select>
+                </div>
+                <div>
+                    <input type="date">
+                </div>
             </div>
 
             <table>
@@ -110,9 +122,11 @@
                 </tbody>
             </table>
 
-            <div class="counter">Mostrando 1 evento(s).</div>
+            <div class="informativo">Mostrando 1 evento(s).</div>
         </section>
-        <section id="modificarEventoSection" class="form-section hidden">
+
+        <!-- Formulario para modificar evento seleccionado -->
+        <section id="modificarEventoSection" class="hidden">
             <h2>Actualizar evento</h2>
             <form id="modificarEventoForm">
                 <input type="hidden" id="modEventoId">
@@ -155,6 +169,7 @@
                 </div>
             </form>
         </section>
+
     </main>
 
     <footer>SIExT | 2025</footer>

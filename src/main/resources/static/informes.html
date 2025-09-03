@@ -2,17 +2,16 @@
 <html lang="es">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Informes - SIExT</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Generar informes - SIExT</title>
   <link href="icons/bootstrap-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="css/global.css">
   <link rel="icon" href="images\icon.png">
 
   <style>
-
-    .btn-group {
-      flex-direction: column;
+    ul li > * {
+      width: 100%;
     }
 
     form {
@@ -22,39 +21,46 @@
       align-items: center;
       margin-top: 1rem;
     }
-
   </style>
 </head>
 
 <body>
 
-  <header>SIExT | Informes</header>
+  <header>SIExT | Generar informes</header>
 
-  <main>
+  <div class="default-block-container">
+    <nav>
+      <h2>Acciones rápidas</h2>
+      <ul>
+        <li><a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver al Panel</a></li>
+      </ul>
+    </nav>
+  </div>
 
-    <section class="cabecera">
-      <h2>Generar Informes</h2>
-      <a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver al Panel</a>
-    </section>
-
+  <main class="default-block-container">
     <section>
-      <div class="btn-group">
-        <a href="#" class="btn"><i class="bi bi-card-list"></i>Listado completo de inventario</a>
-        <a href="#" class="btn" id="btnIngresos"><i class="bi bi-box-arrow-in-down-left"></i></i>Total de ingresos en un
-          período</a>
-        <form id="formIngresos" style="display:none;">
-          <label>Desde:</label>
-          <input type="date" id="desde" required>
-          <label>Hasta:</label>
-          <input type="date" id="hasta" required>
-          <button type="submit" class="btn"><i class="bi bi-search"></i>Ver Informe</button>
-        </form>
-        <a href="informe_minimo.html" class="btn"><i class="bi bi-exclamation-triangle"></i>Inventario bajo mínimo de
-          reposición</a>
-        <a href="#" class="btn"><i class="bi bi-file-bar-graph"></i>Total de solicitudes por departamento</a>
-        <a href="#" class="btn"><i class="bi bi-box-arrow-up-right"></i>Total de salidas por departamento</a>
-      </div>
-
+      <ul class="btn-row" style="flex-direction: column;">
+        <li><a href="#" class="btn"><i class="bi bi-card-list"></i>Listado completo de inventario</a></li>
+        <li>
+          <button class="btn" id="btnIngresos" type="button"><i class="bi bi-box-arrow-in-down-left"></i></i>Total de
+            ingresos
+            en
+            un
+            período</button>
+          <form id="formIngresos" class="hidden">
+            <label>Desde</label>
+            <input type="date" id="desde" required>
+            <label>Hasta</label>
+            <input type="date" id="hasta" required>
+            <button type="submit" class="btn"><i class="bi bi-search"></i>Ver Informe</button>
+          </form>
+        </li>
+        <li><a href="informe_minimo.html" class="btn"><i class="bi bi-exclamation-triangle"></i>Inventario bajo mínimo
+            de
+            reposición</a></li>
+        <li><a href="#" class="btn"><i class="bi bi-file-bar-graph"></i>Total de solicitudes por departamento</a></li>
+        <li><a href="#" class="btn"><i class="bi bi-box-arrow-up-right"></i>Total de salidas por departamento</a></li>
+      </ul>
     </section>
 
   </main>
@@ -66,8 +72,8 @@
     const formIngresos = document.getElementById("formIngresos");
 
     btnIngresos.addEventListener("click", () => {
-      formIngresos.style.display = formIngresos.style.display === "none" ? "flex" : "none";
-      btnIngresos.style.backgroundColor = formIngresos.style.display === "none" ? "var(--azul)" : "var(--azul-profundo)";
+      formIngresos.classList.toggle("hidden");
+      btnIngresos.style.backgroundColor = formIngresos.classList.contains("hidden") ? "" : "var(--azul-profundo)";
     });
 
     document.getElementById("formIngresos").onsubmit = e => {

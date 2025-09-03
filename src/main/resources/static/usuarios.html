@@ -4,22 +4,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Gestión de Usuarios - SIExT</title>
+    <title>Gestionar usuarios - SIExT</title>
     <link href="icons/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/tablas.css">
     <link rel="icon" href="images\icon.png">
 </head>
 
 <body>
 
-    <header>SIExT | Gestión de Usuarios</header>
+    <header>SIExT | Gestionar usuarios</header>
 
-    <main>
-        <section class="cabecera" style="display: flex; justify-content: space-between; align-items: center;">
-            <h2>Usuarios</h2>
-            <a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver al Panel</a>
-        </section>
+    <div class="default-block-container">
+        <nav>
+            <h2>Acciones rápidas</h2>
+            <ul>
+                <li><a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver al Panel</a></li>
+            </ul>
+        </nav>
+    </div>
 
+    <main class="default-block-container">
+
+        <!-- Formulario para registrar nuevo usuario -->
         <section>
             <h2>Registrar nuevo usuario</h2>
             <form id="formNuevoUsuario">
@@ -41,6 +48,7 @@
             </form>
         </section>
 
+        <!-- Gestión de usuarios registrados -->
         <section>
             <h2>Usuarios registrados</h2>
             <table>
@@ -58,13 +66,15 @@
                         <td>admin</td>
                         <td>Administrativo</td>
                         <td>
-                            <button class="btn btn-editar"><i class="bi bi-pencil"></i></button>
+                            <!-- HAY QUE CAMBIAR ESTO CUANDO SEA DINÁMICO ALGÚN DÍA-->
+                            <button class="btn" onclick="editarUsuario(event)"><i class="bi bi-pencil"></i></button>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </section>
 
+        <!-- Formulario para modificar usuario seleccionado -->
         <section id="modificarUsuarioSection" class="hidden">
             <h2>Modificar usuario</h2>
             <form id="formModificarUsuario">
@@ -113,24 +123,22 @@
         <td>${usuario}</td>
         <td>${rol}</td>
         <td>
-          <button class="btn btn-editar"><i class="bi bi-pencil"></i></button>
+          <button class="btn onclick='editarUsuario(${id})'><i class="bi bi-pencil"></i></button>
         </td>
       `;
             tabla.appendChild(fila);
             document.getElementById("formNuevoUsuario").reset();
         });
 
-        // Abrir edición de usuario
-        document.addEventListener("click", e => {
-            if (e.target.closest(".btn-editar")) {
-                const fila = e.target.closest("tr");
+        // Abrir edición de usuario HAY QUE CAMBIAR ESTO CUANDO SEA DINÁMICO ALGÚN DÍA
+        function editarUsuario(event) {
+            const fila = event.target.closest("tr");
                 document.getElementById("modUsuarioId").value = fila.cells[0].textContent;
                 document.getElementById("modNombreUsuario").value = fila.cells[1].textContent;
                 document.getElementById("modPasswordUsuario").value = ""; // No mostrar contraseña real
                 document.getElementById("modRolUsuario").value = fila.cells[2].textContent;
                 document.getElementById("modificarUsuarioSection").classList.remove("hidden");
-            }
-        });
+        }
 
         // Cancelar edición
         document.getElementById("btnCancelarEdicion").addEventListener("click", () => {

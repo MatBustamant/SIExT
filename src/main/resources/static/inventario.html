@@ -2,13 +2,22 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Inventario - SIExT</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ver inventario - SIExT</title>
     <link href="icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="css/global.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/tablas.css">
     <link rel="icon" href="images\icon.png">
     <style>
+        label {
+            display: inline-block;
+        }
+
+        input[type="checkbox"] {
+            width: auto;
+        }
+
         .badge {
             display: inline-block;
             padding: 0.25em 0.5em;
@@ -34,25 +43,37 @@
 </head>
 
 <body>
-    <header>SIExT | Inventario</header>
+    <header>SIExT | Ver inventario</header>
 
-    <main>
-        <section class="cabecera">
+    <div class="default-block-container">
+        <nav>
             <h2>Acciones rápidas</h2>
-            <div>
-                <a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver al Panel</a>
-                <a href="productos.html" class="btn"><i class="bi bi-box-seam"></i></i>Gestionar Productos</a>
-                <a href="informes.html" class="btn"><i class="bi bi-file-earmark-text"></i>Generar Informes</a>
-            </div>
-        </section>
+            <ul>
+                <li><a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver al Panel</a></li>
+                <li><a href="productos.html" class="btn"><i class="bi bi-box-seam"></i></i>Gestionar Productos</a></li>
+                <li><a href="informes.html" class="btn"><i class="bi bi-file-earmark-text"></i>Generar Informes</a></li>
+            </ul>
+        </nav>
+    </div>
 
+    <main class="default-block-container">
+        <!-- Listado de insumos -->
         <section>
-            <h3>Insumos</h3>
-            <div class="filters">
-                <input type="text" id="filterInsumoInput" placeholder="Filtrar por nombre o ID...">
-                <select id="filterInsumoCategoria"></select>
-                <select id="filterInsumoClase"></select>
-                <label><input type="checkbox" id="filterInsumoReposicion"> Solo a reponer</label>
+            <h2>Insumos</h2>
+            <div class="form-grid">
+                <div>
+                    <input type="text" id="filterInsumoInput" placeholder="Filtrar por nombre o ID...">
+                </div>
+                <div>
+                    <select id="filterInsumoCategoria"></select>
+                </div>
+                <div>
+                    <select id="filterInsumoClase"></select>
+                </div>
+                <div>
+                    <input type="checkbox" id="filterInsumoReposicion">
+                    <label>Solo a reponer</label>
+                </div>
             </div>
 
             <table id="insumosTable">
@@ -68,15 +89,23 @@
                 </thead>
                 <tbody></tbody>
             </table>
-            <div class="counter" id="counterInsumos"></div>
+            <div class="informativo" id="counterInsumos"></div>
         </section>
 
+        <!-- Listado de bienes -->
         <section>
-            <h3>Bienes</h3>
-            <div class="filters">
-                <input type="text" id="filterBienInput" placeholder="Filtrar por nombre o ID...">
-                <select id="filterBienCategoria"></select>
-                <label><input type="checkbox" id="filterBienReposicion"> Solo a reponer</label>
+            <h2>Bienes</h2>
+            <div class="form-grid">
+                <div>
+                    <input type="text" id="filterBienInput" placeholder="Filtrar por nombre o ID...">
+                </div>
+                <div>
+                    <select id="filterBienCategoria"></select>
+                </div>
+                <div>
+                    <input type="checkbox" id="filterBienReposicion">
+                    <label>Solo a reponer</label>
+                </div>
             </div>
             <table id="bienesTable">
                 <thead>
@@ -91,7 +120,7 @@
 
                 <tbody></tbody>
             </table>
-            <div class="counter" id="counterBienes"></div>
+            <div class="informativo" id="counterBienes"></div>
         </section>
     </main>
 

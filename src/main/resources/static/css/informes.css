@@ -1,33 +1,38 @@
-    body {
-      padding: 2rem;
-    }
+body {
+  padding: 2rem;
+}
 
-    .fecha, .periodo {
-      font-size: 0.9rem;
-      color: var(--texto-secundario);
-      margin-bottom: 1rem;
-    }
+.btn {
+  margin: 0, 0, 1.5rem, 0;
+  /* margin-bottom: 1.5rem; */
+}
 
-    .btn {
-      margin-bottom: 1.5rem;
-    }
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
 
-    tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
+.grupo-clase {
+  background-color: #e5e5e5 !important;
+  font-weight: 600;
+  text-transform: uppercase;
+}
 
-    .grupo-clase {
-      background-color: #e5e5e5 !important;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
+.informativo {
+  margin: 0, 0, 1rem, 0;
+  /* margin-bottom: 1rem; */
+  /* margin-top: 0; */
+}
 
-    @media print {
-      .btn, footer {
-        display: none !important;
-      }
-      body {
-        background: var(--blanco);
-        padding: 0;
-      }
-    }
+
+@media print {
+
+  .btn,
+  footer {
+    display: none !important;
+  }
+
+  body {
+    background: var(--blanco);
+    padding: 0;
+  }
+}

@@ -2,19 +2,14 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Salidas - SIExT</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Registrar salidas - SIExT</title>
     <link href="icons/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/tablas.css">
     <link rel="icon" href="images\icon.png">
     <style>
-
-        .actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
         #listaProductosSeleccionados {
             border: 1px solid #ccc;
             padding: 10px;
@@ -39,32 +34,40 @@
 </head>
 
 <body>
-    <header>SIExT | Salidas</header>
-    <main>
+    <header>SIExT | Registrar salidas</header>
 
-        <section class="cabecera">
+    <div class="default-block-container">
+        <nav>
             <h2>Acciones rápidas</h2>
-            <div>
-                <a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver a Panel</a>
-                <a href="inventario.html" class="btn"><i class="bi bi-card-list"></i></i>Listar Inventario</a>
-                <a href="informes.html" class="btn"><i class="bi bi-file-earmark-text"></i>Generar Informes</a>
-            </div>
-        </section>
+            <ul>
+                <li><a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver al Panel</a></li>
+                <li><a href="inventario.html" class="btn"><i class="bi bi-card-list"></i></i>Listar Inventario</a></li>
+                <li><a href="informes.html" class="btn"><i class="bi bi-file-earmark-text"></i>Generar Informes</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main class="default-block-container">
 
         <section>
             <h2>Registrar nueva salida</h2>
             <form id="movimientoForm">
                 <label>N° Solicitud Asociada</label>
-                <input type="number" id="numSolicitud" required min="1" />
+                <input type="number" id="numSolicitud" required min="1">
                 <label>Legajo de quien retira</label>
-                <input type="text" id="legajoRetira" required />
+                <input type="text" id="legajoRetira" required>
                 <label>Destino</label>
-                <input type="text" id="destino" required />
-                <label>Fecha de salida</label>
-                <input type="date" id="fechaSalida" required />
-                <label>Hora de salida</label>
-                <input type="time" id="horaSalida" required />
-
+                <input type="text" id="destino" required>
+                <div class="form-grid">
+                    <div>
+                        <label>Fecha de salida</label>
+                        <input type="date" id="fechaSalida" required>
+                    </div>
+                    <div>
+                        <label>Hora de salida</label>
+                        <input type="time" id="horaSalida" required>
+                    </div>
+                </div>
                 <label>Agregar producto por ID</label>
                 <div style="display: flex; gap: 0.5rem; margin-bottom:1rem;">
                     <input type="number" id="inputProductoId" placeholder="ID producto" />
@@ -93,6 +96,7 @@
                 </thead>
                 <tbody></tbody>
             </table>
+            <div class="informativo" id="contadorSalidas">Mostrando 3 salida(s). //ESTÁTICO</div>
         </section>
 
         <section id="modificarMovimientoSection" class="hidden">
@@ -118,7 +122,7 @@
 
                 <div id="modListaProductosSeleccionados"><small>No hay productos agregados.</small></div>
 
-                <div class="actions">
+                <div class="btn-row">
                     <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
                     <button type="button" class="btn" id="cancelarEdicionBtn"><i
                             class="bi bi-x-circle"></i>Cancelar</button>
@@ -127,7 +131,6 @@
                 </div>
             </form>
         </section>
-        <p></p>
     </main>
 
     <footer>SIExT | 2025</footer>
