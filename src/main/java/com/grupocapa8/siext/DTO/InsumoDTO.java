@@ -7,11 +7,11 @@ package com.grupocapa8.siext.DTO;
 public class InsumoDTO {
     private String Nombre;
     private String ClaseProducto;
-    private int Stock;
-    private int MinReposicion;
+    private Integer Stock;
+    private Integer MinReposicion;
     private String NombreCatInsumo;
 
-    public InsumoDTO(String Nombre, String ClaseProducto, int Stock, int MinReposicion, String NombreCatInsumo) {
+    public InsumoDTO(String Nombre, String ClaseProducto, Integer Stock, Integer MinReposicion, String NombreCatInsumo) {
         this.Nombre = Nombre;
         this.ClaseProducto = ClaseProducto;
         this.Stock = Stock;
@@ -35,19 +35,19 @@ public class InsumoDTO {
         this.ClaseProducto = ClaseProducto;
     }
 
-    public int getStock() {
+    public Integer getStock() {
         return Stock;
     }
 
-    public void setStock(int Stock) {
+    public void setStock(Integer Stock) {
         this.Stock = Stock;
     }
 
-    public int getMinReposicion() {
+    public Integer getMinReposicion() {
         return MinReposicion;
     }
 
-    public void setMinReposicion(int MinReposicion) {
+    public void setMinReposicion(Integer MinReposicion) {
         this.MinReposicion = MinReposicion;
     }
 

@@ -14,7 +14,8 @@ public class BienService {
         validarString(dto.getNombreCatBienes(),1);
         validarUbicacionBien(dto.getUbicacionBien());
         validarString(dto.getClaseProducto(),2);
-
+        validarString(dto.getEstadoBien(),3);
+        
         bienDAO.guardar(dto);
     } 
     

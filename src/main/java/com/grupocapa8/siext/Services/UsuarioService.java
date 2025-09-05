@@ -48,10 +48,7 @@ public class UsuarioService {
         }
         
         UsuarioDTO dto = usuarioDAO.obtenerUsuario(idUsuario);
-      //  if (!dto.getRol().equals("ADMIN")) { ver si se puede
-       //     throw new SecurityException("No tiene permisos para eliminar usuarios");
-       // }
-        boolean V = confirmacionEliminarBien(dto); //enviando el dto a la capa de presentacion para que lo muestre y me devuelva verdadero o falso para continuar con la eliminacion
+        boolean V = confirmacionEliminarUsuario(dto); //enviando el dto a la capa de presentacion para que lo muestre y me devuelva verdadero o falso para continuar con la eliminacion
         if(V){
             usuarioDAO.eliminarUsuario(idUsuario);
         }   

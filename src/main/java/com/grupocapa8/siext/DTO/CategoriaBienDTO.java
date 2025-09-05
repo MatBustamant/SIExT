@@ -6,10 +6,10 @@ package com.grupocapa8.siext.DTO;
  */
 public class CategoriaBienDTO {
     private String Nombre;
-    private int MinReposicion;
-    private int Stock;
+    private Integer MinReposicion;
+    private Integer Stock;
 
-    public CategoriaBienDTO(String Nombre, int MinReposicion, int Stock) {
+    public CategoriaBienDTO(String Nombre, Integer MinReposicion, Integer Stock) {
         this.Nombre = Nombre;
         this.MinReposicion = MinReposicion;
         this.Stock = Stock;
@@ -23,19 +23,19 @@ public class CategoriaBienDTO {
         this.Nombre = Nombre;
     }
 
-    public int getMinReposicion() {
+    public Integer getMinReposicion() {
         return MinReposicion;
     }
 
-    public void setMinReposicion(int MinReposicion) {
+    public void setMinReposicion(Integer MinReposicion) {
         this.MinReposicion = MinReposicion;
     }
 
-    public int getStock() {
+    public Integer getStock() {
         return Stock;
     }
 
-    public void setStock(int Stock) {
+    public void setStock(Integer Stock) {
         this.Stock = Stock;
     }
 
