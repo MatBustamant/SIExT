@@ -13,9 +13,9 @@ public class EventoTrazabilidadServices {
     
     public void crearEventoTraz(EventoTrazabilidadDTO dto){
         validarID(dto.getBienAsociado());
-        validarFecha(dto.getFechaEvento());
+        // validarFecha(dto.getFechaEvento()); ver que se va hacer con estas validaciones
         validarString(dto.getTipoEvento(),1);
-        validarHorario(dto.getHorarioEvento().getHoraFormateada());
+        // validarHorario(dto.getHorarioEvento().getHoraFormateada()); ver que se va hacer con estas validaciones
         
         eventoTrazDAO.guardar(dto);
     } 
@@ -28,9 +28,9 @@ public class EventoTrazabilidadServices {
         EventoTrazabilidadDTO dto = eventoTrazDAO.obtenerEventoTraz(idEventoTraz);
         dto = recibirEventoTrazDTO(dto); //enviando el dto a la capa de presentacion para que lo muestre y me devuelva el dto modificado
         validarID(dto.getBienAsociado());
-        validarFecha(dto.getFechaEvento());
+        // validarFecha(dto.getFechaEvento()); ver que se va hacer con estas validaciones
         validarString(dto.getTipoEvento(),1);
-        validarHorario(dto.getHorarioEvento().getHoraFormateada());
+        // validarHorario(dto.getHorarioEvento().getHoraFormateada()); ver que se va hacer con estas validaciones
         
         eventoTrazDAO.guardar(dto);
     } 
@@ -58,7 +58,15 @@ public class EventoTrazabilidadServices {
             throw new IllegalArgumentException("El ID   debe ser un número entero positivo.");
         }
     }
-    public void validarFecha(Fecha fecha) {
+    public void validarString(String string,int a) {
+        if (string == null || string.length() < 3 || string.length() > 50) {
+            switch (a){
+                case 1 -> throw new IllegalArgumentException("El tipo de evento debe tener entre 3 y 50 caracteres");
+                case 2 -> throw new IllegalArgumentException("El Rol debe tener entre 3 y 50 caracteres");
+            } 
+        }
+    }
+/**    public void validarFecha(Fecha fecha) {
         if (fecha == null || fecha.getFecha() == null) {
             throw new IllegalArgumentException("La fecha no puede ser nula.");
         }
@@ -85,12 +93,6 @@ public class EventoTrazabilidadServices {
             throw new IllegalArgumentException("El horario no puede ser nulo ni vacío.");
         }
     }
-    public void validarString(String string,int a) {
-        if (string == null || string.length() < 3 || string.length() > 50) {
-            switch (a){
-                case 1 -> throw new IllegalArgumentException("El tipo de evento debe tener entre 3 y 50 caracteres");
-                case 2 -> throw new IllegalArgumentException("El Rol debe tener entre 3 y 50 caracteres");
-            } 
-        }
-    }
+*/
+    
 }

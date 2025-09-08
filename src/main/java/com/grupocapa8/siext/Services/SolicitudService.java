@@ -10,7 +10,7 @@ public class SolicitudService {
     public void crearSolicitud(SolicitudDTO dto){
         validarNumero(dto.getNumSolicitud());
         validarLegajo(dto.getLegSolicitante());
-        validarFecha(dto.getFechaInicioSolicitud());
+        // validarFecha(dto.getFechaInicioSolicitud()); ver que hacer
         validarString(dto.getEstado(),3);
         validarString(dto.getDestinoProductos(),1);
         // Convertir DTO a entidad y guardarlo en BD
@@ -26,7 +26,7 @@ public class SolicitudService {
         dto = recibirSolicitudDTO(dto); //enviando el dto a la capa de presentacion para que lo muestre y me devuelva el dto modificado
         validarNumero(dto.getNumSolicitud());
         validarLegajo(dto.getLegSolicitante());
-        validarFecha(dto.getFechaInicioSolicitud());
+        // validarFecha(dto.getFechaInicioSolicitud()); ver que hacer
         validarString(dto.getEstado(),3);
         validarString(dto.getDestinoProductos(),1);
         
@@ -70,7 +70,16 @@ public class SolicitudService {
             throw new IllegalArgumentException("El año del legajo es inválido: " + anio);
         }
     }
-    public void validarFecha(Fecha fecha){
+    public void validarString(String string,int a) {
+        if (string == null || string.length() < 3 || string.length() > 50) {
+            switch (a){
+                case 1 -> throw new IllegalArgumentException("El destino debe tener entre 3 y 50 caracteres");
+                case 2 -> throw new IllegalArgumentException("El Rol debe tener entre 3 y 50 caracteres");
+                case 3 -> throw new IllegalArgumentException("El Estado no debe estar vacio.");
+            } 
+        }
+    }
+/*    public void validarFecha(Fecha fecha){
         if (fecha == null || fecha.getFecha() == null) {
             throw new IllegalArgumentException("La fecha no puede ser nula.");
         }
@@ -88,13 +97,6 @@ public class SolicitudService {
             throw new IllegalArgumentException("La fecha no puede ser anterior al año 2024.");
         }
     }
-    public void validarString(String string,int a) {
-        if (string == null || string.length() < 3 || string.length() > 50) {
-            switch (a){
-                case 1 -> throw new IllegalArgumentException("El destino debe tener entre 3 y 50 caracteres");
-                case 2 -> throw new IllegalArgumentException("El Rol debe tener entre 3 y 50 caracteres");
-                case 3 -> throw new IllegalArgumentException("El Estado no debe estar vacio.");
-            } 
-        }
-    }
+*/
+   
 }
