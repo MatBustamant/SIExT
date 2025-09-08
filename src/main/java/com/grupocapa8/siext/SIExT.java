@@ -15,15 +15,14 @@ import org.glassfish.jersey.server.ResourceConfig;
  */
 public class SIExT {
 
-    public static final URI BASE_URI = URI.create("http://localhost:8080/base/");
-    public static final String ROOT_PATH = "testresource";
+    public static final URI BASE_URI = URI.create("http://localhost:8080/api");
 
     public static void main(String[] args) {
         try {
             System.out.println("\"Hello World\" Jersey Example App");
 
             // Se configura con la clase o el paquete donde están los recursos.
-            final ResourceConfig resourceConfig = new ResourceConfig().packages("com.grupocapa8.siext.controladorrest");
+            final ResourceConfig resourceConfig = new ResourceConfig().packages("com.grupocapa8.siext.controller");
 
             // Con esto se configura el arranque del servidor Grizzly
             final HttpServer server = GrizzlyHttpServerFactory.createHttpServer(BASE_URI, resourceConfig, false);
@@ -39,8 +38,8 @@ public class SIExT {
             // Con esto arrancamos el servidor Grizzly
             server.start();
 
-            System.out.println(String.format("Application started.\nTry out %s%s\nStop the application using CTRL+C",
-                    BASE_URI, ROOT_PATH));
+            System.out.println(String.format("Application started.\nTry out %s\nStop the application using CTRL+C",
+                    BASE_URI));
             
             // Para que no termine la ejecución cuando estas líneas acaban
             Thread.currentThread().join();
