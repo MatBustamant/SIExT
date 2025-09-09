@@ -8,7 +8,26 @@ import org.mindrot.jbcrypt.BCrypt;
  */
 public class UsuarioService {
    private UsuarioDAO usuarioDAO; //acceso a la BD
-    
+   
+    public void lecturaDTOs(){
+        int idUsuario = 0;
+        while(usuarioDAO.BuscarUsuario(idUsuario)){
+            UsuarioDTO dto = usuarioDAO.obtenerUsuario(idUsuario);
+            recibirUsuarioDTO(dto);
+            idUsuario = idUsuario + 1;    
+        }
+        if(idUsuario == 0){
+            System.out.println("No Existe el usuario en la BD");
+        }   
+    }
+    public void BuscarDto(int idUsuario){
+        validarID(idUsuario);
+        if (!usuarioDAO.BuscarUsuario(idUsuario)){
+            throw new IllegalArgumentException("No existe el usuario");
+        }
+        UsuarioDTO dto = usuarioDAO.obtenerUsuario(idUsuario);
+        recibirUsuarioDTO(dto); //enviando el dto a la capa de presentacion para que lo muestre
+    }
     public void crearUsuario(UsuarioDTO dto){
         validarString(dto.getNombre(),1);
         validarString(dto.getRol(),2);

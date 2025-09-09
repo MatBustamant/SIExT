@@ -1,5 +1,6 @@
 package com.grupocapa8.siext.Services;
 
+import com.grupocapa8.siext.DTO.CategoriaInsumoDTO;
 import com.grupocapa8.siext.DTO.EventoTrazabilidadDTO;
 import com.grupocapa8.siext.DTO.Fecha;
 import java.time.LocalDate;
@@ -10,6 +11,29 @@ import java.time.LocalDate;
  */
 public class EventoTrazabilidadServices {
     private EventoTrazDAO eventoTrazDAO; //acceso a la BD
+    
+    public void lecturaDTOs(){
+        int idEventoTraz = 0;
+        while(eventoTrazDAO.BuscarEventoTraz(idEventoTraz)){
+            EventoTrazabilidadDTO dto = eventoTrazDAO.obtenerEventoTraz(idEventoTraz);
+            recibirEventoTrazDTO(dto);
+            idEventoTraz = idEventoTraz + 1;    
+        }
+        if(idEventoTraz == 0){
+            System.out.println("No Existen Eventos de trazabilidad en la BD");
+        }
+        
+        
+         
+    }
+    public void BuscarDto(int idEventoTraz){
+        validarID(idEventoTraz);
+        if (!eventoTrazDAO.BuscarEventoTraz(idEventoTraz)){
+            throw new IllegalArgumentException("No existe el Evento de trazabilidad");
+        }
+        EventoTrazabilidadDTO dto = eventoTrazDAO.obtenerEventoTraz(idEventoTraz);
+        recibirEventoTrazDTO(dto); //enviando el dto a la capa de presentacion para que lo muestre
+    }
     
     public void crearEventoTraz(EventoTrazabilidadDTO dto){
         validarID(dto.getBienAsociado());

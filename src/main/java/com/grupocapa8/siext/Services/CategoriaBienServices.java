@@ -9,6 +9,28 @@ import com.grupocapa8.siext.DTO.CategoriaBienDTO;
 public class CategoriaBienServices {
     private CategoriaBienDAO categoriaBienDAO; //acceso a la BD
     
+    public void lecturaDTOs(){
+        int idCategoriaBien = 0;
+        while(categoriaBienDAO.BuscarCategoriaBien(idCategoriaBien)){
+            CategoriaBienDTO dto = categoriaBienDAO.obtenerCategoriaBien(idCategoriaBien);
+            recibirCategoriaBienDTO(dto);
+            idCategoriaBien = idCategoriaBien + 1;    
+        }
+        if(idCategoriaBien == 0){
+            System.out.println("No Existen Categoria de Bienes almacenados en BD");
+        }
+        
+        
+         
+    }
+    public void BuscarDto(int idCategoriaBien){
+        validarID(idCategoriaBien);
+        if (!categoriaBienDAO.BuscarCategoriaBien(idCategoriaBien)){
+            throw new IllegalArgumentException("No existe la categoria del Bien");
+        }
+        CategoriaBienDTO dto = categoriaBienDAO.obtenerCategoriaBien(idCategoriaBien);
+        recibirCategoriaBienDTO(dto); //enviando el dto a la capa de presentacion para que lo muestre
+    }
     public void crearCategoriaBien(CategoriaBienDTO dto){
         validarString(dto.getNombre(),1);
         validarStock(dto.getStock(),dto.getMinReposicion());

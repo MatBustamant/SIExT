@@ -9,6 +9,29 @@ import com.grupocapa8.siext.DTO.InsumoDTO;
 public class InsumoService{
     private InsumoDAO insumoDAO; //acceso a la BD
     
+    public void lecturaDTOs(){
+        int idInsumo = 0;
+        while(insumoDAO.BuscarInsumo(idInsumo)){
+            InsumoDTO dto = insumoDAO.obtenerInsumo(idInsumo);
+            recibirInsumoDTO(dto);
+            idInsumo = idInsumo + 1;    
+        }
+        if(idInsumo == 0){
+            System.out.println("No Existen Insumos en la BD");
+        }
+        
+        
+         
+    }
+    public void BuscarDto(int idInsumo){
+        validarID(idInsumo);
+        if (!insumoDAO.BuscarInsumo(idInsumo)){
+            throw new IllegalArgumentException("No existe el insumo");
+        }
+        InsumoDTO dto = insumoDAO.obtenerInsumo(idInsumo);
+        recibirInsumoDTO(dto); //enviando el dto a la capa de presentacion para que lo muestre
+    }
+    
     public void crearInsumo(InsumoDTO dto){
         validarString(dto.getNombre(),1);
         validarString(dto.getNombreCatInsumo(),1);

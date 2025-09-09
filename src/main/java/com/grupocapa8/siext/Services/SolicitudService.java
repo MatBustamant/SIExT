@@ -7,6 +7,30 @@ import java.time.LocalDate;
 public class SolicitudService {
     private SolicitudDAO solicitudDAO; //acceso a la BD
     
+    
+    public void lecturaDTOs(){
+        int numSolicitud = 0;
+        while(solicitudDAO.BuscarSolicitud(numSolicitud)){
+            SolicitudDTO dto = solicitudDAO.obtenerSolicitud(numSolicitud);
+            recibirSolicitudDTO(dto);
+            numSolicitud = numSolicitud + 1;    
+        }
+        if(numSolicitud == 0){
+            System.out.println("No Existe la solicitud en la BD");
+        }
+        
+        
+         
+    }
+    public void BuscarDto(int numSolicitud){
+        validarID(numSolicitud);
+        if (!solicitudDAO.BuscarSolicitud(numSolicitud)){
+            throw new IllegalArgumentException("No existe la solicitud");
+        }
+        SolicitudDTO dto = solicitudDAO.obtenerSolicitud(numSolicitud);
+        recibirSolicitudDTO(dto); //enviando el dto a la capa de presentacion para que lo muestre
+    }
+    
     public void crearSolicitud(SolicitudDTO dto){
         validarNumero(dto.getNumSolicitud());
         validarLegajo(dto.getLegSolicitante());

@@ -9,6 +9,30 @@ import com.grupocapa8.siext.DTO.CategoriaInsumoDTO;
 public class CategoriaInsumoServices {
   private CategoriaInsumoDAO categoriaInsumoDAO; //acceso a la BD
     
+    public void lecturaDTOs(){
+        int idCategoriaInsumoDTO = 0;
+        while(categoriaInsumoDAO.BuscarCategoriaInsumo(idCategoriaInsumoDTO)){
+            CategoriaInsumoDTO dto = categoriaInsumoDAO.obtenerCategoriaInsumo(idCategoriaInsumoDTO);
+            recibirCategoriaInsumoDTO(dto);
+            idCategoriaInsumoDTO = idCategoriaInsumoDTO + 1;    
+        }
+        if(idCategoriaInsumoDTO == 0){
+            System.out.println("No Existen Categoria de Insumos almacenados en BD");
+        }
+        
+        
+         
+    }
+    public void BuscarDto(int idCategoriaInsumoDTO){
+        validarID(idCategoriaInsumoDTO);
+        if (!categoriaInsumoDAO.BuscarCategoriaInsumo(idCategoriaInsumoDTO)){
+            throw new IllegalArgumentException("No existe la categoria del Insumo");
+        }
+        CategoriaInsumoDTO dto = categoriaInsumoDAO.obtenerCategoriaInsumo(idCategoriaInsumoDTO);
+        recibirCategoriaInsumoDTO(dto); //enviando el dto a la capa de presentacion para que lo muestre
+    }
+  
+  
     public void crearCategoriaInsumoDTO(CategoriaInsumoDTO dto){
         validarString(dto.getNombre(),1);
         validarString(dto.getClaseInsumo(),2);

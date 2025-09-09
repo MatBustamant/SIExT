@@ -9,6 +9,30 @@ import com.grupocapa8.siext.DTO.BienDTO;
 public class BienService {
     private BienDAO bienDAO; //acceso a la BD
     
+    
+    public void lecturaDTOs(){
+        int idBien = 0;
+        while(bienDAO.BuscarBien(idBien)){
+            BienDTO dto = bienDAO.obtenerBien(idBien);
+            recibirBienDTO(dto);
+            idBien = idBien + 1;    
+        }
+        if(idBien == 0){
+            System.out.println("No Existen Bienes almacenados en BD");
+        }
+        
+        
+         //enviando el dto a la capa de presentacion para que lo muestre y me devuelva el dto modificado
+    }
+    public void BuscarDto(int idBien){
+        validarID(idBien);
+        if (!bienDAO.BuscarBien(idBien)){
+            throw new IllegalArgumentException("No existe el Bien");
+        }
+        BienDTO dto = bienDAO.obtenerBien(idBien);
+        recibirBienDTO(dto); //enviando el dto a la capa de presentacion para que lo muestre y me devuelva el dto modificado
+    }
+    
     public void crearBien(BienDTO dto){
         validarString(dto.getNombre(),1);
         validarString(dto.getNombreCatBienes(),1);
@@ -51,6 +75,7 @@ public class BienService {
             bienDAO.eliminarBien(idBien);
         }   
     } 
+    
     public void validarUbicacionBien(String ubi){
         if (ubi== null || ubi.length() < 3 || ubi.length() > 80) {
             throw new IllegalArgumentException("La ubicacion debe tener entre 3 y 80 caracteres");
