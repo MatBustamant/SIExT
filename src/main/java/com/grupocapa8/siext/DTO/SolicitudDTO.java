@@ -7,16 +7,14 @@ package com.grupocapa8.siext.DTO;
 public class SolicitudDTO {
     private Integer numSolicitud;
     private String FechaInicioSolicitud;
-    private String DestinoProductos;
+    private String UbicacionBienes;
     private String Estado;
-    private String LegSolicitante;
 
-    public SolicitudDTO(Integer numSolicitud, String FechaInicioSolicitud, String DestinoProductos, String Estado, String LegSolicitante) {
+    public SolicitudDTO(Integer numSolicitud, String FechaInicioSolicitud, String UbicacionBienes, String Estado) {
         this.numSolicitud = numSolicitud;
         this.FechaInicioSolicitud = FechaInicioSolicitud;
-        this.DestinoProductos = DestinoProductos;
+        this.UbicacionBienes = UbicacionBienes;
         this.Estado = Estado;
-        this.LegSolicitante = LegSolicitante;
     }
 
     public Integer getNumSolicitud() {
@@ -35,12 +33,12 @@ public class SolicitudDTO {
         this.FechaInicioSolicitud = FechaInicioSolicitud;
     }
 
-    public String getDestinoProductos() {
-        return DestinoProductos;
+    public String getUbicacionBienes() {
+        return UbicacionBienes;
     }
 
-    public void setDestinoProductos(String DestinoProductos) {
-        this.DestinoProductos = DestinoProductos;
+    public void setUbicacionBienes(String UbicacionBienes) {
+        this.UbicacionBienes = UbicacionBienes;
     }
 
     public String getEstado() {
@@ -49,16 +47,5 @@ public class SolicitudDTO {
 
     public void setEstado(String Estado) {
         this.Estado = Estado;
-    }
-
-    public String getLegSolicitante() {
-        return LegSolicitante;
-    }
-
-    public void setLegSolicitante(String LegSolicitante) {
-        this.LegSolicitante = LegSolicitante;
-    }
-
-    
-    
+    }   
 }

@@ -33,7 +33,6 @@ public class CategoriaBienServices {
     }
     public void crearCategoriaBien(CategoriaBienDTO dto){
         validarString(dto.getNombre(),1);
-        validarStock(dto.getStock(),dto.getMinReposicion());
 
         categoriaBienDAO.guardar(dto);
     } 
@@ -46,7 +45,6 @@ public class CategoriaBienServices {
         CategoriaBienDTO dto = categoriaBienDAO.obtenerCategoriaBien(idCategoriaBien);
         dto = recibirCategoriaBienDTO(dto); //enviando el dto a la capa de presentacion para que lo muestre y me devuelva el dto modificado
         validarString(dto.getNombre(),1);
-        validarStock(dto.getStock(),dto.getMinReposicion());
        
         categoriaBienDAO.guardar(dto);
     } 
@@ -67,23 +65,7 @@ public class CategoriaBienServices {
             categoriaBienDAO.eliminarCategoriaBien(idCategoriaBien);
         }   
     } 
-    public void validarStock(Integer stock, Integer minimoReposicion){
-        if (stock == null) {
-            throw new IllegalArgumentException("El stock no puede ser nulo.");
-        }
-        if (minimoReposicion == null) {
-            throw new IllegalArgumentException("El mínimo de reposición no puede ser nulo.");
-        }
-        if (stock < 0) {
-            throw new IllegalArgumentException("El stock no puede ser negativo.");
-        }
-        if (minimoReposicion < 0) {
-            throw new IllegalArgumentException("El mínimo de reposición no puede ser negativo.");
-        }
-        if (minimoReposicion > stock) {
-            System.out.println("⚠️ Advertencia: el stock actual está por debajo del mínimo de reposición.");
-        }
-    }
+  
     public void validarID(Integer id){
         if (id == null) {
             throw new IllegalArgumentException("El ID no puede ser nulo.");

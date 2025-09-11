@@ -37,7 +37,6 @@ public class BienService {
         validarString(dto.getNombre(),1);
         validarString(dto.getNombreCatBienes(),1);
         validarUbicacionBien(dto.getUbicacionBien());
-        validarString(dto.getClaseProducto(),2);
         validarString(dto.getEstadoBien(),3);
         
         bienDAO.guardar(dto);
@@ -53,7 +52,6 @@ public class BienService {
         validarString(dto.getNombre(),1);
         validarString(dto.getNombreCatBienes(),1);
         validarUbicacionBien(dto.getUbicacionBien());
-        validarString(dto.getClaseProducto(),2);
         validarString(dto.getEstadoBien(),3);
        
         bienDAO.guardar(dto);
@@ -93,9 +91,8 @@ public class BienService {
         if (string == null || string.length() < 3 || string.length() > 50) {
             switch (a){
                 case 1 -> throw new IllegalArgumentException("El nombre debe tener entre 3 y 50 caracteres");
-                case 2 -> throw new IllegalArgumentException("La clase de producto no debe estar vacia");
-                case 3 -> throw new IllegalArgumentException("El estado del bien no debe estar vacio");
-                case 4 -> throw new IllegalArgumentException("El Rol debe tener entre 3 y 50 caracteres");
+                case 2 -> throw new IllegalArgumentException("El estado del bien no debe estar vacio");
+                case 3 -> throw new IllegalArgumentException("El Rol debe tener entre 3 y 50 caracteres");
             } 
         }
     }

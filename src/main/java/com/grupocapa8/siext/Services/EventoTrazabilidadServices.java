@@ -1,8 +1,6 @@
 package com.grupocapa8.siext.Services;
 
-import com.grupocapa8.siext.DTO.CategoriaInsumoDTO;
 import com.grupocapa8.siext.DTO.EventoTrazabilidadDTO;
-import com.grupocapa8.siext.DTO.Fecha;
 import java.time.LocalDate;
 
 /**
