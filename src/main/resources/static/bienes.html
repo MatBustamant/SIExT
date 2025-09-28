@@ -53,7 +53,7 @@
             <ul>
                 <li><a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver al Panel</a></li>
                 <li><a href="inventario.html" class="btn"><i class="bi bi-card-list"></i></i>Listar Inventario</a></li>
-                <li><a href="categorias.html" class="btn"><i class="bi bi-tags"></i>Editar Categorías</a></li>
+                <li><a href="eventos.html" class="btn"><i class="bi bi-exclamation-circle"></i>Registrar Eventos</a></li>
             </ul>
         </nav>
     </div>
@@ -76,8 +76,8 @@
                     </div> -->
                     <div>
                         <label>Categoría</label>
-                        <select id="categoriaProducto" required>
-                        </select>
+                        <input list="categoriasSugeridas" type="text" id="categoriaProducto" required>
+                        <datalist id="categoriasSugeridas"></datalist>
                     </div>
                     <div>
                         <label>Nombre</label>
@@ -131,7 +131,8 @@
                 <form id="formModificarDatos" class="hidden" style="margin-top: 1rem;">
                     <div>
                         <label>Categoría</label>
-                        <select id="modCategoria" required></select>
+                        <input list="modCategoriasSugeridas" type="text" id="modCategoria" required>
+                        <datalist id="modCategoriasSugeridas"></datalist>
                     </div>
                     <div>
                         <label>Nombre</label>
@@ -238,7 +239,8 @@
             sel.disabled = false;
         }
 
-        cargarCategorias("categoriaProducto");
+        cargarCategorias("categoriasSugeridas");
+        cargarCategorias("modCategoriasSugeridas");
 
 /*        claseProducto.addEventListener("change", () => {
             if (!claseProducto.value) {
@@ -268,7 +270,7 @@
 
             const nombre = document.getElementById("nombreProducto").value.toUpperCase();
             const ubicacion = ubicacionProducto.value.toUpperCase();
-            const categoria = categoriaProducto.value;
+            const categoria = categoriaProducto.value.toUpperCase();
             const stockInicial = +document.getElementById("stockInicial").value;
 
             // Validación básica
@@ -299,6 +301,15 @@
                     };
                     ingresos.push(ing);
                     prods.push(bien);
+                }
+                if (!JSON.parse(localStorage.getItem("categorias")).some(c => c.nombre === categoria)) {
+                    // Agregar nueva categoría si no existe
+                    // Esto reemplaza la página entera de categorías
+                    const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
+                    categorias.push({ id: Date.now(), nombre: categoria });
+                    localStorage.setItem("categorias", JSON.stringify(categorias));
+                    cargarCategorias("categoriasSugeridas");
+                    cargarCategorias("modCategoriasSugeridas");
                 }
             }
                 // if (stockInicial > 0) {
@@ -408,13 +419,6 @@
             // }
 
 
-            modNombre.value = p.nombre;
-            // modClaseSel.value = p.clase;
-            cargarCategorias("modCategoria");
-            modCategoria.value = p.categoria;
-            modUbicacion.value = p.ubicacion;
-            // modMinimo.value = p.minimoReposicion;
-
             // const grupoModMinimo = document.getElementById("grupoModMinimo");
             // if (p.clase === "Bien") {
             //     grupoModMinimo.classList.add("hidden");
@@ -440,6 +444,11 @@
                 document.getElementById("formModificarDatos").classList.remove("hidden");
                 // document.getElementById("formAgregarStock").classList.add("hidden");
                 document.getElementById("tituloProductoEncontrado").textContent = "Modificar Datos del Bien";
+                modNombre.value = p.nombre;
+                // modClaseSel.value = p.clase;
+                modCategoria.value = p.categoria;
+                modUbicacion.value = p.ubicacion;
+                // modMinimo.value = p.minimoReposicion;
                 ocultarInfoYAcciones();
             };
 
@@ -469,11 +478,20 @@
 
                 p.nombre = modNombre.value.toUpperCase();
                 // p.clase = modClaseSel.value;
-                p.categoria = modCategoria.value;
+                p.categoria = modCategoria.value.toUpperCase();
                 p.ubicacion = modUbicacion.value.toUpperCase();
                 // p.minimoReposicion = +modMinimo.value;
 
                 localStorage.setItem("productos", JSON.stringify(prods));
+                if (!JSON.parse(localStorage.getItem("categorias")).some(c => c.nombre === p.categoria)) {
+                    // Agregar nueva categoría si no existe
+                    // Esto reemplaza la página entera de categorías
+                    const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
+                    categorias.push({ id: Date.now(), nombre: p.categoria });
+                    localStorage.setItem("categorias", JSON.stringify(categorias));
+                    cargarCategorias("categoriasSugeridas");
+                    cargarCategorias("modCategoriasSugeridas");
+                }
                 alert("Datos actualizados.");
                 mostrarInfoYAcciones(p.id);
                 document.getElementById("formModificarDatos").classList.add("hidden");
