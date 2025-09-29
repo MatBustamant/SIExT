@@ -25,7 +25,7 @@
     <thead>
       <tr>
         <th>Fecha</th>
-        <th>Producto</th>
+        <th>Nombre</th>
         <th>Categoría</th>
         <th>Cantidad Ingresada</th>
       </tr>
@@ -49,19 +49,44 @@
     const tbody = document.querySelector("#tablaIngresos tbody");
 
     // Preparar datos: filtrar, mapear, ordenar por fecha
-    const ingresosFiltrados = ingresos
-      .filter(i => i.fecha >= desde && i.fecha <= hasta)
-      .map(i => {
-        const p = productos.find(prod => prod.id === i.productoId);
-        return {
-          fecha: i.fecha,
+    // const ingresosFiltrados = ingresos
+    //   .filter(i => i.fecha >= desde && i.fecha <= hasta)
+    //   .map(i => {
+    //     const p = productos.find(prod => prod.id === i.productoId);
+    //     return {
+    //       fecha: i.fecha,
+    //       clase: p ? p.clase : "Sin datos",
+    //       nombre: p ? p.nombre : "Producto eliminado",
+    //       categoria: p ? p.categoria : "-",
+    //       cantidad: i.cantidad
+    //     };
+    //   })
+    //   .sort((a, b) => a.fecha.localeCompare(b.fecha));
+const ingresosFiltrados = Object.values(
+  ingresos
+    .filter(i => i.fecha >= desde && i.fecha <= hasta)
+    .reduce((acc, i) => {
+      const p = productos.find(prod => prod.id === i.productoId);
+      const fecha = i.fecha;
+      const nombre = p ? p.nombre : "Producto eliminado";
+      const categoria = p ? p.categoria : "-";
+
+      // clave única: fecha + nombre + categoría
+      const clave = `${fecha}-${nombre}-${categoria}`;
+
+      if (!acc[clave]) {
+        acc[clave] = {
+          fecha,
           clase: p ? p.clase : "Sin datos",
-          nombre: p ? p.nombre : "Producto eliminado",
-          categoria: p ? p.categoria : "-",
-          cantidad: i.cantidad
+          nombre,
+          categoria,
+          cantidad: 0
         };
-      })
-      .sort((a, b) => a.fecha.localeCompare(b.fecha));
+      }
+      acc[clave].cantidad += 1;
+      return acc;
+    }, {})
+).sort((a, b) => a.fecha.localeCompare(b.fecha));
 
     if (ingresosFiltrados.length === 0) {
       const fila = document.createElement("tr");
@@ -69,20 +94,20 @@
       tbody.appendChild(fila);
     } else {
       // Agrupar por clase
-      const ingresosPorClase = {};
-      ingresosFiltrados.forEach(dato => {
-        if (!ingresosPorClase[dato.clase]) ingresosPorClase[dato.clase] = [];
-        ingresosPorClase[dato.clase].push(dato);
-      });
+      // const ingresosPorClase = {};
+      // ingresosFiltrados.forEach(dato => {
+      //   if (!ingresosPorClase[dato.clase]) ingresosPorClase[dato.clase] = [];
+      //   ingresosPorClase[dato.clase].push(dato);
+      // });
 
       // Insertar al DOM agrupado
-      Object.keys(ingresosPorClase).forEach(clase => {
-        const filaClase = document.createElement("tr");
-        filaClase.classList.add("grupo-clase");
-        filaClase.innerHTML = `<td colspan="4">${clase}</td>`;
-        tbody.appendChild(filaClase);
+      // Object.keys(ingresosPorClase).forEach(clase => {
+      //   const filaClase = document.createElement("tr");
+      //   filaClase.classList.add("grupo-clase");
+      //   filaClase.innerHTML = `<td colspan="4">${clase}</td>`;
+      //   tbody.appendChild(filaClase);
 
-        ingresosPorClase[clase].forEach(dato => {
+        ingresosFiltrados.forEach(dato => {
           const fila = document.createElement("tr");
           fila.innerHTML = `
             <td>${dato.fecha}</td>
@@ -92,8 +117,7 @@
           `;
           tbody.appendChild(fila);
         });
-      });
-    }
+      };
   </script>
 
 </body>
