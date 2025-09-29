@@ -31,10 +31,10 @@
         <section>
             <h2>Registrar nueva solicitud</h2>
             <form id="solicitudForm">
-                <label>Fecha</label>
-                <input type="date" id="fecha" required>
-                <label>Legajo solicitante</label>
-                <input type="text" id="legajo" required>
+                <!-- <label>Fecha</label> -->
+                <!-- <input type="date" id="fecha" required> -->
+                <!-- <label>Legajo solicitante</label> -->
+                <!-- <input type="text" id="legajo" required> -->
                 <label>Ubicación destino</label>
                 <input type="text" id="ubicacion" required>
                 <label>Estado</label>
@@ -58,7 +58,7 @@
                     <tr>
                         <th>N° Solicitud</th>
                         <th>Fecha</th>
-                        <th>Legajo</th>
+                        <!-- <th>Legajo</th> -->
                         <th>Ubicación</th>
                         <th>Estado</th>
                         <th>Acciones</th>
@@ -73,10 +73,10 @@
             <h2>Editar solicitud</h2>
             <form id="modificarSolicitudForm">
                 <input type="hidden" id="modSolicitudId">
-                <label>Fecha</label>
-                <input type="date" id="modFecha" required>
-                <label>Legajo solicitante</label>
-                <input type="text" id="modLegajo" required>
+                <!-- <label>Fecha</label> -->
+                <!-- <input type="date" id="modFecha" required> -->
+                <!-- <label>Legajo solicitante</label> -->
+                <!-- <input type="text" id="modLegajo" required> -->
                 <label>Ubicación destino</label>
                 <input type="text" id="modUbicacion" required>
                 <label>Estado</label>
@@ -107,7 +107,6 @@
                 {
                     id: 1,
                     fecha: "2025-06-15",
-                    legajo: "12345",
                     ubicacion: "GAME",
                     estado: "Pendiente de aprobación",
                     descripcion: "5 resmas A4, 2 toners HP 85A"
@@ -115,7 +114,6 @@
                 {
                     id: 2,
                     fecha: "2025-06-16",
-                    legajo: "67890",
                     ubicacion: "Parque Industrial",
                     estado: "Aprobada",
                     descripcion: "20 metros cable 2,5mm, 5 tubos LED 18W"
@@ -123,7 +121,6 @@
                 {
                     id: 3,
                     fecha: "2025-06-17",
-                    legajo: "54321",
                     ubicacion: "Bedelía",
                     estado: "Aprobada",
                     descripcion: "1 Mouse"
@@ -142,7 +139,6 @@
                 fila.innerHTML = `
                     <td>${sol.id}</td>
                     <td>${sol.fecha}</td>
-                    <td>${sol.legajo}</td>
                     <td>${sol.ubicacion}</td>
                     <td>${sol.estado}</td>
                     <td>
@@ -174,8 +170,8 @@
             const sol = solicitudes.find(s => s.id === id);
             if (!sol) return;
             document.getElementById("modSolicitudId").value = sol.id;
-            document.getElementById("modFecha").value = sol.fecha;
-            document.getElementById("modLegajo").value = sol.legajo;
+            // document.getElementById("modFecha").value = sol.fecha;
+            // document.getElementById("modLegajo").value = sol.legajo;
             document.getElementById("modUbicacion").value = sol.ubicacion;
             document.getElementById("modEstado").value = sol.estado;
             document.getElementById("modDescripcion").value = sol.descripcion;
@@ -188,8 +184,8 @@
             const solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
             const sol = solicitudes.find(s => s.id === id);
             if (!sol) return;
-            sol.fecha = document.getElementById("modFecha").value;
-            sol.legajo = document.getElementById("modLegajo").value.trim();
+            // sol.fecha = document.getElementById("modFecha").value;
+            // sol.legajo = document.getElementById("modLegajo").value.trim();
             sol.ubicacion = document.getElementById("modUbicacion").value.trim();
             sol.estado = document.getElementById("modEstado").value;
             sol.descripcion = document.getElementById("modDescripcion").value.trim();
