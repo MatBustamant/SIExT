@@ -195,9 +195,9 @@
 
         if (!localStorage.getItem("ingresos")) {
             const ingresosPredef = [
-                { id: 1, productoId: 1, fecha: "2025-01-01" },
-                { id: 2, productoId: 2, fecha: "2025-01-03" },
-                { id: 3, productoId: 3, fecha: "2025-01-04" }
+                { id: 1, productoId: 1, fecha: "2025-01-01T22:10:12.781Z" },
+                { id: 2, productoId: 2, fecha: "2025-01-03T22:10:12.781Z" },
+                { id: 3, productoId: 3, fecha: "2025-01-04T22:10:12.781Z" }
             ];
             localStorage.setItem("ingresos", JSON.stringify(ingresosPredef));
         }
@@ -294,10 +294,7 @@
                     const ing = {
                         id: Date.now() + i,
                         productoId: bien.id,
-                        fecha: new Date().toLocaleDateString('es-AR', {
-                            timeZone: 'America/Argentina/Buenos_Aires',
-                            year: 'numeric', month: '2-digit', day: '2-digit'
-                        }).split('/').reverse().join('-')
+                        fecha: new Date().toISOString()
                     };
                     ingresos.push(ing);
                     prods.push(bien);
