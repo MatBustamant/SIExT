@@ -5,18 +5,22 @@ package com.grupocapa8.siext.DTO;
  * @author geroj
  */
 public class BienDTO {
+    private int ID_Bien;
     private String Nombre;
     private String UbicacionBien;
     private String EstadoBien; //Cambiaria a EnUso o EnDesuso
     private String NombreCatBienes;
 
-    public BienDTO(String Nombre , String UbicacionBien, String EstadoBien, String NombreCatBienes) {
+    public BienDTO(int ID_Bien, String Nombre, String UbicacionBien, String EstadoBien, String NombreCatBienes) {
+        this.ID_Bien = ID_Bien;
         this.Nombre = Nombre;
         this.UbicacionBien = UbicacionBien;
         this.EstadoBien = EstadoBien;
         this.NombreCatBienes = NombreCatBienes;
     }
-
+    public BienDTO(){
+        
+    }
     public String getNombre() {
         return Nombre;
     }
@@ -47,6 +51,14 @@ public class BienDTO {
 
     public void setNombreCatBienes(String NombreCatBienes) {
         this.NombreCatBienes = NombreCatBienes;
+    }
+
+    public int getID_Bien() {
+        return ID_Bien;
+    }
+
+    public void setID_Bien(int ID_Bien) {
+        this.ID_Bien = ID_Bien;
     }
 
    

@@ -1,22 +1,36 @@
 package com.grupocapa8.siext.DTO;
 
+import java.time.LocalDate;
+
 /**
  *
  * @author geroj
  */
 public class SolicitudDTO {
     private Integer numSolicitud;
-    private String FechaInicioSolicitud;
+    private LocalDate FechaInicioSolicitud;
     private String UbicacionBienes;
     private String Estado;
-
-    public SolicitudDTO(Integer numSolicitud, String FechaInicioSolicitud, String UbicacionBienes, String Estado) {
+    private String Descripcion;
+    
+    public SolicitudDTO(){
+        
+    }
+    public SolicitudDTO(Integer numSolicitud, LocalDate FechaInicioSolicitud, String UbicacionBienes, String Estado) {
         this.numSolicitud = numSolicitud;
         this.FechaInicioSolicitud = FechaInicioSolicitud;
         this.UbicacionBienes = UbicacionBienes;
         this.Estado = Estado;
     }
 
+    public String getDescripcion() {
+        return Descripcion;
+    }
+
+    public void setDescripcion(String Descripcion) {
+        this.Descripcion = Descripcion;
+    }
+    
     public Integer getNumSolicitud() {
         return numSolicitud;
     }
@@ -25,11 +39,11 @@ public class SolicitudDTO {
         this.numSolicitud = numSolicitud;
     }
 
-    public String getFechaInicioSolicitud() {
+    public LocalDate getFechaInicioSolicitud() {
         return FechaInicioSolicitud;
     }
 
-    public void setFechaInicioSolicitud(String FechaInicioSolicitud) {
+    public void setFechaInicioSolicitud(LocalDate FechaInicioSolicitud) {
         this.FechaInicioSolicitud = FechaInicioSolicitud;
     }
 
