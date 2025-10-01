@@ -2,221 +2,32 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Registrar Eventos - SIExT</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Registrar eventos - SIExT</title>
     <link href="icons/bootstrap-icons.css" rel="stylesheet">
-    <link rel="icon" href="Logo del sistema SIExT.png">
-    <style>
-        :root {
-            --negro: #000;
-            --gris-oscuro: #212529;
-            --blanco: #fff;
-            --azul: #007bff;
-            --azul-profundo: #0066cc;
-            --fondo: #f1f4f9;
-            --texto-secundario: #747775;
-            --rojo: #dc3545;
-            --rojo-profundo: #a61b26;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background-color: var(--fondo);
-            color: var(--gris-oscuro);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        header {
-            background-color: var(--gris-oscuro);
-            color: var(--blanco);
-            padding: 1rem 2rem;
-            font-size: 1.3rem;
-            font-weight: 600;
-        }
-
-        main {
-            flex: 1;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        section {
-            background: var(--blanco);
-            padding: 1.5rem;
-            border-radius: 6px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        h2 {
-            margin-bottom: 1rem;
-        }
-
-        label {
-            font-weight: 600;
-            margin-bottom: 0.4rem;
-            display: block;
-        }
-
-        input,
-        select,
-        textarea {
-            padding: 0.6rem;
-            width: 100%;
-            margin-bottom: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.7rem 1.2rem;
-            height: 42px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            background-color: var(--azul);
-            color: var(--blanco);
-            transition: background 0.25s ease;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-top: 1rem;
-        }
-
-        .btn-row {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .btn:hover {
-            background-color: var(--azul-profundo);
-        }
-
-        .btn-danger {
-            background-color: var(--rojo);
-        }
-
-        .btn-danger:hover {
-            background-color: var(--rojo-profundo);
-        }
-
-        .filters {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-bottom: 1rem;
-        }
-
-        .filters input,
-        .filters select {
-            padding: 0.5rem;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-
-        th,
-        td {
-            padding: 0.8rem;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-            font-size: 0.95rem;
-        }
-
-        th {
-            background-color: var(--gris-oscuro);
-            color: var(--blanco);
-            cursor: pointer;
-        }
-
-        tr:hover {
-            background-color: #f5f5f5;
-        }
-
-        .counter {
-            margin-top: 1rem;
-            font-size: 0.95rem;
-            color: var(--texto-secundario);
-        }
-
-        .actions {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            /* margin-bottom: 1rem; */
-        }
-
-        .cabecera {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        footer {
-            text-align: center;
-            padding: 1rem;
-            font-size: 0.8rem;
-            color: var(--texto-secundario);
-        }
-
-        .pieza-input {
-            padding: 0.6rem;
-            width: 100%;
-            margin-bottom: 0.6rem;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-    </style>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/tablas.css">
+    <link rel="icon" href="images\icon.png">
 </head>
 
 <body>
 
-    <header>SIExT | Registrar Evento</header>
+    <header>SIExT | Registrar eventos</header>
 
-    <main>
-        <section class="cabecera">
+    <div class="default-block-container">
+        <nav>
             <h2>Acciones rápidas</h2>
-            <div>
-                <a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver a Panel</a>
-                <a href="inventario.html" class="btn"><i class="bi bi-card-list"></i></i>Listar Inventario</a>
-                <a href="informes.html" class="btn"><i class="bi bi-file-earmark-text"></i>Generar Informes</a>
-            </div>
-        </section>
+            <ul>
+                <li><a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver al Panel</a></li>
+                <li><a href="inventario.html" class="btn"><i class="bi bi-card-list"></i>Ver Inventario</a></li>
+                <li><a href="informes.html" class="btn"><i class="bi bi-file-earmark-text"></i>Generar Informes</a></li>
+            </ul>
+        </nav>
+    </div>
 
+    <main class="default-block-container">
+        <!-- Formulario para agregar nuevo evento -->
         <section>
             <h2>Registrar evento sobre un bien</h2>
             <form>
@@ -225,28 +36,28 @@
                         <label>ID del bien</label>
                         <input type="number" required>
                     </div>
-
                     <div>
                         <label>Tipo de evento</label>
                         <select id="tipoEvento" required>
                             <option value="">Seleccionar</option>
-                            <option>Avería</option>
-                            <option>Reparación</option>
-                            <option>Devolución</option>
-                            <option>Despiece</option>
+                            <option value="AVERIO">Averío</option>
+                            <option value="REPARACION">Reparación</option>
+                            <option value="ENTREGA">Entrega</option>
                         </select>
                     </div>
                 </div>
+                <!-- 
+                <div class="form-grid">
+                    <div>
+                        <label>Fecha</label>
+                        <input type="date" required>
+                    </div>
+                    <div>
+                        <label>Hora</label>
+                        <input type="time" required>
+                    </div>
+                </div> -->
 
-                <div>
-                    <label>Fecha</label>
-                    <input type="date" required>
-                </div>
-
-                <div>
-                    <label>Hora</label>
-                    <input type="time" required>
-                </div>
                 <div id="despiecePiezasSection" class="hidden">
                     <div
                         style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
@@ -257,25 +68,31 @@
                     <div id="piezasContainer"></div>
                 </div>
 
-                <div class="btn-group">
+                <div class="btn-row">
                     <button type="submit" class="btn"><i class="bi bi-plus-circle"></i>Registrar</button>
                 </div>
             </form>
         </section>
 
+        <!-- Gestión de eventos -->
         <section>
             <h2>Eventos registrados</h2>
-
-            <div class="filters">
-                <input type="number" placeholder="Filtrar por ID de bien">
-                <select>
-                    <option value="">Todos</option>
-                    <option>Avería</option>
-                    <option>Reparación</option>
-                    <option>Devolución</option>
-                    <option>Despiece</option>
-                </select>
-                <input type="date">
+            <!-- Filtros -->
+            <div class="form-grid">
+                <div>
+                    <input type="number" placeholder="Filtrar por ID de bien">
+                </div>
+                <div>
+                    <select>
+                        <option value="">Todos los eventos</option>
+                        <option value="AVERIO">Averío</option>
+                        <option value="REPARACION">Reparación</option>
+                        <option value="ENTREGA">Entrega</option>
+                    </select>
+                </div>
+                <div>
+                    <input type="date">
+                </div>
             </div>
 
             <table>
@@ -285,7 +102,6 @@
                         <th>Bien</th>
                         <th>Tipo</th>
                         <th>Fecha</th>
-                        <th>Hora</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -293,9 +109,8 @@
                     <tr>
                         <td>1</td>
                         <td>1023</td>
-                        <td>Avería</td>
-                        <td>2025-06-29</td>
-                        <td>14:30</td>
+                        <td>Averío</td>
+                        <td>2025-06-29 22:30:20 (localizado para Arg)</td>
                         <td>
                             <button class="btn"><i class="bi bi-pencil"></i></button>
                         </td>
@@ -303,9 +118,11 @@
                 </tbody>
             </table>
 
-            <div class="counter">Mostrando 1 evento(s).</div>
+            <div class="informativo">Mostrando 1 evento(s).</div>
         </section>
-        <section id="modificarEventoSection" class="form-section hidden">
+
+        <!-- Formulario para modificar evento seleccionado -->
+        <section id="modificarEventoSection" class="hidden">
             <h2>Actualizar evento</h2>
             <form id="modificarEventoForm">
                 <input type="hidden" id="modEventoId">
@@ -316,17 +133,16 @@
                 <label>Tipo de evento</label>
                 <select id="modTipoEvento" required>
                     <option value="">Seleccionar</option>
-                    <option>Avería</option>
-                    <option>Reparación</option>
-                    <option>Devolución</option>
-                    <option>Despiece</option>
+                    <option value="AVERIO">Averío</option>
+                    <option value="REPARACION">Reparación</option>
+                    <option value="ENTREGA">Entrega</option>
                 </select>
 
-                <label>Fecha</label>
+                <!-- <label>Fecha</label>
                 <input type="date" id="modFechaEvento" required>
 
                 <label>Hora</label>
-                <input type="time" id="modHoraEvento" required>
+                <input type="time" id="modHoraEvento" required> -->
 
                 <div id="modDespiecePiezasSection" class="hidden">
                     <div
@@ -348,6 +164,7 @@
                 </div>
             </form>
         </section>
+
     </main>
 
     <footer>SIExT | 2025</footer>
@@ -359,9 +176,9 @@
                 // Datos simulados: en producción, tomás los valores reales de la fila
                 document.getElementById("modEventoId").value = "1";
                 document.getElementById("modBienId").value = "1023";
-                document.getElementById("modTipoEvento").value = "Avería";
-                document.getElementById("modFechaEvento").value = "2025-06-29";
-                document.getElementById("modHoraEvento").value = "14:30";
+                document.getElementById("modTipoEvento").value = "AVERIO";
+                // document.getElementById("modFechaEvento").value = "2025-06-29";
+                // document.getElementById("modHoraEvento").value = "14:30";
 
                 // Mostrar sección de edición
                 document.getElementById("modificarEventoSection").classList.remove("hidden");
@@ -389,176 +206,176 @@
         });
     </script>
 
-    <script>
-        // Mostrar sección de piezas si evento es despiece
-        document.getElementById("tipoEvento").addEventListener("change", function () {
-            if (this.value === "Despiece") {
-                document.getElementById("despiecePiezasSection").classList.remove("hidden");
-            } else {
-                document.getElementById("despiecePiezasSection").classList.add("hidden");
-                document.getElementById("piezasContainer").innerHTML = "";
-            }
-        });
+    <!-- <script>
+        // // Mostrar sección de piezas si evento es despiece
+        // document.getElementById("tipoEvento").addEventListener("change", function () {
+        //     if (this.value === "Despiece") {
+        //         document.getElementById("despiecePiezasSection").classList.remove("hidden");
+        //     } else {
+        //         document.getElementById("despiecePiezasSection").classList.add("hidden");
+        //         document.getElementById("piezasContainer").innerHTML = "";
+        //     }
+        // });
 
-        // Agregar pieza en registro
-        document.getElementById("agregarPiezaBtn").addEventListener("click", () => {
-            const container = document.getElementById("piezasContainer");
+        // // Agregar pieza en registro
+        // document.getElementById("agregarPiezaBtn").addEventListener("click", () => {
+        //     const container = document.getElementById("piezasContainer");
 
-            // Crear un div contenedor para la fila
-            const filaDiv = document.createElement("div");
-            filaDiv.style.display = "flex";
-            filaDiv.style.gap = "1rem";
-            filaDiv.style.alignItems = "flex-end";
-            filaDiv.style.marginBottom = "1rem";
+        //     // Crear un div contenedor para la fila
+        //     const filaDiv = document.createElement("div");
+        //     filaDiv.style.display = "flex";
+        //     filaDiv.style.gap = "1rem";
+        //     filaDiv.style.alignItems = "flex-end";
+        //     filaDiv.style.marginBottom = "1rem";
 
-            // Crear div para categoría (label + select)
-            const categoriaDiv = document.createElement("div");
-            categoriaDiv.style.flex = "1";
+        //     // Crear div para categoría (label + select)
+        //     const categoriaDiv = document.createElement("div");
+        //     categoriaDiv.style.flex = "1";
 
-            const labelCategoria = document.createElement("label");
-            labelCategoria.textContent = "Categoría";
-            labelCategoria.setAttribute("for", "categoriaProducto");
-            categoriaDiv.appendChild(labelCategoria);
+        //     const labelCategoria = document.createElement("label");
+        //     labelCategoria.textContent = "Categoría";
+        //     labelCategoria.setAttribute("for", "categoriaProducto");
+        //     categoriaDiv.appendChild(labelCategoria);
 
-            const selectCategoria = document.createElement("select");
-            selectCategoria.id = "categoriaProducto";
-            selectCategoria.required = true;
-            selectCategoria.style.width = "100%";
-            selectCategoria.style.padding = "0.6rem";
-            selectCategoria.style.border = "1px solid #ccc";
-            selectCategoria.style.borderRadius = "5px";
+        //     const selectCategoria = document.createElement("select");
+        //     selectCategoria.id = "categoriaProducto";
+        //     selectCategoria.required = true;
+        //     selectCategoria.style.width = "100%";
+        //     selectCategoria.style.padding = "0.6rem";
+        //     selectCategoria.style.border = "1px solid #ccc";
+        //     selectCategoria.style.borderRadius = "5px";
 
-            // Opción vacía
-            const opcionDefault = document.createElement("option");
-            opcionDefault.value = "";
-            opcionDefault.textContent = "Seleccionar";
-            selectCategoria.appendChild(opcionDefault);
+        //     // Opción vacía
+        //     const opcionDefault = document.createElement("option");
+        //     opcionDefault.value = "";
+        //     opcionDefault.textContent = "Seleccionar";
+        //     selectCategoria.appendChild(opcionDefault);
 
-            categoriaDiv.appendChild(selectCategoria);
+        //     categoriaDiv.appendChild(selectCategoria);
 
-            // Crear div para nombre (label + input)
-            const nombreDiv = document.createElement("div");
-            nombreDiv.style.flex = "1";
+        //     // Crear div para nombre (label + input)
+        //     const nombreDiv = document.createElement("div");
+        //     nombreDiv.style.flex = "1";
 
-            const labelNombre = document.createElement("label");
-            labelNombre.textContent = "Nombre";
-            labelNombre.setAttribute("for", "nombreProducto");
-            nombreDiv.appendChild(labelNombre);
+        //     const labelNombre = document.createElement("label");
+        //     labelNombre.textContent = "Nombre";
+        //     labelNombre.setAttribute("for", "nombreProducto");
+        //     nombreDiv.appendChild(labelNombre);
 
-            const inputNombre = document.createElement("input");
-            inputNombre.type = "text";
-            inputNombre.id = "nombreProducto";
-            inputNombre.required = true;
-            inputNombre.style.width = "100%";
-            inputNombre.style.padding = "0.6rem";
-            inputNombre.style.border = "1px solid #ccc";
-            inputNombre.style.borderRadius = "5px";
+        //     const inputNombre = document.createElement("input");
+        //     inputNombre.type = "text";
+        //     inputNombre.id = "nombreProducto";
+        //     inputNombre.required = true;
+        //     inputNombre.style.width = "100%";
+        //     inputNombre.style.padding = "0.6rem";
+        //     inputNombre.style.border = "1px solid #ccc";
+        //     inputNombre.style.borderRadius = "5px";
 
-            nombreDiv.appendChild(inputNombre);
+        //     nombreDiv.appendChild(inputNombre);
 
-            // Crear botón eliminar
-            const btnEliminar = document.createElement("button");
-            btnEliminar.innerHTML = "<i class='bi bi-x-lg'></i>";
-            btnEliminar.className = "btn btn-danger";
-            btnEliminar.style.height = "36px";
-            btnEliminar.style.marginBottom = "1rem";
-            btnEliminar.type = "button";
-            btnEliminar.addEventListener("click", () => filaDiv.remove());
+        //     // Crear botón eliminar
+        //     const btnEliminar = document.createElement("button");
+        //     btnEliminar.innerHTML = "<i class='bi bi-x-lg'></i>";
+        //     btnEliminar.className = "btn btn-danger";
+        //     btnEliminar.style.height = "36px";
+        //     btnEliminar.style.marginBottom = "1rem";
+        //     btnEliminar.type = "button";
+        //     btnEliminar.addEventListener("click", () => filaDiv.remove());
 
-            // Agregar los elementos a la fila
-            filaDiv.appendChild(categoriaDiv);
-            filaDiv.appendChild(nombreDiv);
-            filaDiv.appendChild(btnEliminar);
+        //     // Agregar los elementos a la fila
+        //     filaDiv.appendChild(categoriaDiv);
+        //     filaDiv.appendChild(nombreDiv);
+        //     filaDiv.appendChild(btnEliminar);
 
-            // Agregar la fila al contenedor
-            container.appendChild(filaDiv);
-        });
+        //     // Agregar la fila al contenedor
+        //     container.appendChild(filaDiv);
+        // });
 
-        // Mostrar sección de piezas en modificar evento
-        document.getElementById("modTipoEvento").addEventListener("change", function () {
-            if (this.value === "Despiece") {
-                document.getElementById("modDespiecePiezasSection").classList.remove("hidden");
-            } else {
-                document.getElementById("modDespiecePiezasSection").classList.add("hidden");
-                document.getElementById("modPiezasContainer").innerHTML = "";
-            }
-        });
+        // // Mostrar sección de piezas en modificar evento
+        // document.getElementById("modTipoEvento").addEventListener("change", function () {
+        //     if (this.value === "Despiece") {
+        //         document.getElementById("modDespiecePiezasSection").classList.remove("hidden");
+        //     } else {
+        //         document.getElementById("modDespiecePiezasSection").classList.add("hidden");
+        //         document.getElementById("modPiezasContainer").innerHTML = "";
+        //     }
+        // });
 
-        // Agregar pieza en modificación
-        document.getElementById("modAgregarPiezaBtn").addEventListener("click", () => {
-            const container = document.getElementById("modPiezasContainer");
+        // // Agregar pieza en modificación
+        // document.getElementById("modAgregarPiezaBtn").addEventListener("click", () => {
+        //     const container = document.getElementById("modPiezasContainer");
 
-            // Crear un div contenedor para la fila
-            const filaDiv = document.createElement("div");
-            filaDiv.style.display = "flex";
-            filaDiv.style.gap = "1rem";
-            filaDiv.style.alignItems = "flex-end";
-            filaDiv.style.marginBottom = "1rem";
+        //     // Crear un div contenedor para la fila
+        //     const filaDiv = document.createElement("div");
+        //     filaDiv.style.display = "flex";
+        //     filaDiv.style.gap = "1rem";
+        //     filaDiv.style.alignItems = "flex-end";
+        //     filaDiv.style.marginBottom = "1rem";
 
-            // Crear div para categoría (label + select)
-            const categoriaDiv = document.createElement("div");
-            categoriaDiv.style.flex = "1";
+        //     // Crear div para categoría (label + select)
+        //     const categoriaDiv = document.createElement("div");
+        //     categoriaDiv.style.flex = "1";
 
-            const labelCategoria = document.createElement("label");
-            labelCategoria.textContent = "Categoría";
-            labelCategoria.setAttribute("for", "modCategoriaProducto");
-            categoriaDiv.appendChild(labelCategoria);
+        //     const labelCategoria = document.createElement("label");
+        //     labelCategoria.textContent = "Categoría";
+        //     labelCategoria.setAttribute("for", "modCategoriaProducto");
+        //     categoriaDiv.appendChild(labelCategoria);
 
-            const selectCategoria = document.createElement("select");
-            selectCategoria.id = "modCategoriaProducto";
-            selectCategoria.required = true;
-            selectCategoria.style.width = "100%";
-            selectCategoria.style.padding = "0.6rem";
-            selectCategoria.style.border = "1px solid #ccc";
-            selectCategoria.style.borderRadius = "5px";
+        //     const selectCategoria = document.createElement("select");
+        //     selectCategoria.id = "modCategoriaProducto";
+        //     selectCategoria.required = true;
+        //     selectCategoria.style.width = "100%";
+        //     selectCategoria.style.padding = "0.6rem";
+        //     selectCategoria.style.border = "1px solid #ccc";
+        //     selectCategoria.style.borderRadius = "5px";
 
-            // Opción vacía
-            const opcionDefault = document.createElement("option");
-            opcionDefault.value = "";
-            opcionDefault.textContent = "Seleccionar";
-            selectCategoria.appendChild(opcionDefault);
+        //     // Opción vacía
+        //     const opcionDefault = document.createElement("option");
+        //     opcionDefault.value = "";
+        //     opcionDefault.textContent = "Seleccionar";
+        //     selectCategoria.appendChild(opcionDefault);
 
-            categoriaDiv.appendChild(selectCategoria);
+        //     categoriaDiv.appendChild(selectCategoria);
 
-            // Crear div para nombre (label + input)
-            const nombreDiv = document.createElement("div");
-            nombreDiv.style.flex = "1";
+        //     // Crear div para nombre (label + input)
+        //     const nombreDiv = document.createElement("div");
+        //     nombreDiv.style.flex = "1";
 
-            const labelNombre = document.createElement("label");
-            labelNombre.textContent = "Nombre";
-            labelNombre.setAttribute("for", "modNombreProducto");
-            nombreDiv.appendChild(labelNombre);
+        //     const labelNombre = document.createElement("label");
+        //     labelNombre.textContent = "Nombre";
+        //     labelNombre.setAttribute("for", "modNombreProducto");
+        //     nombreDiv.appendChild(labelNombre);
 
-            const inputNombre = document.createElement("input");
-            inputNombre.type = "text";
-            inputNombre.id = "modNombreProducto";
-            inputNombre.required = true;
-            inputNombre.style.width = "100%";
-            inputNombre.style.padding = "0.6rem";
-            inputNombre.style.border = "1px solid #ccc";
-            inputNombre.style.borderRadius = "5px";
+        //     const inputNombre = document.createElement("input");
+        //     inputNombre.type = "text";
+        //     inputNombre.id = "modNombreProducto";
+        //     inputNombre.required = true;
+        //     inputNombre.style.width = "100%";
+        //     inputNombre.style.padding = "0.6rem";
+        //     inputNombre.style.border = "1px solid #ccc";
+        //     inputNombre.style.borderRadius = "5px";
 
-            nombreDiv.appendChild(inputNombre);
+        //     nombreDiv.appendChild(inputNombre);
 
-            // Crear botón eliminar
-            const btnEliminar = document.createElement("button");
-            btnEliminar.innerHTML = "<i class='bi bi-x-lg'></i>";
-            btnEliminar.className = "btn btn-danger";
-            btnEliminar.style.height = "36px";
-            btnEliminar.style.marginBottom = "1rem";
-            btnEliminar.type = "button";
-            btnEliminar.addEventListener("click", () => filaDiv.remove());
+        //     // Crear botón eliminar
+        //     const btnEliminar = document.createElement("button");
+        //     btnEliminar.innerHTML = "<i class='bi bi-x-lg'></i>";
+        //     btnEliminar.className = "btn btn-danger";
+        //     btnEliminar.style.height = "36px";
+        //     btnEliminar.style.marginBottom = "1rem";
+        //     btnEliminar.type = "button";
+        //     btnEliminar.addEventListener("click", () => filaDiv.remove());
 
-            // Agregar los elementos a la fila
-            filaDiv.appendChild(categoriaDiv);
-            filaDiv.appendChild(nombreDiv);
-            filaDiv.appendChild(btnEliminar);
+        //     // Agregar los elementos a la fila
+        //     filaDiv.appendChild(categoriaDiv);
+        //     filaDiv.appendChild(nombreDiv);
+        //     filaDiv.appendChild(btnEliminar);
 
-            // Agregar la fila al contenedor
-            container.appendChild(filaDiv);
-        });
+        //     // Agregar la fila al contenedor
+        //     container.appendChild(filaDiv);
+        // });
 
-    </script>
+    </script> -->
 
 </body>
 
