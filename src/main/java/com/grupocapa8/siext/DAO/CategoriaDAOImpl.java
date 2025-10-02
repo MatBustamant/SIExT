@@ -107,14 +107,14 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
     }
 
     @Override
-    public int eliminar(CategoriaBienDTO Categoria) {
+    public int eliminar(int id) {
         String sql = "DELETE FROM Categoria WHERE ID_Categoria = ?";
         int resultado = 0;
         
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
-            ps.setInt(1, Categoria.getID_Categoria());
+            ps.setInt(1, id);
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {

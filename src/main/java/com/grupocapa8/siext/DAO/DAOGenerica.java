@@ -15,5 +15,5 @@ public interface DAOGenerica<T> {
     List<T> buscarTodos();
     int insertar(T entidad);
     int actualizar(T entidad);
-    int eliminar(T entidad);
+    int eliminar(int id);
 }

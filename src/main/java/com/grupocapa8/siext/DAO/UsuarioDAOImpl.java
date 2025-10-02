@@ -106,14 +106,14 @@ public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
     }
 
     @Override
-    public int eliminar(UsuarioDTO Usuario) {
+    public int eliminar(int id) {
         String sql = "DELETE FROM Usuario WHERE id = ?";
         int resultado = 0;
         
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
-            ps.setInt(1, Usuario.getID_Usuario());
+            ps.setInt(1, id);
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {

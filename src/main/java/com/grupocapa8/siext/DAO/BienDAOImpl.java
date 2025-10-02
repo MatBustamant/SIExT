@@ -130,14 +130,14 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
     }
 
     @Override
-    public int eliminar(BienDTO bien) {
+    public int eliminar(int id) {
         String sql = "DELETE FROM Bien WHERE ID_Bien = ?";
         int resultado = 0;
         
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
-            ps.setInt(1, bien.getID_Bien());
+            ps.setInt(1, id);
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {

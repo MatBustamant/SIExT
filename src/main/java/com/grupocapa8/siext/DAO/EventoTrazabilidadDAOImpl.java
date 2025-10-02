@@ -128,13 +128,13 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
     }
 
     @Override
-    public int eliminar(EventoTrazabilidadDTO Evento) {
+    public int eliminar(int id) {
         String sql = "DELETE FROM EventoTrazabilidad WHERE ID_Evento = ?";
         int resultado = 0;
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
-            ps.setInt(1, Evento.getID_Evento());
+            ps.setInt(1, id);
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
             System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);

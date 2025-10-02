@@ -117,13 +117,13 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
     }    
 
     @Override
-    public int eliminar(SolicitudDTO Solicitud) {
+    public int eliminar(int id) {
         String sql = "DELETE FROM Solicitud WHERE Num_Solicitud = ?";
         int resultado = 0;
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
-            ps.setInt(1, Solicitud.getNumSolicitud());
+            ps.setInt(1, id);
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
