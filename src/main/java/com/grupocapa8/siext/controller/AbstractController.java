@@ -4,6 +4,7 @@
  */
 package com.grupocapa8.siext.controller;
 
+import com.grupocapa8.siext.Services.ServiceGenerico;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -19,7 +20,7 @@ import jakarta.ws.rs.core.MediaType;
  */
 public abstract class AbstractController<E, ID> {
     
-    protected Object servicio;
+    protected ServiceGenerico servicio;
     
     @POST
     @Consumes(MediaType.APPLICATION_JSON)

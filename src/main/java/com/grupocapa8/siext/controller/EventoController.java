@@ -4,6 +4,8 @@
  */
 package com.grupocapa8.siext.controller;
 
+import com.grupocapa8.siext.DTO.EventoTrazabilidadDTO;
+import com.grupocapa8.siext.Services.EventoTrazabilidadServices;
 import jakarta.ws.rs.Path;
 
 /**
@@ -11,10 +13,10 @@ import jakarta.ws.rs.Path;
  * @author Matias
  */
 @Path("evento")
-public class EventoController extends AbstractController<Object, Integer>{
+public class EventoController extends AbstractController<EventoTrazabilidadDTO, Integer>{
 
     public EventoController() {
-        this.servicio = new Object(); //EventoService
+        this.servicio = new EventoTrazabilidadServices(); //EventoService
     }
     
 }

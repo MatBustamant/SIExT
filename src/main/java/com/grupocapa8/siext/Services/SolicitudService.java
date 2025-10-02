@@ -4,7 +4,7 @@ import com.grupocapa8.siext.DAO.SolicitudDAOImpl;
 import com.grupocapa8.siext.DTO.SolicitudDTO;
 import java.util.NoSuchElementException;
 
-public class SolicitudService {
+public class SolicitudService implements ServiceGenerico<SolicitudDTO> {
     private final SolicitudDAOImpl solicitudDAO; //acceso a la BD
 
     public SolicitudService() {
@@ -23,7 +23,8 @@ public class SolicitudService {
 //        }
 //    }
     
-    public SolicitudDTO BuscarDto(int numSolicitud) throws NoSuchElementException {
+    @Override
+    public SolicitudDTO buscar(int numSolicitud) throws NoSuchElementException {
         validarNumero(numSolicitud);
         SolicitudDTO solicitud = solicitudDAO.buscar(numSolicitud);
         if (solicitud == null){
@@ -32,7 +33,8 @@ public class SolicitudService {
         return solicitud;
     }
     
-    public void crearSolicitud(SolicitudDTO dto){
+    @Override
+    public void crear(SolicitudDTO dto){
         validarNumero(dto.getNumSolicitud());
         // validarFecha(dto.getFechaInicioSolicitud()); ver que hacer
         validarString(dto.getEstado(),3);
@@ -41,7 +43,8 @@ public class SolicitudService {
         solicitudDAO.insertar(dto);
     } 
     
-    public void modificarSolicitud(SolicitudDTO dto) throws NoSuchElementException {
+    @Override
+    public void modificar(SolicitudDTO dto) throws NoSuchElementException {
         int numSolicitud = dto.getNumSolicitud();
         validarNumero(numSolicitud);
         if (solicitudDAO.buscar(numSolicitud) == null){
@@ -55,7 +58,8 @@ public class SolicitudService {
         solicitudDAO.actualizar(dto);
     }
     
-    public void eliminarSolicitud(Integer numSolicitud) throws NoSuchElementException {
+    @Override
+    public void eliminar(int numSolicitud) throws NoSuchElementException {
         validarNumero(numSolicitud);
         if (solicitudDAO.buscar(numSolicitud) == null){ //hacer una validacion del id
             throw new NoSuchElementException("No existe la solicitud");

@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
  *
  * @author geroj
  */
-public class BienService {
+public class BienService implements ServiceGenerico<BienDTO> {
     private final BienDAOImpl bienDAO; //acceso a la BD
 
     public BienService() {
@@ -30,7 +30,8 @@ public class BienService {
 //         //enviando el dto a la capa de presentacion para que lo muestre y me devuelva el dto modificado
 //    }
     
-    public BienDTO BuscarDto(int idBien) throws NoSuchElementException {
+    @Override
+    public BienDTO buscar(int idBien) throws NoSuchElementException {
         validarID(idBien);
         BienDTO bien = bienDAO.buscar(idBien);
         if (bien == null){
@@ -39,7 +40,8 @@ public class BienService {
         return bien;
     }
     
-    public void crearBien(BienDTO dto){
+    @Override
+    public void crear(BienDTO dto){
         validarString(dto.getNombre(),1);
         validarString(dto.getNombreCatBienes(),1);
         validarUbicacionBien(dto.getUbicacionBien());
@@ -48,7 +50,8 @@ public class BienService {
         bienDAO.insertar(dto);
     } 
     
-    public void modificarBien(BienDTO dto) throws NoSuchElementException {
+    @Override
+    public void modificar(BienDTO dto) throws NoSuchElementException {
         int idBien = dto.getID_Bien();
         validarID(idBien);
         if (bienDAO.buscar(idBien) == null){
@@ -62,7 +65,8 @@ public class BienService {
         bienDAO.actualizar(dto);
     } 
    
-    public void eliminarBien(int idBien) throws NoSuchElementException {
+    @Override
+    public void eliminar(int idBien) throws NoSuchElementException {
         validarID(idBien);
         if (bienDAO.buscar(idBien) == null){
             throw new NoSuchElementException("No existe el Bien");

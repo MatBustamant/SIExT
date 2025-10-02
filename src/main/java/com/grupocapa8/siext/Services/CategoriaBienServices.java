@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
  *
  * @author geroj
  */
-public class CategoriaBienServices {
+public class CategoriaBienServices implements ServiceGenerico<CategoriaBienDTO>{
     private final CategoriaDAOImpl categoriaBienDAO; //acceso a la BD
 
     public CategoriaBienServices() {
@@ -27,7 +27,8 @@ public class CategoriaBienServices {
 //        }
 //    }
     
-    public CategoriaBienDTO BuscarDto(int idCategoriaBien) throws NoSuchElementException {
+    @Override
+    public CategoriaBienDTO buscar(int idCategoriaBien) throws NoSuchElementException {
         validarID(idCategoriaBien);
         CategoriaBienDTO categoria = categoriaBienDAO.buscar(idCategoriaBien);
         if (categoria == null){
@@ -36,13 +37,15 @@ public class CategoriaBienServices {
         return categoria;
     }
     
-    public void crearCategoriaBien(CategoriaBienDTO dto){
+    @Override
+    public void crear(CategoriaBienDTO dto){
         validarString(dto.getNombre(),1);
 
         categoriaBienDAO.insertar(dto);
     } 
     
-    public void modificarCategoriaBien(CategoriaBienDTO dto) throws NoSuchElementException {
+    @Override
+    public void modificar(CategoriaBienDTO dto) throws NoSuchElementException {
         int idCategoriaBien = dto.getID_Categoria();
         validarID(idCategoriaBien);
         if (categoriaBienDAO.buscar(idCategoriaBien) == null){
@@ -53,7 +56,8 @@ public class CategoriaBienServices {
         categoriaBienDAO.actualizar(dto);
     } 
    
-    public void eliminarCategoriaBien(int idCategoriaBien) throws NoSuchElementException {
+    @Override
+    public void eliminar(int idCategoriaBien) throws NoSuchElementException {
         validarID(idCategoriaBien);
         if (categoriaBienDAO.buscar(idCategoriaBien) == null){
             throw new NoSuchElementException("No existe la categoria");

@@ -8,7 +8,7 @@ import org.mindrot.jbcrypt.BCrypt;
  *
  * @author geroj
  */
-public class UsuarioService {
+public class UsuarioService implements ServiceGenerico<UsuarioDTO> {
    private final UsuarioDAOImpl usuarioDAO; //acceso a la BD
 
     public UsuarioService() {
@@ -27,7 +27,8 @@ public class UsuarioService {
 //        }   
 //    }
     
-    public UsuarioDTO BuscarDto(int idUsuario) throws NoSuchElementException {
+   @Override
+    public UsuarioDTO buscar(int idUsuario) throws NoSuchElementException {
         validarID(idUsuario);
         UsuarioDTO usuario = usuarioDAO.buscar(idUsuario);
         
@@ -38,7 +39,8 @@ public class UsuarioService {
         return usuario; //enviando el dto a la capa de presentacion para que lo muestre
     }
     
-    public void crearUsuario(UsuarioDTO dto){
+   @Override
+    public void crear(UsuarioDTO dto){
         validarString(dto.getNombre(),1);
         validarString(dto.getRol(),2);
         validarContraseña(dto.getContraseña());
@@ -48,7 +50,8 @@ public class UsuarioService {
         usuarioDAO.insertar(dto);
     }
     
-    public void modificarUsuario(UsuarioDTO dto) throws NoSuchElementException {
+   @Override
+    public void modificar(UsuarioDTO dto) throws NoSuchElementException {
         int idUsuario = dto.getID_Usuario();
         validarID(idUsuario);
         if (usuarioDAO.buscar(idUsuario) == null){
@@ -64,7 +67,8 @@ public class UsuarioService {
         usuarioDAO.actualizar(dto);
     }
     
-    public void eliminarUsuario(Integer idUsuario) throws NoSuchElementException {
+   @Override
+    public void eliminar(int idUsuario) throws NoSuchElementException {
         validarID(idUsuario);
         if (usuarioDAO.buscar(idUsuario) == null){ //hacer una validacion del id
             throw new NoSuchElementException("No existe el usuario");

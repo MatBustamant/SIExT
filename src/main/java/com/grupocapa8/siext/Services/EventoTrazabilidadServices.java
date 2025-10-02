@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
  *
  * @author geroj
  */
-public class EventoTrazabilidadServices {
+public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabilidadDTO>{
     private final EventoTrazabilidadDAOImpl eventoTrazDAO; //acceso a la BD
 
     public EventoTrazabilidadServices() {
@@ -27,7 +27,8 @@ public class EventoTrazabilidadServices {
 //        }
 //    }
     
-    public EventoTrazabilidadDTO BuscarDto(int idEventoTraz) throws NoSuchElementException {
+    @Override
+    public EventoTrazabilidadDTO buscar(int idEventoTraz) throws NoSuchElementException {
         validarID(idEventoTraz);
         EventoTrazabilidadDTO evento = eventoTrazDAO.buscar(idEventoTraz);
         if (evento == null){
@@ -36,16 +37,18 @@ public class EventoTrazabilidadServices {
         return evento;
     }
     
-    public void crearEventoTraz(EventoTrazabilidadDTO dto){
+    @Override
+    public void crear(EventoTrazabilidadDTO dto){
         validarID(dto.getBienAsociado());
         // validarFecha(dto.getFechaEvento()); ver que se va hacer con estas validaciones
         validarString(dto.getTipoEvento(),1);
         // validarHorario(dto.getHorarioEvento().getHoraFormateada()); ver que se va hacer con estas validaciones
         
         eventoTrazDAO.insertar(dto);
-    } 
+    }
     
-    public void modificarEventoTraz(EventoTrazabilidadDTO dto) throws NoSuchElementException {
+    @Override
+    public void modificar(EventoTrazabilidadDTO dto) throws NoSuchElementException {
         int idEventoTraz = dto.getID_Evento();
         validarID(idEventoTraz);
         if (eventoTrazDAO.buscar(idEventoTraz) == null){
@@ -57,8 +60,10 @@ public class EventoTrazabilidadServices {
         // validarHorario(dto.getHorarioEvento().getHoraFormateada()); ver que se va hacer con estas validaciones
         
         eventoTrazDAO.actualizar(dto);
-    } 
-    public void eliminarEventoTraz(Integer idEventoTraz) throws NoSuchElementException {
+    }
+    
+    @Override
+    public void eliminar(int idEventoTraz) throws NoSuchElementException {
         validarID(idEventoTraz);
         if (eventoTrazDAO.buscar(idEventoTraz) == null){ //hacer una validacion del id
             throw new NoSuchElementException("No existe el evento de trazabilidad");
