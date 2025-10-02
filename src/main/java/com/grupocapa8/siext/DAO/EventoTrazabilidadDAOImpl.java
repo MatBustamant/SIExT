@@ -26,7 +26,7 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
     @Override
     public EventoTrazabilidadDTO buscar(int id) throws SQLException {
 
-        EventoTrazabilidadDTO evento = null;
+        EventoTrazabilidadDTO evento = new EventoTrazabilidadDTO();
         String sql = "SELECT * FROM EventoTrazabilidad WHERE ID_Evento = ?";
         try (Connection con = getConnection();
             PreparedStatement ps = con.prepareStatement(sql)) {

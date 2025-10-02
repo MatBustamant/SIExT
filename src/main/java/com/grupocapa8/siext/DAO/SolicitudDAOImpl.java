@@ -20,7 +20,7 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
 
     @Override
     public SolicitudDTO buscar(int id) throws SQLException {
-        SolicitudDTO soli = null;
+        SolicitudDTO soli = new SolicitudDTO();
         String sql = "SELECT * FROM Solicitud WHERE Num_Solicitud = ?";
         try (Connection con = getConnection();
             PreparedStatement ps = con.prepareStatement(sql)) {
