@@ -2,12 +2,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.grupocapa8.siext.DAOImpl;
+package com.grupocapa8.siext.DAO;
 
 import com.grupocapa8.siext.ConexionBD.BasedeDatos;
 import static com.grupocapa8.siext.ConexionBD.BasedeDatos.getConnection;
 import com.grupocapa8.siext.DTO.SolicitudDTO;
-import com.grupocapa8.siext.InterfacesDAO.DAOGenerica;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,7 +19,7 @@ import java.util.List;
 public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
 
     @Override
-    public SolicitudDTO get(int id) throws SQLException {
+    public SolicitudDTO buscar(int id) throws SQLException {
         SolicitudDTO soli = null;
         String sql = "SELECT * FROM Solicitud WHERE Num_Solicitud = ?";
         try (Connection con = getConnection();
@@ -48,7 +47,7 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
     }
 
     @Override
-    public List<SolicitudDTO> getAll() throws SQLException {
+    public List<SolicitudDTO> buscarTodos() throws SQLException {
         List<SolicitudDTO> solicitudes = new ArrayList<>();
         String sql = "SELECT * FROM Solicitud";
         try (Connection con = getConnection();
@@ -89,11 +88,6 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
             ps.close();
         }
         return resultado;    
-    }
-
-    @Override
-    public int guardar(SolicitudDTO Solicitud) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override

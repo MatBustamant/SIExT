@@ -2,11 +2,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.grupocapa8.siext.DAOImpl;
+package com.grupocapa8.siext.DAO;
 
 import com.grupocapa8.siext.ConexionBD.BasedeDatos;
 import com.grupocapa8.siext.DTO.UsuarioDTO;
-import com.grupocapa8.siext.InterfacesDAO.DAOGenerica;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,7 +16,7 @@ import java.util.List;
 public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
 
     @Override
-    public UsuarioDTO get(int id) throws SQLException {
+    public UsuarioDTO buscar(int id) throws SQLException {
         Connection con = BasedeDatos.getConnection();
         UsuarioDTO usuario = null;
         
@@ -41,7 +40,7 @@ public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
     }
 
     @Override
-    public List<UsuarioDTO> getAll() throws SQLException {
+    public List<UsuarioDTO> buscarTodos() throws SQLException {
         List<UsuarioDTO> usuarios = new ArrayList<>();
         
         String sql = "SELECT * FROM Usuario";
@@ -81,10 +80,6 @@ public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
        return result;
        
     
-    }
-    @Override
-    public int guardar(UsuarioDTO Usuario) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override

@@ -2,11 +2,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.grupocapa8.siext.DAOImpl;
+package com.grupocapa8.siext.DAO;
 
 import com.grupocapa8.siext.ConexionBD.BasedeDatos;
 import com.grupocapa8.siext.DTO.BienDTO;
-import com.grupocapa8.siext.InterfacesDAO.DAOGenerica;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,9 +18,15 @@ import java.util.List;
  * @author oveja
  */
 public class BienDAOImpl implements DAOGenerica<BienDTO> {
+    
+    private CategoriaDAOImpl categoriaDAO;
+
+    public BienDAOImpl() {
+        this.categoriaDAO = new CategoriaDAOImpl();
+    }
 
     @Override
-    public BienDTO get(int id) throws SQLException {
+    public BienDTO buscar(int id) throws SQLException {
         Connection con = BasedeDatos.getConnection();
         BienDTO bien = null;
         
@@ -37,36 +42,15 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
             String estado = rs.getString("Estado");
             String ubicacion = rs.getString("Ubicacion");
             int categoriaID = rs.getInt("ID_Categoria");
-            String nombreCategoriaBien = getNombreCatBienesByID(categoriaID);
+            String nombreCategoriaBien = categoriaDAO.buscarNombrePorId(categoriaID);
             
             bien = new BienDTO(bienID, nombreBien, ubicacion, estado, nombreCategoriaBien);
         }
         return bien;
     }
 
-    public String getNombreCatBienesByID(int idCat) throws SQLException {
-        Connection con = BasedeDatos.getConnection();
-        String nombreCatBien = null;
-
-        String sql = "SELECT Nombre FROM Categoria WHERE ID_Categoria = ?";
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setInt(1, idCat);
-
-        ResultSet rs = ps.executeQuery();
-
-        if (rs.next()) {
-            nombreCatBien = rs.getString("Nombre");
-        }
-
-        rs.close();
-        ps.close();
-        con.close();
-
-        return nombreCatBien;
-    }
-
     @Override
-    public List getAll() throws SQLException {
+    public List buscarTodos() throws SQLException {
         List<BienDTO> bienes = new ArrayList<>();
 
         String sql = "SELECT * FROM Bien";
@@ -77,7 +61,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
                 bien.setID_Bien(rs.getInt("ID_Bien"));
                 bien.setNombre(rs.getString("Nombre"));
                 int categoriaID = rs.getInt("ID_Categoria");
-                bien.setNombreCatBienes(getNombreCatBienesByID(categoriaID));  //Ocurre que ID_Categoria es clave foranea, NO tengo el nombre de la cat
+                bien.setNombreCatBienes(categoriaDAO.buscarNombrePorId(categoriaID));  //Ocurre que ID_Categoria es clave foranea, NO tengo el nombre de la cat
                 //llamo a una busqueda en la tabla Categoria, enviandole el id que tengo desde tabla Bien
                 //Porque en el DTO no me interesa el idcat, sino nombre de categoria, entonces debo buscarlo 
                 //para ponerlo en la lista y sea compatible con BienDTO
@@ -90,10 +74,11 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
         return bienes;
     }
 
+    @Override
     public int insertar(BienDTO Bien) throws SQLException {
         Connection con = BasedeDatos.getConnection();
 
-        int idCategoria = getIdCategoriaByNombre(Bien.getNombreCatBienes());
+        int idCategoria = categoriaDAO.buscarPorNombre(Bien.getNombreCatBienes());
         if (idCategoria == -1) {
             throw new SQLException("La categoría '" + Bien.getNombreCatBienes() + "' no existe en la base de datos"); //evitamos errores si pregunta si existe la categoria primero
         }
@@ -115,37 +100,11 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
         return result;
     }
 
-    public int getIdCategoriaByNombre(String nombreCategoria) throws SQLException {
-        Connection con = BasedeDatos.getConnection();
-        int idCategoria = -1;  // valor por defecto si no se encuentra
-
-        String sql = "SELECT ID_Categoria FROM Categoria WHERE Nombre = ?";
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setString(1, nombreCategoria);
-
-        ResultSet rs = ps.executeQuery();
-
-        if (rs.next()) {
-            idCategoria = rs.getInt("ID_Categoria");
-        }
-
-        rs.close();
-        ps.close();
-        con.close();
-
-        return idCategoria;
-    }
-
-    @Override
-    public int guardar(BienDTO Bien) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
     @Override
     public int actualizar(BienDTO Bien) throws SQLException {
         Connection con = BasedeDatos.getConnection();
 
-        int idCategoria = getIdCategoriaByNombre(Bien.getNombreCatBienes());
+        int idCategoria = categoriaDAO.buscarPorNombre(Bien.getNombreCatBienes());
         if (idCategoria == -1) {
             throw new SQLException("La categoría '" + Bien.getNombreCatBienes() + "' no existe en la base de datos"); //evitamos errores si pregunta si existe la categoria primero
         }

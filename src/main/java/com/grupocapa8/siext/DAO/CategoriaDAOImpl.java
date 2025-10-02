@@ -2,11 +2,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.grupocapa8.siext.DAOImpl;
+package com.grupocapa8.siext.DAO;
 
 import com.grupocapa8.siext.ConexionBD.BasedeDatos;
 import com.grupocapa8.siext.DTO.CategoriaBienDTO;
-import com.grupocapa8.siext.InterfacesDAO.DAOGenerica;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -39,11 +38,6 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
     }
 
     @Override
-    public int guardar(CategoriaBienDTO Categoria) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
     public int actualizar(CategoriaBienDTO Categoria) throws SQLException {
         Connection con = BasedeDatos.getConnection();
         String sql = "UPDATE Categoria set ID_Categoria = ?, Nombre = ?";
@@ -64,7 +58,7 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
     
 
     @Override
-    public CategoriaBienDTO get(int id) throws SQLException {
+    public CategoriaBienDTO buscar(int id) throws SQLException {
 
         Connection con = BasedeDatos.getConnection();
         CategoriaBienDTO categoriaBien = null;
@@ -87,7 +81,7 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
     }
 
     @Override
-    public List<CategoriaBienDTO> getAll() throws SQLException {
+    public List<CategoriaBienDTO> buscarTodos() throws SQLException {
         List<CategoriaBienDTO> categoriaBienes = new ArrayList<>();
 
         String sql = "SELECT * FROM Categoria";
@@ -126,6 +120,48 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
             System.getLogger(CategoriaDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
         return result;
+    }
+    
+    public String buscarNombrePorId(int idCat) throws SQLException {
+        Connection con = BasedeDatos.getConnection();
+        String nombreCategoria = null;
+
+        String sql = "SELECT Nombre FROM Categoria WHERE ID_Categoria = ?";
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setInt(1, idCat);
+
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+            nombreCategoria = rs.getString("Nombre");
+        }
+
+        rs.close();
+        ps.close();
+        con.close();
+
+        return nombreCategoria;
+    }
+    
+    public int buscarPorNombre(String nombreCategoria) throws SQLException {
+        Connection con = BasedeDatos.getConnection();
+        int idCategoria = -1;  // valor por defecto si no se encuentra
+
+        String sql = "SELECT ID_Categoria FROM Categoria WHERE Nombre = ?";
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setString(1, nombreCategoria);
+
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+            idCategoria = rs.getInt("ID_Categoria");
+        }
+
+        rs.close();
+        ps.close();
+        con.close();
+
+        return idCategoria;
     }
 
 }

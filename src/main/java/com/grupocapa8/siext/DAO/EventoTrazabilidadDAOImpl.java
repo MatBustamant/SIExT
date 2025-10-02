@@ -2,12 +2,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.grupocapa8.siext.DAOImpl;
+package com.grupocapa8.siext.DAO;
 
 import com.grupocapa8.siext.ConexionBD.BasedeDatos;
 import static com.grupocapa8.siext.ConexionBD.BasedeDatos.getConnection;
 import com.grupocapa8.siext.DTO.EventoTrazabilidadDTO;
-import com.grupocapa8.siext.InterfacesDAO.DAOGenerica;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,7 +24,7 @@ import java.util.List;
 public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidadDTO> {
 
     @Override
-    public EventoTrazabilidadDTO get(int id) throws SQLException {
+    public EventoTrazabilidadDTO buscar(int id) throws SQLException {
 
         EventoTrazabilidadDTO evento = null;
         String sql = "SELECT * FROM EventoTrazabilidad WHERE ID_Evento = ?";
@@ -58,7 +57,7 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
     }
 
     @Override
-    public List<EventoTrazabilidadDTO> getAll() throws SQLException {
+    public List<EventoTrazabilidadDTO> buscarTodos() throws SQLException {
         
         List<EventoTrazabilidadDTO> eventos = new ArrayList<>();
         String sql = "SELECT * FROM EventoTrazabilidad";
@@ -102,11 +101,6 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
             ps.close();
         }
         return resultado;
-    }
-
-    @Override
-    public int guardar(EventoTrazabilidadDTO Evento) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
