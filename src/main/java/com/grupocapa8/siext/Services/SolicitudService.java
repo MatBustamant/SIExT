@@ -2,6 +2,7 @@ package com.grupocapa8.siext.Services;
 
 import com.grupocapa8.siext.DAO.SolicitudDAOImpl;
 import com.grupocapa8.siext.DTO.SolicitudDTO;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 public class SolicitudService implements ServiceGenerico<SolicitudDTO> {
@@ -31,6 +32,11 @@ public class SolicitudService implements ServiceGenerico<SolicitudDTO> {
             throw new NoSuchElementException("No existe la solicitud");
         }
         return solicitud;
+    }
+    
+    @Override
+    public List<SolicitudDTO> buscarTodos() {
+        return solicitudDAO.buscarTodos();
     }
     
     @Override

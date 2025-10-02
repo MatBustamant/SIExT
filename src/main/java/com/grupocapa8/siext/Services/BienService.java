@@ -2,6 +2,7 @@ package com.grupocapa8.siext.Services;
 
 import com.grupocapa8.siext.DAO.BienDAOImpl;
 import com.grupocapa8.siext.DTO.BienDTO;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -38,6 +39,11 @@ public class BienService implements ServiceGenerico<BienDTO> {
             throw new NoSuchElementException("No existe el Bien");
         }
         return bien;
+    }
+    
+    @Override
+    public List<BienDTO> buscarTodos() {
+        return bienDAO.buscarTodos();
     }
     
     @Override

@@ -2,6 +2,7 @@ package com.grupocapa8.siext.Services;
 
 import com.grupocapa8.siext.DAO.CategoriaDAOImpl;
 import com.grupocapa8.siext.DTO.CategoriaBienDTO;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -35,6 +36,11 @@ public class CategoriaBienServices implements ServiceGenerico<CategoriaBienDTO>{
             throw new NoSuchElementException("No existe la categoria");
         }
         return categoria;
+    }
+    
+    @Override
+    public List<CategoriaBienDTO> buscarTodos() {
+        return categoriaBienDAO.buscarTodos();
     }
     
     @Override

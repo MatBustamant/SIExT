@@ -2,6 +2,7 @@ package com.grupocapa8.siext.Services;
 
 import com.grupocapa8.siext.DAO.UsuarioDAOImpl;
 import com.grupocapa8.siext.DTO.UsuarioDTO;
+import java.util.List;
 import java.util.NoSuchElementException;
 import org.mindrot.jbcrypt.BCrypt;
 /**
@@ -37,6 +38,11 @@ public class UsuarioService implements ServiceGenerico<UsuarioDTO> {
         }
         
         return usuario; //enviando el dto a la capa de presentacion para que lo muestre
+    }
+    
+    @Override
+    public List<UsuarioDTO> buscarTodos() {
+        return usuarioDAO.buscarTodos();
     }
     
    @Override

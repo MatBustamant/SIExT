@@ -4,6 +4,7 @@
  */
 package com.grupocapa8.siext.Services;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -13,6 +14,7 @@ import java.util.NoSuchElementException;
 public interface ServiceGenerico<E> {
     
     public E buscar(int id) throws NoSuchElementException;
+    public List<E> buscarTodos();
     public void crear(E entidad);
     public void modificar(E entidad) throws NoSuchElementException;
     public void eliminar(int id) throws NoSuchElementException;

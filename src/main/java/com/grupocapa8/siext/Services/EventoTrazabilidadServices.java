@@ -2,6 +2,7 @@ package com.grupocapa8.siext.Services;
 
 import com.grupocapa8.siext.DAO.EventoTrazabilidadDAOImpl;
 import com.grupocapa8.siext.DTO.EventoTrazabilidadDTO;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -35,6 +36,11 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
             throw new NoSuchElementException("No existe el Evento de trazabilidad");
         }
         return evento;
+    }
+    
+    @Override
+    public List<EventoTrazabilidadDTO> buscarTodos() {
+        return eventoTrazDAO.buscarTodos();
     }
     
     @Override
