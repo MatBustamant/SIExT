@@ -8,13 +8,12 @@ package com.grupocapa8.siext.DAO;
  *
  * @author oveja
  */
-import java.sql.SQLException;
 import java.util.List;
 
 public interface DAOGenerica<T> {
-    T buscar(int id) throws SQLException;
-    List<T> buscarTodos() throws SQLException;
-    int insertar(T entidad) throws SQLException;
-    int actualizar(T entidad) throws SQLException;
+    T buscar(int id);
+    List<T> buscarTodos();
+    int insertar(T entidad);
+    int actualizar(T entidad);
     int eliminar(T entidad);
 }

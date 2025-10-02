@@ -18,43 +18,50 @@ import java.util.List;
  * @author oveja
  */
 public class BienDAOImpl implements DAOGenerica<BienDTO> {
-    
-    private CategoriaDAOImpl categoriaDAO;
+
+    private final CategoriaDAOImpl categoriaDAO;
 
     public BienDAOImpl() {
         this.categoriaDAO = new CategoriaDAOImpl();
     }
 
     @Override
-    public BienDTO buscar(int id) throws SQLException {
-        Connection con = BasedeDatos.getConnection();
+    public BienDTO buscar(int id) {
+
         BienDTO bien = null;
-        
-        String sql = "SELECT ID_Bien, Nombre, ID_Categoria, Estado, Ubicacion FROM Bien WHERE id= ?";
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setInt(1, id);
-        
-        ResultSet rs = ps.executeQuery();
-        
-        if(rs.next()){
-            int bienID = rs.getInt("ID_Bien");
-            String nombreBien = rs.getString("Nombre");
-            String estado = rs.getString("Estado");
-            String ubicacion = rs.getString("Ubicacion");
-            int categoriaID = rs.getInt("ID_Categoria");
-            String nombreCategoriaBien = categoriaDAO.buscar(categoriaID).getNombre();
-            
-            bien = new BienDTO(bienID, nombreBien, ubicacion, estado, nombreCategoriaBien);
+        String sql = "SELECT * FROM Bien WHERE ID_Bien = ?";
+
+        try (Connection con = BasedeDatos.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    bien = new BienDTO();
+                    bien.setID_Bien(rs.getInt("ID_Bien"));
+                    bien.setNombre(rs.getString("Nombre"));
+                    bien.setEstadoBien(rs.getString("Estado"));
+                    bien.setUbicacionBien(rs.getString("Ubicacion"));
+
+                    int categoriaID = rs.getInt("ID_Categoria");
+                    bien.setNombreCatBienes(categoriaDAO.buscar(categoriaID).getNombre());
+                }
+            }
+        } catch (SQLException ex) {
+            System.getLogger(BienDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
+
         return bien;
     }
 
     @Override
-    public List buscarTodos() throws SQLException {
+    public List<BienDTO> buscarTodos() {
         List<BienDTO> bienes = new ArrayList<>();
 
         String sql = "SELECT * FROM Bien";
-        try (Connection con = BasedeDatos.getConnection(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        try (Connection con = BasedeDatos.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 BienDTO bien = new BienDTO();
@@ -70,86 +77,74 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
 
                 bienes.add(bien);
             }
+        } catch (SQLException ex) {
+            System.getLogger(BienDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
         return bienes;
     }
 
     @Override
-    public int insertar(BienDTO Bien) throws SQLException {
-        Connection con = BasedeDatos.getConnection();
-
-        int idCategoria = categoriaDAO.buscar(Bien.getNombreCatBienes()).getID_Categoria();
-        if (idCategoria == -1) {
-            throw new SQLException("La categoría '" + Bien.getNombreCatBienes() + "' no existe en la base de datos"); //evitamos errores si pregunta si existe la categoria primero
-        }
-
+    public int insertar(BienDTO bien) {
         String sql = "INSERT INTO Bien (ID_Bien, Nombre, ID_Categoria, Estado, Ubicacion) VALUES (?,?,?,?,?)";
-        PreparedStatement ps = con.prepareStatement(sql);
+        int resultado = 0;
+        int idCategoria = categoriaDAO.buscar(bien.getNombreCatBienes()).getID_Categoria();
 
-        ps.setInt(1, Bien.getID_Bien());
-        ps.setString(2, Bien.getNombre());
-        ps.setInt(3, idCategoria); //el id de categoria que mande a buscar antes
-        ps.setString(4, Bien.getEstadoBien());
-        ps.setString(5, Bien.getUbicacionBien());
+        try (Connection con = BasedeDatos.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
 
-        int result = ps.executeUpdate();
-
-        ps.close();
-        con.close();
-
-        return result;
-    }
-
-    @Override
-    public int actualizar(BienDTO Bien) throws SQLException {
-        Connection con = BasedeDatos.getConnection();
-
-        int idCategoria = categoriaDAO.buscar(Bien.getNombreCatBienes()).getID_Categoria();
-        if (idCategoria == -1) {
-            throw new SQLException("La categoría '" + Bien.getNombreCatBienes() + "' no existe en la base de datos"); //evitamos errores si pregunta si existe la categoria primero
+            ps.setInt(1, bien.getID_Bien());
+            ps.setString(2, bien.getNombre());
+            ps.setInt(3, idCategoria); //el id de categoria que mande a buscar antes
+            ps.setString(4, bien.getEstadoBien());
+            ps.setString(5, bien.getUbicacionBien());
+            
+            resultado = ps.executeUpdate();
+        } catch (SQLException ex) {
+            System.getLogger(BienDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
 
-        String sql = "UPDATE Bien set ID_Bien = ?, Nombre = ?, ID_Categoria = ?, Estado = ?, Ubicacion = ?";
-
-        PreparedStatement ps = con.prepareStatement(sql);
-
-        ps.setInt(1, Bien.getID_Bien());
-        ps.setString(2, Bien.getNombre());
-        ps.setInt(3, idCategoria);  //use lo mismo en insertar ya que buscamos el id antes de actualizar, si existe, lo setea
-        ps.setString(4, Bien.getEstadoBien());
-        ps.setString(4, Bien.getUbicacionBien());
-
-        int result = ps.executeUpdate();
-
-        ps.close();
-        con.close();
-
-        return result;
+        return resultado;
     }
 
     @Override
-    public int eliminar(BienDTO Bien) {
-        int result = 0;
-        try {
-            Connection con = BasedeDatos.getConnection();
+    public int actualizar(BienDTO bien) {
+        String sql = "UPDATE Bien SET Nombre = ?, ID_Categoria = ?, Estado = ?, Ubicacion = ? WHERE ID_Bien = ?";
+        int idCategoria = categoriaDAO.buscar(bien.getNombreCatBienes()).getID_Categoria();
+        int resultado = 0;
+
+        try (Connection con = BasedeDatos.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
             
-            String sql = "DELETE FROM Bien WHERE id = ?";
+            ps.setString(1, bien.getNombre());
+            ps.setInt(2, idCategoria);  //use lo mismo en insertar ya que buscamos el id antes de actualizar, si existe, lo setea
+            ps.setString(3, bien.getEstadoBien());
+            ps.setString(4, bien.getUbicacionBien());
+            ps.setInt(5, bien.getID_Bien());
             
-            PreparedStatement ps = con.prepareStatement(sql);
-            
-            ps.setInt(1, Bien.getID_Bien());
-            
-            result = ps.executeUpdate();
-            
-            con.close();
-            ps.close();
+            resultado = ps.executeUpdate();
         } catch (SQLException ex) {
             System.getLogger(BienDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
         
-        return result;
+        return resultado;
     }
 
-   
+    @Override
+    public int eliminar(BienDTO bien) {
+        String sql = "DELETE FROM Bien WHERE ID_Bien = ?";
+        int resultado = 0;
+        
+        try (Connection con = BasedeDatos.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setInt(1, bien.getID_Bien());
+            
+            resultado = ps.executeUpdate();
+        } catch (SQLException ex) {
+            System.getLogger(BienDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+
+        return resultado;
+    }
 
 }

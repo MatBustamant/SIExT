@@ -24,16 +24,18 @@ import java.util.List;
 public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidadDTO> {
 
     @Override
-    public EventoTrazabilidadDTO buscar(int id) throws SQLException {
+    public EventoTrazabilidadDTO buscar(int id) {
 
-        EventoTrazabilidadDTO evento = new EventoTrazabilidadDTO();
+        EventoTrazabilidadDTO evento = null;
         String sql = "SELECT * FROM EventoTrazabilidad WHERE ID_Evento = ?";
+        
         try (Connection con = getConnection();
             PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()){
                 if (rs.next()){
+                    evento = new EventoTrazabilidadDTO();
                     evento.setID_Evento(rs.getInt("ID_Evento"));
                     evento.setBienAsociado(rs.getInt("ID_Bien"));
                     evento.setTipoEvento(rs.getString("TipoEvento"));
@@ -50,15 +52,14 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
                 }
             }
             
-        } catch (SQLException e){
-            e.printStackTrace();
+        } catch (SQLException ex) {
+            System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
         return evento;
     }
 
     @Override
-    public List<EventoTrazabilidadDTO> buscarTodos() throws SQLException {
-        
+    public List<EventoTrazabilidadDTO> buscarTodos() {
         List<EventoTrazabilidadDTO> eventos = new ArrayList<>();
         String sql = "SELECT * FROM EventoTrazabilidad";
         try (Connection con = getConnection();
@@ -79,63 +80,66 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
                 String horaString = rs.getString("Hora");
                 LocalTime hora = LocalTime.parse(horaString, DateTimeFormatter.ofPattern("HH:mm:ss"));
                 evento.setHorarioEvento(hora);
+                
+                eventos.add(evento);
             }
             
-        } catch (SQLException e){
-            e.printStackTrace();
+        } catch (SQLException ex) {
+            System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
         return eventos;
     }
 
     @Override
-    public int insertar(EventoTrazabilidadDTO Evento) throws SQLException {
-        
-        int resultado;
-        try (Connection con = BasedeDatos.getConnection()) {
-            String sql = "INSERT INTO EventoTrazabilidad (ID_Evento, ID_Bien, TipoEvento) VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setInt(1, Evento.getID_Evento());
-            ps.setInt(2, Evento.getBienAsociado());
-            ps.setString(5, Evento.getTipoEvento());
-            resultado = ps.executeUpdate();
-            ps.close();
-        }
-        return resultado;
-    }
-
-    @Override
-    public int actualizar(EventoTrazabilidadDTO Evento) throws SQLException {
+    public int insertar(EventoTrazabilidadDTO Evento) {
+        String sql = "INSERT INTO EventoTrazabilidad (ID_Evento, ID_Bien, TipoEvento) VALUES (?, ?, ?)";
         int resultado = 0;
-        
-        try (Connection con = BasedeDatos.getConnection()) {
-            String sql = "UPDATE EventoTrazabilidad set ID_Evento = ?, ID_Bien = ?, TipoEvento = ? where id = ?";
-            PreparedStatement ps = con.prepareStatement(sql);
+        try (Connection con = BasedeDatos.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            
             ps.setInt(1, Evento.getID_Evento());
             ps.setInt(2, Evento.getBienAsociado());
             ps.setString(3, Evento.getTipoEvento());
             
             resultado = ps.executeUpdate();
-            ps.close();
+        } catch (SQLException ex) {
+            System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+        return resultado;
+    }
+
+    @Override
+    public int actualizar(EventoTrazabilidadDTO Evento) {
+        String sql = "UPDATE EventoTrazabilidad SET ID_Bien = ?, TipoEvento = ? WHERE ID_Evento = ?";
+        int resultado = 0;
+        
+        try (Connection con = BasedeDatos.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setInt(1, Evento.getBienAsociado());
+            ps.setString(2, Evento.getTipoEvento());
+            ps.setInt(3, Evento.getID_Evento());
+            
+            resultado = ps.executeUpdate();
+        } catch (SQLException ex) {
+            System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
         return resultado;
     }
 
     @Override
     public int eliminar(EventoTrazabilidadDTO Evento) {
-        int result = 0;
-        try (Connection con = BasedeDatos.getConnection()) {
-            String sql = "DELETE FROM EventoTrazabilidad WHERE ID_Evento = ?";
-            PreparedStatement ps = con.prepareStatement(sql);
+        String sql = "DELETE FROM EventoTrazabilidad WHERE ID_Evento = ?";
+        int resultado = 0;
+        try (Connection con = BasedeDatos.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            
             ps.setInt(1, Evento.getID_Evento());
-            result = ps.executeUpdate();
-            ps.close();
+            resultado = ps.executeUpdate();
         } catch (SQLException ex) {
             System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
-        
-        
-        
-        return result;
+        return resultado;
     }
 
 }

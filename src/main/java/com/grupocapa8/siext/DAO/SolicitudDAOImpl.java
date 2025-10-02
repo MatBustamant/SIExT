@@ -19,8 +19,8 @@ import java.util.List;
 public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
 
     @Override
-    public SolicitudDTO buscar(int id) throws SQLException {
-        SolicitudDTO soli = new SolicitudDTO();
+    public SolicitudDTO buscar(int id) {
+        SolicitudDTO soli = null;
         String sql = "SELECT * FROM Solicitud WHERE Num_Solicitud = ?";
         try (Connection con = getConnection();
             PreparedStatement ps = con.prepareStatement(sql)) {
@@ -28,6 +28,7 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()){
                 if (rs.next()){
+                    soli = new SolicitudDTO();
                     soli.setNumSolicitud(rs.getInt("Num_Solicitud"));
                     
                     String fechaString = rs.getString("Fecha");
@@ -40,14 +41,14 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
                     soli.setDescripcion(rs.getString("Descripcion"));
                 }
             }
-        } catch (SQLException e){
-            e.printStackTrace();
+        } catch (SQLException ex) {
+            System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
         return soli;
     }
 
     @Override
-    public List<SolicitudDTO> buscarTodos() throws SQLException {
+    public List<SolicitudDTO> buscarTodos() {
         List<SolicitudDTO> solicitudes = new ArrayList<>();
         String sql = "SELECT * FROM Solicitud";
         try (Connection con = getConnection();
@@ -66,61 +67,69 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
                 soli.setUbicacionBienes(rs.getString("Destino"));
                 soli.setEstado(rs.getString("Estado"));
                 soli.setDescripcion(rs.getString("Descripcion"));
+                
+                solicitudes.add(soli);
             }
             
-        } catch (SQLException e){
-            e.printStackTrace();
+        } catch (SQLException ex) {
+            System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
         return solicitudes;
     }
 
     @Override
-    public int insertar(SolicitudDTO Solicitud) throws SQLException {
-        int resultado;
-        try (Connection con = BasedeDatos.getConnection()) {
-            String sql = "INSERT INTO Solicitud (Num_Solicitud, Estado, Destino, Descripcion) VALUES (?, ?, ?, ?)";
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setInt(1, Solicitud.getNumSolicitud());
-            ps.setString(2, Solicitud.getEstado());
-            ps.setString(3, Solicitud.getUbicacionBienes());
-            ps.setString(5, Solicitud.getDescripcion());
-            resultado = ps.executeUpdate();
-            ps.close();
-        }
-        return resultado;    
-    }
-
-    @Override
-    public int actualizar(SolicitudDTO Solicitud) throws SQLException {
+    public int insertar(SolicitudDTO Solicitud) {
+        String sql = "INSERT INTO Solicitud (Num_Solicitud, Estado, Destino, Descripcion) VALUES (?, ?, ?, ?)";
         int resultado = 0;
-        
-        try (Connection con = BasedeDatos.getConnection()) {
-            String sql = "UPDATE Solicitud set Num_Solicitud = ?, Estado = ?, Destino = ?, Descripcion = ?, where id = ?";
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setInt(1, (int) Solicitud.getNumSolicitud());
+        try (Connection con = BasedeDatos.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setInt(1, Solicitud.getNumSolicitud());
             ps.setString(2, Solicitud.getEstado());
             ps.setString(3, Solicitud.getUbicacionBienes());
             ps.setString(4, Solicitud.getDescripcion());
             
             resultado = ps.executeUpdate();
-            ps.close();
+        } catch (SQLException ex) {
+            System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+        return resultado;    
+    }
+
+    @Override
+    public int actualizar(SolicitudDTO Solicitud) {
+        String sql = "UPDATE Solicitud SET Estado = ?, Destino = ?, Descripcion = ? WHERE Num_Solicitud = ?";
+        int resultado = 0;
+        
+        try (Connection con = BasedeDatos.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setString(1, Solicitud.getEstado());
+            ps.setString(2, Solicitud.getUbicacionBienes());
+            ps.setString(3, Solicitud.getDescripcion());
+            ps.setInt(4, Solicitud.getNumSolicitud());
+            
+            resultado = ps.executeUpdate();
+        } catch (SQLException ex) {
+            System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
         return resultado;
     }    
 
     @Override
     public int eliminar(SolicitudDTO Solicitud) {
-        int result = 0;
-        try (Connection con = BasedeDatos.getConnection()) {
-            String sql = "DELETE FROM Solicitud WHERE Num_Solicitud = ?";
-            PreparedStatement ps = con.prepareStatement(sql);
+        String sql = "DELETE FROM Solicitud WHERE Num_Solicitud = ?";
+        int resultado = 0;
+        try (Connection con = BasedeDatos.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            
             ps.setInt(1, Solicitud.getNumSolicitud());
-            result = ps.executeUpdate();
-            ps.close();
+            
+            resultado = ps.executeUpdate();
         } catch (SQLException ex) {
             System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
-        return result;
+        return resultado;
     }
     
 }

@@ -16,115 +16,110 @@ import java.util.List;
 public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
 
     @Override
-    public UsuarioDTO buscar(int id) throws SQLException {
-        Connection con = BasedeDatos.getConnection();
+    public UsuarioDTO buscar(int id) {
         UsuarioDTO usuario = null;
+        String sql = "SELECT ID_Usuario, Nombre_Usuario, Contraseña, Rol FROM Usuario WHERE ID_Usuario = ?";
         
-        String sql = "SELECT ID_Usuario, Nombre_Usuario, Contraseña, Rol FROM Usuario WHERE id= ?";
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setInt(1, id);
-        
-        ResultSet rs = ps.executeQuery();
-        
-        if(rs.next()){
-            int usuarioID = rs.getInt("ID_Usuario");
-            String nombreUsuario = rs.getString("Nombre_Usuario");
-            String contraseña = rs.getString("Contraseña");
-            String rol = rs.getString("Rol");
+        try(Connection con = BasedeDatos.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
             
-            usuario = new UsuarioDTO(usuarioID, nombreUsuario, contraseña, rol);
+            ps.setInt(1, id);
+            try(ResultSet rs = ps.executeQuery()) {
+                if(rs.next()){
+                    usuario = new UsuarioDTO();
+                    usuario.setID_Usuario(rs.getInt("ID_Usuario"));
+                    usuario.setNombre(rs.getString("Nombre_Usuario"));
+                    usuario.setContraseña(rs.getString("Contraseña"));
+                    usuario.setRol(rs.getString("Rol"));
+                }
+            }
             
+        } catch (SQLException ex) {
+            System.getLogger(UsuarioDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
-        
         return usuario;
     }
 
     @Override
-    public List<UsuarioDTO> buscarTodos() throws SQLException {
+    public List<UsuarioDTO> buscarTodos() {
         List<UsuarioDTO> usuarios = new ArrayList<>();
-        
         String sql = "SELECT * FROM Usuario";
-         try (Connection con = BasedeDatos.getConnection();
-         PreparedStatement ps = con.prepareStatement(sql);
-         ResultSet rs = ps.executeQuery()) {
+        
+        try (Connection con = BasedeDatos.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
-        while (rs.next()) {
-            UsuarioDTO usuario = new UsuarioDTO();
-            usuario.setID_Usuario(rs.getInt("ID_Usuario"));
-            usuario.setNombre(rs.getString("Nombre_Usuario"));
-            usuario.setContraseña(rs.getString("Contraseña"));
-            usuario.setRol(rs.getString("Rol"));
-            
-            usuarios.add(usuario);
+            while (rs.next()) {
+                UsuarioDTO usuario = new UsuarioDTO();
+                usuario.setID_Usuario(rs.getInt("ID_Usuario"));
+                usuario.setNombre(rs.getString("Nombre_Usuario"));
+                usuario.setContraseña(rs.getString("Contraseña"));
+                usuario.setRol(rs.getString("Rol"));
+
+                usuarios.add(usuario);
+            }
+        } catch (SQLException ex) {
+            System.getLogger(UsuarioDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
-    }
         return usuarios;
     }
 
     @Override
-    public int insertar(UsuarioDTO Usuario) throws SQLException {
-       Connection con = BasedeDatos.getConnection();
-       String sql = "INSERT INTO Usuario (ID_Usuario, Nombre_Usuario, Contraseña, Rol) VALUES (?,?,?,?)";
-       PreparedStatement ps = con.prepareStatement(sql);
-       
-       ps.setInt(1, Usuario.getID_Usuario());
-       ps.setString(2, Usuario.getNombre());
-       ps.setString(3, Usuario.getContraseña());
-       ps.setString(4, Usuario.getRol());
-       
-       int result = ps.executeUpdate();
-       
-       ps.close();
-       con.close();
-       
-       return result;
-       
-    
+    public int insertar(UsuarioDTO Usuario) {
+        String sql = "INSERT INTO Usuario (ID_Usuario, Nombre_Usuario, Contraseña, Rol) VALUES (?,?,?,?)";
+        int resultado = 0;
+        try (Connection con = BasedeDatos.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            
+                ps.setInt(1, Usuario.getID_Usuario());
+                ps.setString(2, Usuario.getNombre());
+                ps.setString(3, Usuario.getContraseña());
+                ps.setString(4, Usuario.getRol());
+
+                resultado = ps.executeUpdate();
+            
+        } catch (SQLException ex) {
+            System.getLogger(UsuarioDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+        return resultado;
     }
 
     @Override
-    public int actualizar(UsuarioDTO Usuario) throws SQLException {
-      Connection con= BasedeDatos.getConnection();
-      String sql = "UPDATE Usuario set ID_Usuario = ?, Nombre_Usuario = ?, Contraseña = ?, Rol = ?";
-      
-      PreparedStatement ps = con.prepareStatement(sql);
-      
-      ps.setInt(1, Usuario.getID_Usuario());
-      ps.setString(2, Usuario.getNombre());
-      ps.setString(3, Usuario.getContraseña());
-      ps.setString(4, Usuario.getRol());
-      
-      int result = ps.executeUpdate();
-       
-      ps.close();
-      con.close();
-      
-      return result;
-       
+    public int actualizar(UsuarioDTO Usuario) {
+        String sql = "UPDATE Usuario SET Nombre_Usuario = ?, Contraseña = ?, Rol = ? WHERE ID_Usuario = ?";
+        int resultado = 0;
+        
+        try (Connection con = BasedeDatos.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setString(1, Usuario.getNombre());
+            ps.setString(2, Usuario.getContraseña());
+            ps.setString(3, Usuario.getRol());
+            ps.setInt(4, Usuario.getID_Usuario());
+
+            resultado = ps.executeUpdate();
+        } catch (SQLException ex) {
+            System.getLogger(UsuarioDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+
+        return resultado;
     }
 
     @Override
     public int eliminar(UsuarioDTO Usuario) {
-        int result = 0;
-        try {
-            Connection con = BasedeDatos.getConnection();
-            
-            String sql = "DELETE FROM Usuario WHERE id = ?";
-            
-            PreparedStatement ps = con.prepareStatement(sql);
+        String sql = "DELETE FROM Usuario WHERE id = ?";
+        int resultado = 0;
+        
+        try (Connection con = BasedeDatos.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, Usuario.getID_Usuario());
             
-            result = ps.executeUpdate();
-            
-            con.close();
-            ps.close();
+            resultado = ps.executeUpdate();
         } catch (SQLException ex) {
             System.getLogger(UsuarioDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
-        return result;
+        return resultado;
     }
-
     
-
 }

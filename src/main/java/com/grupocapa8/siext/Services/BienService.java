@@ -1,5 +1,6 @@
 package com.grupocapa8.siext.Services;
 
+import com.grupocapa8.siext.DAO.BienDAOImpl;
 import com.grupocapa8.siext.DTO.BienDTO;
 
 /**
@@ -7,12 +8,12 @@ import com.grupocapa8.siext.DTO.BienDTO;
  * @author geroj
  */
 public class BienService {
-    private BienDAO bienDAO; //acceso a la BD
+    private BienDAOImpl bienDAO; //acceso a la BD
     
     
     public void lecturaDTOs(){
         int idBien = 0;
-        while(bienDAO.BuscarBien(idBien)){
+        while(bienDAO.buscar(idBien) != null){
             BienDTO dto = bienDAO.obtenerBien(idBien);
             recibirBienDTO(dto);
             idBien = idBien + 1;    
