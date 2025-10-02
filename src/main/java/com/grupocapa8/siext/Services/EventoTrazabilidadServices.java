@@ -1,36 +1,39 @@
 package com.grupocapa8.siext.Services;
 
+import com.grupocapa8.siext.DAO.EventoTrazabilidadDAOImpl;
 import com.grupocapa8.siext.DTO.EventoTrazabilidadDTO;
-import java.time.LocalDate;
+import java.util.NoSuchElementException;
 
 /**
  *
  * @author geroj
  */
 public class EventoTrazabilidadServices {
-    private EventoTrazDAO eventoTrazDAO; //acceso a la BD
-    
-    public void lecturaDTOs(){
-        int idEventoTraz = 0;
-        while(eventoTrazDAO.BuscarEventoTraz(idEventoTraz)){
-            EventoTrazabilidadDTO dto = eventoTrazDAO.obtenerEventoTraz(idEventoTraz);
-            recibirEventoTrazDTO(dto);
-            idEventoTraz = idEventoTraz + 1;    
-        }
-        if(idEventoTraz == 0){
-            System.out.println("No Existen Eventos de trazabilidad en la BD");
-        }
-        
-        
-         
+    private final EventoTrazabilidadDAOImpl eventoTrazDAO; //acceso a la BD
+
+    public EventoTrazabilidadServices() {
+        this.eventoTrazDAO = new EventoTrazabilidadDAOImpl();
     }
-    public void BuscarDto(int idEventoTraz){
+    
+//    public void lecturaDTOs(){
+//        int idEventoTraz = 0;
+//        while(eventoTrazDAO.BuscarEventoTraz(idEventoTraz)){
+//            EventoTrazabilidadDTO dto = eventoTrazDAO.obtenerEventoTraz(idEventoTraz);
+//            recibirEventoTrazDTO(dto);
+//            idEventoTraz = idEventoTraz + 1;    
+//        }
+//        if(idEventoTraz == 0){
+//            System.out.println("No Existen Eventos de trazabilidad en la BD");
+//        }
+//    }
+    
+    public EventoTrazabilidadDTO BuscarDto(int idEventoTraz) throws NoSuchElementException {
         validarID(idEventoTraz);
-        if (!eventoTrazDAO.BuscarEventoTraz(idEventoTraz)){
-            throw new IllegalArgumentException("No existe el Evento de trazabilidad");
+        EventoTrazabilidadDTO evento = eventoTrazDAO.buscar(idEventoTraz);
+        if (evento == null){
+            throw new NoSuchElementException("No existe el Evento de trazabilidad");
         }
-        EventoTrazabilidadDTO dto = eventoTrazDAO.obtenerEventoTraz(idEventoTraz);
-        recibirEventoTrazDTO(dto); //enviando el dto a la capa de presentacion para que lo muestre
+        return evento;
     }
     
     public void crearEventoTraz(EventoTrazabilidadDTO dto){
@@ -39,40 +42,32 @@ public class EventoTrazabilidadServices {
         validarString(dto.getTipoEvento(),1);
         // validarHorario(dto.getHorarioEvento().getHoraFormateada()); ver que se va hacer con estas validaciones
         
-        eventoTrazDAO.guardar(dto);
+        eventoTrazDAO.insertar(dto);
     } 
     
-    public void modificarEventoTraz(Integer idEventoTraz){
+    public void modificarEventoTraz(EventoTrazabilidadDTO dto) throws NoSuchElementException {
+        int idEventoTraz = dto.getID_Evento();
         validarID(idEventoTraz);
-        if (!eventoTrazDAO.BuscarEventoTraz(idEventoTraz)){
-            throw new IllegalArgumentException("No existe el Evento de trazabilidad");
+        if (eventoTrazDAO.buscar(idEventoTraz) == null){
+            throw new NoSuchElementException("No existe el Evento de trazabilidad");
         }
-        EventoTrazabilidadDTO dto = eventoTrazDAO.obtenerEventoTraz(idEventoTraz);
-        dto = recibirEventoTrazDTO(dto); //enviando el dto a la capa de presentacion para que lo muestre y me devuelva el dto modificado
         validarID(dto.getBienAsociado());
         // validarFecha(dto.getFechaEvento()); ver que se va hacer con estas validaciones
         validarString(dto.getTipoEvento(),1);
         // validarHorario(dto.getHorarioEvento().getHoraFormateada()); ver que se va hacer con estas validaciones
         
-        eventoTrazDAO.guardar(dto);
+        eventoTrazDAO.actualizar(dto);
     } 
-    public void eliminarEventoTraz(Integer idEventoTraz, String rol){
+    public void eliminarEventoTraz(Integer idEventoTraz) throws NoSuchElementException {
         validarID(idEventoTraz);
-        validarString(rol,2);
-        if (!rol.equals("ADMIN")) {
-            throw new SecurityException("No tiene permisos para eliminar eventos de trazabilidad");
-        }
-        if (!eventoTrazDAO.BuscarEventoTraz(idEventoTraz)){ //hacer una validacion del id
-            throw new IllegalArgumentException("No existe el evento de trazabilidad");
+        if (eventoTrazDAO.buscar(idEventoTraz) == null){ //hacer una validacion del id
+            throw new NoSuchElementException("No existe el evento de trazabilidad");
         }
         
-        EventoTrazabilidadDTO dto = eventoTrazDAO.obtenerEventoTraz(idEventoTraz);
-        boolean V = confirmacionEliminarEventoTraz(dto); //enviando el dto a la capa de presentacion para que lo muestre y me devuelva verdadero o falso para continuar con la eliminacion
-        if(V){
-            eventoTrazDAO.eliminarEventoTraz(idEventoTraz);
-        }   
-    } 
-    public void validarID(Integer num){
+        eventoTrazDAO.eliminar(idEventoTraz);
+    }
+    
+    private void validarID(Integer num){
         if (num == null) {
             throw new IllegalArgumentException("El ID no puede ser nulo.");
         }
@@ -80,7 +75,8 @@ public class EventoTrazabilidadServices {
             throw new IllegalArgumentException("El ID   debe ser un número entero positivo.");
         }
     }
-    public void validarString(String string,int a) {
+    
+    private void validarString(String string,int a) {
         if (string == null || string.length() < 3 || string.length() > 50) {
             switch (a){
                 case 1 -> throw new IllegalArgumentException("El tipo de evento debe tener entre 3 y 50 caracteres");
