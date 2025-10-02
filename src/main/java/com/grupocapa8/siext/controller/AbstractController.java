@@ -11,54 +11,51 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import java.util.List;
 
 /**
  *
  * @author Matias
  */
-public abstract class AbstractController<E, ID> {
+public abstract class AbstractController<E> {
     
-    protected ServiceGenerico servicio;
+    protected ServiceGenerico<E> servicio;
     
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("crear")
     public void crear(E entidad) {
-        // servicio.crear(entidad);
-        throw new UnsupportedOperationException("servicios no creados todavía");
+        servicio.crear(entidad);
     }
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("leer/{id}")
-    public E buscarPorId(ID id) {
-        // return servicio.buscarPorId(id);
-        throw new UnsupportedOperationException("servicios no creados todavía");
+    public E buscarPorId(@PathParam("id") int id) {
+        return servicio.buscar(id);
     }
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("leer")
-    public E[] buscarTodos() {
-        // return servicio.buscarTodos();
-        throw new UnsupportedOperationException("servicios no creados todavía");
+    public List<E> buscarTodos() {
+        return servicio.buscarTodos();
     }
     
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("modificar/{id}")
-    public void modificar(E entidad, ID id) {
-        // return servicio.modificar(entidad);
-        throw new UnsupportedOperationException("servicios no creados todavía");
+    public void modificar(E entidad, @PathParam("id") int id) {
+        servicio.modificar(entidad);
     }
     
     @DELETE
     @Path("eliminar/{id}")
-    public void eliminar(ID id) {
-        // return servicio.eliminar(id);
-        throw new UnsupportedOperationException("servicios no creados todavía");
+    public void eliminar(@PathParam("id") int id) {
+        servicio.eliminar(id);
     }
     
 }

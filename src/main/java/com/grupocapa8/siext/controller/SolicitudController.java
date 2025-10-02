@@ -13,7 +13,7 @@ import jakarta.ws.rs.Path;
  * @author Matias
  */
 @Path("solicitud")
-public class SolicitudController extends AbstractController<SolicitudDTO, Integer>{
+public class SolicitudController extends AbstractController<SolicitudDTO>{
 
     public SolicitudController() {
         this.servicio = new SolicitudService(); //SolicitudService

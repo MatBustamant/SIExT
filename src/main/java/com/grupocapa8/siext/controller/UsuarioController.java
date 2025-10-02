@@ -13,7 +13,7 @@ import jakarta.ws.rs.Path;
  * @author Matias
  */
 @Path("usuario")
-public class UsuarioController extends AbstractController<UsuarioDTO, Integer>{
+public class UsuarioController extends AbstractController<UsuarioDTO>{
 
     public UsuarioController() {
         this.servicio = new UsuarioService(); //UsuarioService
