@@ -42,7 +42,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
             String estado = rs.getString("Estado");
             String ubicacion = rs.getString("Ubicacion");
             int categoriaID = rs.getInt("ID_Categoria");
-            String nombreCategoriaBien = categoriaDAO.buscarNombrePorId(categoriaID);
+            String nombreCategoriaBien = categoriaDAO.buscar(categoriaID).getNombre();
             
             bien = new BienDTO(bienID, nombreBien, ubicacion, estado, nombreCategoriaBien);
         }
@@ -61,7 +61,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
                 bien.setID_Bien(rs.getInt("ID_Bien"));
                 bien.setNombre(rs.getString("Nombre"));
                 int categoriaID = rs.getInt("ID_Categoria");
-                bien.setNombreCatBienes(categoriaDAO.buscarNombrePorId(categoriaID));  //Ocurre que ID_Categoria es clave foranea, NO tengo el nombre de la cat
+                bien.setNombreCatBienes(categoriaDAO.buscar(categoriaID).getNombre());  //Ocurre que ID_Categoria es clave foranea, NO tengo el nombre de la cat
                 //llamo a una busqueda en la tabla Categoria, enviandole el id que tengo desde tabla Bien
                 //Porque en el DTO no me interesa el idcat, sino nombre de categoria, entonces debo buscarlo 
                 //para ponerlo en la lista y sea compatible con BienDTO
@@ -78,7 +78,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
     public int insertar(BienDTO Bien) throws SQLException {
         Connection con = BasedeDatos.getConnection();
 
-        int idCategoria = categoriaDAO.buscarPorNombre(Bien.getNombreCatBienes());
+        int idCategoria = categoriaDAO.buscar(Bien.getNombreCatBienes()).getID_Categoria();
         if (idCategoria == -1) {
             throw new SQLException("La categoría '" + Bien.getNombreCatBienes() + "' no existe en la base de datos"); //evitamos errores si pregunta si existe la categoria primero
         }
@@ -104,7 +104,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
     public int actualizar(BienDTO Bien) throws SQLException {
         Connection con = BasedeDatos.getConnection();
 
-        int idCategoria = categoriaDAO.buscarPorNombre(Bien.getNombreCatBienes());
+        int idCategoria = categoriaDAO.buscar(Bien.getNombreCatBienes()).getID_Categoria();
         if (idCategoria == -1) {
             throw new SQLException("La categoría '" + Bien.getNombreCatBienes() + "' no existe en la base de datos"); //evitamos errores si pregunta si existe la categoria primero
         }

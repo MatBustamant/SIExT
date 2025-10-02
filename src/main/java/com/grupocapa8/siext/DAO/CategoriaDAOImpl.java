@@ -122,46 +122,26 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
         return result;
     }
     
-    public String buscarNombrePorId(int idCat) throws SQLException {
-        Connection con = BasedeDatos.getConnection();
-        String nombreCategoria = null;
+    public CategoriaBienDTO buscar(String nombre) throws SQLException {
 
-        String sql = "SELECT Nombre FROM Categoria WHERE ID_Categoria = ?";
+        Connection con = BasedeDatos.getConnection();
+        CategoriaBienDTO categoriaBien = null;
+
+        String sql = "SELECT ID_Categoria, Nombre FROM Categoria WHERE Nombre = ?";
         PreparedStatement ps = con.prepareStatement(sql);
-        ps.setInt(1, idCat);
+        ps.setString(1, nombre);
 
         ResultSet rs = ps.executeQuery();
 
         if (rs.next()) {
-            nombreCategoria = rs.getString("Nombre");
+            int categoriaBienID = rs.getInt("ID_Categoria");
+            String nombreCategoriaBien = rs.getString("Nombre");
+
+            categoriaBien = new CategoriaBienDTO(categoriaBienID, nombreCategoriaBien);
+
         }
 
-        rs.close();
-        ps.close();
-        con.close();
-
-        return nombreCategoria;
-    }
-    
-    public int buscarPorNombre(String nombreCategoria) throws SQLException {
-        Connection con = BasedeDatos.getConnection();
-        int idCategoria = -1;  // valor por defecto si no se encuentra
-
-        String sql = "SELECT ID_Categoria FROM Categoria WHERE Nombre = ?";
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setString(1, nombreCategoria);
-
-        ResultSet rs = ps.executeQuery();
-
-        if (rs.next()) {
-            idCategoria = rs.getInt("ID_Categoria");
-        }
-
-        rs.close();
-        ps.close();
-        con.close();
-
-        return idCategoria;
+        return categoriaBien;
     }
 
 }
