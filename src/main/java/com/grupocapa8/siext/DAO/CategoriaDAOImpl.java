@@ -130,7 +130,7 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
         String sql = "SELECT ID_Categoria, Nombre FROM Categoria WHERE Nombre = ?";
 
         try (Connection con = BasedeDatos.getConnection();
-                PreparedStatement ps = con.prepareCall(sql)) {
+                PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setString(1, nombre);
             try (ResultSet rs = ps.executeQuery()) {
