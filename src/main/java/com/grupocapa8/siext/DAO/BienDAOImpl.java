@@ -20,9 +20,11 @@ import java.util.List;
 public class BienDAOImpl implements DAOGenerica<BienDTO> {
 
     private final CategoriaDAOImpl categoriaDAO;
+    private final EventoTrazabilidadDAOImpl eventoDAO;
 
     public BienDAOImpl() {
         this.categoriaDAO = new CategoriaDAOImpl();
+        this.eventoDAO = new EventoTrazabilidadDAOImpl();
     }
 
     @Override
@@ -98,6 +100,16 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
             ps.setString(4, bien.getUbicacionBien());
             
             resultado = ps.executeUpdate();
+            
+            // Se crea un evento de ENTREGA junto a la creación de un nuevo bien. Básicamente para tener la fecha y hora de cuando pasa esto
+            if (resultado > 0) {
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        int claveGenerada = rs.getInt(1);
+                        eventoDAO.insertarNuevoIngreso(claveGenerada);
+                    }
+                }
+            }
         } catch (SQLException ex) {
             System.getLogger(BienDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
@@ -107,7 +119,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
 
     @Override
     public int actualizar(BienDTO bien) {
-        String sql = "UPDATE Bien SET Nombre = ?, ID_Categoria = ?, Estado = ?, Ubicacion = ? WHERE ID_Bien = ?";
+        String sql = "UPDATE Bien SET Nombre = ?, ID_Categoria = ?, Ubicacion = ? WHERE ID_Bien = ?";
         int idCategoria = categoriaDAO.buscar(bien.getNombreCatBienes()).getID_Categoria();
         int resultado = 0;
 
@@ -116,9 +128,8 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
             
             ps.setString(1, bien.getNombre());
             ps.setInt(2, idCategoria);  //use lo mismo en insertar ya que buscamos el id antes de actualizar, si existe, lo setea
-            ps.setString(3, bien.getEstadoBien());
-            ps.setString(4, bien.getUbicacionBien());
-            ps.setInt(5, bien.getID_Bien());
+            ps.setString(3, bien.getUbicacionBien());
+            ps.setInt(4, bien.getID_Bien());
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {

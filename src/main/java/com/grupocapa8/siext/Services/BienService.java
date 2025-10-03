@@ -1,7 +1,9 @@
 package com.grupocapa8.siext.Services;
 
 import com.grupocapa8.siext.DAO.BienDAOImpl;
+import com.grupocapa8.siext.DAO.CategoriaDAOImpl;
 import com.grupocapa8.siext.DTO.BienDTO;
+import com.grupocapa8.siext.DTO.CategoriaBienDTO;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -11,9 +13,11 @@ import java.util.NoSuchElementException;
  */
 public class BienService implements ServiceGenerico<BienDTO> {
     private final BienDAOImpl bienDAO; //acceso a la BD
+    private final CategoriaDAOImpl catDAO;
 
     public BienService() {
         this.bienDAO = new BienDAOImpl();
+        this.catDAO = new CategoriaDAOImpl();
     }
     
     @Override
@@ -33,12 +37,30 @@ public class BienService implements ServiceGenerico<BienDTO> {
     
     @Override
     public void crear(BienDTO dto){
-        validarString(dto.getNombre(),1);
-        validarString(dto.getNombreCatBienes(),1);
+        // Validamos solo que debemos recibir
+        String nombre = dto.getNombre().toUpperCase();
+        validarString(nombre,1);
+        String categoria = dto.getNombreCatBienes().toUpperCase();
+        validarString(categoria,1);
+        String ubcacion = dto.getUbicacionBien().toUpperCase();
         validarUbicacionBien(dto.getUbicacionBien());
-        validarString(dto.getEstadoBien(),3);
         
-        bienDAO.insertar(dto);
+        // Una vez validado, dejamos en el dto los datos formateados y agregamos el resto
+        dto.setNombre(nombre);
+        dto.setNombreCatBienes(categoria);
+        dto.setUbicacionBien(ubcacion);
+        dto.setEstadoBien("EN CONDICIONES");
+        
+        // Si no existe la categoría, la creamos
+        if (catDAO.buscar(categoria) == null) {
+            CategoriaBienDTO nuevaCategoria = new CategoriaBienDTO(0, categoria);
+            catDAO.insertar(nuevaCategoria);
+        }
+        
+        // Creamos la cantidad de bienes que nos pide el front
+        for (int i = 0; i < dto.getCantBienes(); i++) {
+            bienDAO.insertar(dto);
+        }
     } 
     
     @Override
@@ -47,10 +69,23 @@ public class BienService implements ServiceGenerico<BienDTO> {
         if (bienDAO.buscar(id) == null){
             throw new NoSuchElementException("No existe el Bien");
         }
-        validarString(dto.getNombre(),1);
-        validarString(dto.getNombreCatBienes(),1);
-        validarUbicacionBien(dto.getUbicacionBien());
-        validarString(dto.getEstadoBien(),3);
+        String nombre = dto.getNombre().toUpperCase();
+        validarString(nombre,1);
+        String categoria = dto.getNombreCatBienes();
+        validarString(categoria,1);
+        String ubicacion = dto.getUbicacionBien();
+        validarUbicacionBien(ubicacion);
+        
+        dto.setNombre(nombre);
+        dto.setNombreCatBienes(categoria);
+        dto.setUbicacionBien(ubicacion);
+        dto.setID_Bien(id);
+        
+        // Si no existe la categoría, la creamos
+        if (catDAO.buscar(categoria) == null) {
+            CategoriaBienDTO nuevaCategoria = new CategoriaBienDTO(0, categoria);
+            catDAO.insertar(nuevaCategoria);
+        }
        
         bienDAO.actualizar(dto);
     } 

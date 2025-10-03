@@ -64,16 +64,6 @@
             <h2>Registrar nuevo bien</h2>
             <form id="productoForm">
                 <div class="form-grid">
-                    <!-- <div>
-                        <label>Clase</label>
-                        <select id="claseProducto" required>
-                            <option value="">Seleccionar</option>
-                            <option>Insumo Oficina</option>
-                            <option>Insumo Limpieza</option>
-                            <option>Insumo Eléctrico</option>
-                            <option>Bien</option>
-                        </select>
-                    </div> -->
                     <div>
                         <label>Categoría</label>
                         <input list="categoriasSugeridas" type="text" id="categoriaProducto" required>
@@ -91,10 +81,6 @@
                         <label>Cantidad</label>
                         <input type="number" id="stockInicial" min="1" value="1" required>
                     </div>
-                    <!-- <div id="grupoMinimoReposicion">
-                        <label>Mínimo reposición</label>
-                        <input type="number" id="minimoReposicion" min="0" value="0">
-                    </div> -->
                 </div>
                 <div>
                     <button type="submit" class="btn"><i class="bi bi-plus-circle"></i>Registrar</button>
@@ -121,8 +107,6 @@
                 <div class="btn-row">
                     <button type="button" class="btn" id="btnEditarDatos"><i class="bi bi-pencil-square"></i>Modificar
                         Datos</button>
-                    <!-- <button type="button" class="btn" id="btnAgregarStock"><i class="bi bi-plus-circle"></i>Agregar
-                        Stock</button> -->
                     <button type="button" class="btn btn-danger" id="eliminarProducto"><i
                             class="bi bi-trash"></i>Eliminar</button>
                 </div>
@@ -142,33 +126,12 @@
                         <label>Ubicación</label>
                         <input type="text" id="modUbicacion" required>
                     </div>
-                    <!-- <div>
-                        <label>Clase</label>
-                        <select id="modClase" required></select>
-                    </div> -->
-                    <!-- <div id="grupoModMinimo">
-                        <label>Mínimo reposición</label>
-                        <input type="number" id="modMinimo" min="0" required>
-                    </div> -->
                     <div class="btn-row">
                         <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
                         <button type="button" class="btn" id="cancelarEdicionBtn"><i
                                 class="bi bi-x-circle"></i>Cancelar</button>
                     </div>
                 </form>
-
-                <!-- Formulario Agregar Stock -->
-                <!-- <form id="formAgregarStock" class="hidden" style="margin-top: 1rem;">
-                    <div>
-                        <label>Agregar stock</label>
-                        <input type="number" id="modStockAgregar" min="1" value="1" required>
-                    </div>
-                    <div class="btn-row">
-                        <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
-                        <button type="button" class="btn" id="cancelarIngresoBtn"><i
-                                class="bi bi-x-circle"></i>Cancelar</button>
-                    </div>
-                </form> -->
             </div>
         </section>
     </main>
@@ -176,51 +139,37 @@
     <footer>SIExT | 2025</footer>
 
     <script>
-        if (!localStorage.getItem("categorias")) {
-            const categoriasPredef = [
-                { id: 1, nombre: "SILLAS"},
-                { id: 2, nombre: "PROYECTORES"}
-            ];
-            localStorage.setItem("categorias", JSON.stringify(categoriasPredef));
-        }
 
-        if (!localStorage.getItem("productos")) {
-            const productosPredef = [
-                { id: 1, nombre: "SILLA ERGONÓMICA", categoria: "SILLAS", estado: "EN CONDICIONES", ubicacion: "LUGAR-A" },
-                { id: 2, nombre: "SILLA ERGONÓMICA", categoria: "SILLAS", estado: "EN CONDICIONES", ubicacion: "LUGAR-A" },
-                { id: 3, nombre: "SILLA ERGONÓMICA", categoria: "SILLAS", estado: "EN CONDICIONES", ubicacion: "LUGAR-A" },
-            ];
-            localStorage.setItem("productos", JSON.stringify(productosPredef));
-        }
+        // if (!localStorage.getItem("productos")) {
+        //     const productosPredef = [
+        //         { id: 1, nombre: "SILLA ERGONÓMICA", categoria: "SILLAS", estado: "EN CONDICIONES", ubicacion: "LUGAR-A" },
+        //         { id: 2, nombre: "SILLA ERGONÓMICA", categoria: "SILLAS", estado: "EN CONDICIONES", ubicacion: "LUGAR-A" },
+        //         { id: 3, nombre: "SILLA ERGONÓMICA", categoria: "SILLAS", estado: "EN CONDICIONES", ubicacion: "LUGAR-A" },
+        //     ];
+        //     localStorage.setItem("productos", JSON.stringify(productosPredef));
+        // }
 
-        if (!localStorage.getItem("ingresos")) {
-            const ingresosPredef = [
-                { id: 1, productoId: 1, fecha: "2025-01-01T22:10:12.781Z" },
-                { id: 2, productoId: 2, fecha: "2025-01-03T22:10:12.781Z" },
-                { id: 3, productoId: 3, fecha: "2025-01-04T22:10:12.781Z" }
-            ];
-            localStorage.setItem("ingresos", JSON.stringify(ingresosPredef));
-        }
+        // if (!localStorage.getItem("ingresos")) {
+        //     const ingresosPredef = [
+        //         { id: 1, productoId: 1, fecha: "2025-01-01T22:10:12.781Z" },
+        //         { id: 2, productoId: 2, fecha: "2025-01-03T22:10:12.781Z" },
+        //         { id: 3, productoId: 3, fecha: "2025-01-04T22:10:12.781Z" }
+        //     ];
+        //     localStorage.setItem("ingresos", JSON.stringify(ingresosPredef));
+        // }
     </script>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
 
     <script>
         const categoriaProducto = document.getElementById("categoriaProducto");
         const ubicacionProducto = document.getElementById("ubicacionProducto");
-        // const modClaseSel = document.getElementById("modClase");
         const modNombre = document.getElementById("modNombre");
         const modCategoria = document.getElementById("modCategoria");
         const modUbicacion = document.getElementById("modUbicacion");
-        // const modMinimo = document.getElementById("modMinimo");
         const modificarForm = document.getElementById("modificarForm");
         const modificarContenedor = document.getElementById("modificarContenedor");
-
-        // Cargar clases en el select de modificación
-        // const clases = ["Insumo Oficina", "Insumo Limpieza", "Insumo Eléctrico", "Bien"];
-        // clases.forEach(c => {
-        //     const opt = document.createElement("option");
-        //     opt.textContent = c;
-        //     modClaseSel.appendChild(opt);
-        // });
 
         function cargarCategorias(idSelect) {
             const sel = document.getElementById(idSelect);
@@ -242,196 +191,115 @@
         cargarCategorias("categoriasSugeridas");
         cargarCategorias("modCategoriasSugeridas");
 
-/*        claseProducto.addEventListener("change", () => {
-            if (!claseProducto.value) {
-                categoriaProducto.innerHTML = "<option>Seleccionar clase primero</option>";
-                categoriaProducto.disabled = true;
-                return;
-            }
-            // Mostrar/ocultar campo de mínimo reposición según clase
-            const grupoMinimo = document.getElementById("grupoMinimoReposicion");
-            if (claseProducto.value === "Bien") {
-                grupoMinimo.classList.add("hidden");
-            } else {
-                grupoMinimo.classList.remove("hidden");
-            }
-            cargarCategorias(claseProducto.value, "categoriaProducto");
-        });
-*/
-
-        // modClaseSel.addEventListener("change", () => {
-        //     cargarCategorias(modClaseSel.value, "modCategoria");
-        // });
-
-        document.getElementById("productoForm").onsubmit = e => {
+        document.getElementById("productoForm").onsubmit = async (e) => {
             e.preventDefault();
-            const prods = JSON.parse(localStorage.getItem("productos")) || [];
-            const ingresos = JSON.parse(localStorage.getItem("ingresos")) || [];
-
             const nombre = document.getElementById("nombreProducto").value.toUpperCase();
             const ubicacion = ubicacionProducto.value.toUpperCase();
             const categoria = categoriaProducto.value.toUpperCase();
-            const stockInicial = +document.getElementById("stockInicial").value;
+            const cantBienes = +document.getElementById("stockInicial").value;
 
             // Validación básica
-            if (!nombre || !categoria || stockInicial < 1) {
+            if (!nombre || !categoria || !ubicacion || cantBienes < 1) {
                 alert("Datos incompletos.");
                 return;
             }
 
-            // if (clase === "Bien") {
-                // Crear N bienes individuales
-            if (stockInicial > 0) {
-                for (let i = 0; i < stockInicial; i++) {
-                    const bien = {
-                        id: Date.now() + i,
-                        nombre,
-                        categoria,
-                        estado: "EN CONDICIONES",
-                        ubicacion
-                        // No se guarda minimoReposicion en Bien
-                    };
-                    const ing = {
-                        id: Date.now() + i,
-                        productoId: bien.id,
-                        fecha: new Date().toISOString()
-                    };
-                    ingresos.push(ing);
-                    prods.push(bien);
+            const bien = {
+                nombre,
+                nombreCatBienes: categoria,
+                ubicacionBien: ubicacion,
+                cantBienes
+            };
+
+            try {
+                const response = await crearBien(bien);
+                if (!response.ok) {
+                    alert(`El servidor no pudo realizar el registro del bien. Código: ${response.status}`);
+                    return;
                 }
-                if (!JSON.parse(localStorage.getItem("categorias")).some(c => c.nombre === categoria)) {
-                    // Agregar nueva categoría si no existe
-                    // Esto reemplaza la página entera de categorías
-                    const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
-                    categorias.push({ id: Date.now(), nombre: categoria });
-                    localStorage.setItem("categorias", JSON.stringify(categorias));
-                    cargarCategorias("categoriasSugeridas");
-                    cargarCategorias("modCategoriasSugeridas");
-                }
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
             }
-                // if (stockInicial > 0) {
-                //     // Registrar ingreso inicial de bienes
-                //     const ing = {
-                //         id: Date.now(),
-                //         productoId: prods[prods.length - 1].id, // ID del último bien agregado
-                //         cantidad: stockInicial,
-                //         fecha: new Date().toLocaleDateString('es-AR', {
-                //             timeZone: 'America/Argentina/Buenos_Aires',
-                //             year: 'numeric', month: '2-digit', day: '2-digit'
-                //         }).split('/').reverse().join('-')
-                //     };
-                //     ingresos.push(ing);
-                //     localStorage.setItem("ingresos", JSON.stringify(ingresos));
-                // }
-                alert(`${stockInicial} bienes registrados.`);
-            // } else {
-            //     // Verificar duplicado exacto en insumos
-            //     const existe = prods.some(p =>
-            //         p.nombre === nombre && p.clase === clase && p.categoria === categoria
-            //     );
-            //     if (existe) {
-            //         alert("Ese insumo ya existe.");
-            //         return;
-            //     }
 
-            //     // Crear insumo único con stock
-            //     const insumo = {
-            //         id: Date.now(),
-            //         nombre,
-            //         clase,
-            //         categoria,
-            //         stock: stockInicial,
-            //         minimoReposicion,
-            //         estado: "En condiciones",
-            //         ubicacion: "Depósito"
-            //     };
-            //     prods.push(insumo);
+            if (cantBienes > 1) {alert(`${cantBienes} bienes registrados.`);}
+            else {alert("Bien registrado.");}
+            await recargarBienes();
+            await recargarCategorias();
+            await recargarEventos();
 
-            //     // Registrar ingreso inicial
-            //     const ing = {
-            //         id: Date.now(),
-            //         productoId: insumo.id,
-            //         cantidad: stockInicial,
-            //         fecha: new Date().toLocaleDateString('es-AR', {
-            //             timeZone: 'America/Argentina/Buenos_Aires',
-            //             year: 'numeric', month: '2-digit', day: '2-digit'
-            //         }).split('/').reverse().join('-')
-            //     };
-            //     ingresos.push(ing);
-            //     localStorage.setItem("ingresos", JSON.stringify(ingresos));
-
-            //     alert("Insumo registrado.");
-            // }
-
-            localStorage.setItem("productos", JSON.stringify(prods));
-            localStorage.setItem("ingresos", JSON.stringify(ingresos));
+            // Reiniciamos el form y lo preparamos para nuevos inserts
+            cargarCategorias("categoriasSugeridas");
+            cargarCategorias("modCategoriasSugeridas");
             e.target.reset();
-            // categoriaProducto.disabled = true;
         };
     </script>
 
     <script>
+        let bienIdActual = null;
         // Al buscar producto:
-        document.getElementById("busquedaForm").onsubmit = e => {
+        document.getElementById("busquedaForm").onsubmit = async (e) => {
             e.preventDefault();
             const id = +document.getElementById("buscarId").value;
-            const prods = JSON.parse(localStorage.getItem("productos")) || [];
-            const p = prods.find(x => x.id === id);
-            if (!p) {
-                alert("Bien no encontrado.");
-                modificarContenedor.classList.add("hidden");
+            let bien;
+            try {
+                const response = await leerBien(id);
+                bienIdActual = id;
+                if (!response.ok) {
+                    modificarContenedor.classList.add("hidden");
+                    if (response.status == 404) {
+                        alert("Bien no encontrado.");
+                        return;
+                    }
+                    else if (response.status == 500) {
+                        alert("El servidor no pudo realizar la búsqueda del bien. Código: 500");
+                        return;
+                    }
+                    else {
+                        alert(`El servidor no pudo realizar la búsqueda del bien. Código: ${response.status}`);
+                        return;
+                    }
+                }
+                bien = await response.json();
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
                 return;
             }
 
             modificarContenedor.classList.remove("hidden");
             // Mostrar todos los datos actuales
-            // if (p.clase === "Insumo Oficina" || p.clase === "Insumo Limpieza" || p.clase === "Insumo Eléctrico") {
-            //     const datosHTML = `
-            //     <p><strong>ID:</strong> ${p.id}</p>
-            //     <p><strong>Nombre:</strong> ${p.nombre}</p>
-            //     <p><strong>Clase:</strong> ${p.clase}</p>
-            //     <p><strong>Categoría:</strong> ${p.categoria}</p>
-            //     <p><strong>Stock actual:</strong> ${p.stock}</p>
-            //     <p><strong>Mínimo de reposición:</strong> ${p.minimoReposicion}</p>
-            //     `;
-            //     document.getElementById("datosProductoEncontrado").innerHTML = datosHTML;
-
-            // } else {
-                // const datosHTML = `
-                // <p><strong>ID:</strong> ${p.id}</p>
-                // <p><strong>Nombre:</strong> ${p.nombre}</p>
-                // <p><strong>Clase:</strong> ${p.clase}</p>
-                // <p><strong>Categoría:</strong> ${p.categoria}</p>
-                // `;
                 const datosHTML = `
-                <p><strong>Nombre:</strong> ${p.nombre}</p>
-                <p><strong>Categoría:</strong> ${p.categoria}</p>
-                <p><strong>Estado:</strong> ${p.estado}</p>
-                <p><strong>Ubicación:</strong> ${p.ubicacion}</p>
+                <p><strong>Nombre:</strong> ${bien.nombre}</p>
+                <p><strong>Categoría:</strong> ${bien.nombreCatBienes}</p>
+                <p><strong>Estado:</strong> ${bien.estadoBien}</p>
+                <p><strong>Ubicación:</strong> ${bien.ubicacionBien}</p>
                 `;
-                const titulo = `Bien con identificador "${p.id}" encontrado`;
+                const titulo = `Bien con identificador "${bienIdActual}" encontrado`;
                 document.getElementById("tituloProductoEncontrado").textContent = titulo;
                 document.getElementById("datosProductoEncontrado").innerHTML = datosHTML;
 
-            // }
-
-
-            // const grupoModMinimo = document.getElementById("grupoModMinimo");
-            // if (p.clase === "Bien") {
-            //     grupoModMinimo.classList.add("hidden");
-            // } else {
-            //     grupoModMinimo.classList.remove("hidden");
-            // }
-
             // Ocultar formularios
             document.getElementById("formModificarDatos").classList.add("hidden");
-            // document.getElementById("formAgregarStock").classList.add("hidden");
 
             // Botón eliminar producto
-            document.getElementById("eliminarProducto").onclick = () => {
+            document.getElementById("eliminarProducto").onclick = async () => {
                 if (!confirm("¿Eliminar bien?")) return;
-                const nuevos = prods.filter(x => x.id !== id);
-                localStorage.setItem("productos", JSON.stringify(nuevos));
+                try {
+                    const response = await eliminarBien(bienIdActual);
+                    if (!response.ok) {
+                        if (response.status == 500) {
+                            alert("El servidor no pudo realizar la eliminación del bien. Código: 500");
+                            return;
+                        }
+                        else {
+                            alert(`El servidor no pudo realizar la eliminación del bien. Código: ${response.status}`);
+                            return;
+                        }
+                    }
+                } catch (error) {
+                    alert("No se pudo conectar con el servidor.");
+                    return;
+                }
                 alert("Bien eliminado.");
                 modificarContenedor.classList.add("hidden");
             };
@@ -439,135 +307,60 @@
             // Mostrar form de edición de datos
             document.getElementById("btnEditarDatos").onclick = () => {
                 document.getElementById("formModificarDatos").classList.remove("hidden");
-                // document.getElementById("formAgregarStock").classList.add("hidden");
                 document.getElementById("tituloProductoEncontrado").textContent = "Modificar Datos del Bien";
-                modNombre.value = p.nombre;
-                // modClaseSel.value = p.clase;
-                modCategoria.value = p.categoria;
-                modUbicacion.value = p.ubicacion;
-                // modMinimo.value = p.minimoReposicion;
+                modNombre.value = bien.nombre;
+                modCategoria.value = bien.nombreCatBienes;
+                modUbicacion.value = bien.ubicacionBien;
                 ocultarInfoYAcciones();
             };
 
-            // Mostrar form de agregar stock
-            // document.getElementById("btnAgregarStock").onclick = () => {
-            //     document.getElementById("formAgregarStock").classList.remove("hidden");
-            //     document.getElementById("formModificarDatos").classList.add("hidden");
-            //     document.getElementById("tituloProductoEncontrado").textContent = "Agregar Stock al Producto";
-            //     ocultarInfoYAcciones();
-            // };
-
             // Guardar cambios de datos generales
-            document.getElementById("formModificarDatos").onsubmit = ev => {
+            document.getElementById("formModificarDatos").onsubmit = async (ev) => {
                 ev.preventDefault();
 
-                // const existeDuplicado = prods.some(prod =>
-                //     prod.id !== p.id &&
-                //     prod.nombre === modNombre.value.toUpperCase() &&
-                //     // prod.clase === modClaseSel.value &&
-                //     prod.categoria === modCategoria.value &&
-                //     prod.ubicacion === modUbicacion.value.toUpperCase()
-                // );
-                // if (existeDuplicado) {
-                //     alert("Ya existe otro bien con esos datos.");
-                //     return;
-                // }
+                const bienModificado = {
+                    nombre: modNombre.value.toUpperCase(),
+                    nombreCatBienes: modCategoria.value.toUpperCase(),
+                    ubicacionBien: modUbicacion.value.toUpperCase()
+                };
 
-                p.nombre = modNombre.value.toUpperCase();
-                // p.clase = modClaseSel.value;
-                p.categoria = modCategoria.value.toUpperCase();
-                p.ubicacion = modUbicacion.value.toUpperCase();
-                // p.minimoReposicion = +modMinimo.value;
-
-                localStorage.setItem("productos", JSON.stringify(prods));
-                if (!JSON.parse(localStorage.getItem("categorias")).some(c => c.nombre === p.categoria)) {
-                    // Agregar nueva categoría si no existe
-                    // Esto reemplaza la página entera de categorías
-                    const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
-                    categorias.push({ id: Date.now(), nombre: p.categoria });
-                    localStorage.setItem("categorias", JSON.stringify(categorias));
-                    cargarCategorias("categoriasSugeridas");
-                    cargarCategorias("modCategoriasSugeridas");
+                try {
+                    const response = await modificarBien(bienModificado, bienIdActual);
+                    if (!response.ok) {
+                        if (response.status == 500) {
+                            alert("El servidor no pudo realizar la modificación del bien. Código: 500");
+                            return;
+                        } else {
+                        alert(`El servidor no pudo realizar la modificación del bien. Código: ${response.status}`);
+                        return;
+                        }
+                    }
+                } catch (error) {
+                    alert("No se pudo conectar con el servidor.");
+                    return;
                 }
-                alert("Datos actualizados.");
-                mostrarInfoYAcciones(p.id);
+
+                alert("Bien actualizado.");
+                await recargarBienes();
+                await recargarCategorias();
+                await recargarEventos();
+
+                cargarCategorias("categoriasSugeridas");
+                cargarCategorias("modCategoriasSugeridas");
+                mostrarInfoYAcciones(bienIdActual);
                 document.getElementById("formModificarDatos").classList.add("hidden");
                 modificarContenedor.classList.add("hidden");
+                ev.target.reset();
             };
 
             // Cancelar edición de datos
             document.getElementById("cancelarEdicionBtn").onclick = () => {
                 if (confirm("¿Deseás cancelar la edición? Se perderán los cambios no guardados.")) {
                     document.getElementById("formModificarDatos").classList.add("hidden");
-                    mostrarInfoYAcciones(p.id);
+                    mostrarInfoYAcciones(bienIdActual);
                 }
             };
-
-            // Confirmar ingreso de stock
-            // document.getElementById("formAgregarStock").onsubmit = ev => {
-            //     ev.preventDefault();
-            //     const cantidad = +document.getElementById("modStockAgregar").value;
-            //     if (cantidad <= 0) {
-            //         alert("Cantidad inválida.");
-            //         return;
-            //     }
-
-            //     if (p.clase === "Bien") {
-            //         // Crear nuevas unidades individuales
-            //         for (let i = 0; i < cantidad; i++) {
-            //             const nuevoBien = {
-            //                 id: Date.now() + i, // aseguramos id único
-            //                 nombre: p.nombre,
-            //                 clase: p.clase,
-            //                 categoria: p.categoria,
-            //                 estado: "En condiciones",
-            //                 ubicacion: "Depósito"
-            //             };
-            //             prods.push(nuevoBien);
-            //         }
-            //         const ingresos = JSON.parse(localStorage.getItem("ingresos")) || [];
-            //         ingresos.push({
-            //             id: Date.now(),
-            //             productoId: p.id,
-            //             cantidad: cantidad,
-            //             fecha: new Date().toLocaleDateString('es-AR', {
-            //                 timeZone: 'America/Argentina/Buenos_Aires',
-            //                 year: 'numeric', month: '2-digit', day: '2-digit'
-            //             }).split('/').reverse().join('-')
-            //         });
-            //         localStorage.setItem("ingresos", JSON.stringify(ingresos));
-
-            //     } else {
-            //         // Insumo: sumar stock al producto existente
-            //         p.stock += cantidad;
-
-            //         const ingresos = JSON.parse(localStorage.getItem("ingresos")) || [];
-            //         const ing = {
-            //             id: Date.now(),
-            //             productoId: p.id,
-            //             cantidad: cantidad,
-            //             fecha: new Date().toLocaleDateString('es-AR', {
-            //                 timeZone: 'America/Argentina/Buenos_Aires',
-            //                 year: 'numeric', month: '2-digit', day: '2-digit'
-            //             }).split('/').reverse().join('-')
-            //         };
-            //         ingresos.push(ing);
-            //         localStorage.setItem("ingresos", JSON.stringify(ingresos));
-            //     }
-
-            //     localStorage.setItem("productos", JSON.stringify(prods));
-            //     alert("Stock ingresado.");
-            //     modificarContenedor.classList.add("hidden");
-            // };
         };
-
-        // Cancelar ingreso de stock
-        // document.getElementById("cancelarIngresoBtn").onclick = () => {
-        //     if (confirm("¿Deseás cancelar el ingreso de stock? Se perderán los cambios no guardados.")) {
-        //         // document.getElementById("formAgregarStock").classList.add("hidden");
-        //         mostrarInfoYAcciones();
-        //     }
-        // };
 
     </script>
 

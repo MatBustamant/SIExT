@@ -64,7 +64,7 @@ public abstract class AbstractController<E> {
     @Path("modificar/{id}")
     public Response modificar(E entidad, @PathParam("id") int id) {
         try {
-            servicio.modificar(entidad);
+            servicio.modificar(entidad, id);
             return Response.ok().build();
         } catch (NoSuchElementException e) {
             return Response.status(Response.Status.NOT_FOUND).entity("{}").build();
