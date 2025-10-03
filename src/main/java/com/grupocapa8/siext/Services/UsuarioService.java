@@ -57,10 +57,9 @@ public class UsuarioService implements ServiceGenerico<UsuarioDTO> {
     }
     
    @Override
-    public void modificar(UsuarioDTO dto) throws NoSuchElementException {
-        int idUsuario = dto.getID_Usuario();
-        validarID(idUsuario);
-        if (usuarioDAO.buscar(idUsuario) == null){
+    public void modificar(UsuarioDTO dto, int id) throws NoSuchElementException {
+        validarID(id);
+        if (usuarioDAO.buscar(id) == null){
             throw new NoSuchElementException("No existe el Usuario");
         }
         validarString(dto.getNombre(),1);

@@ -54,10 +54,9 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
     }
     
     @Override
-    public void modificar(EventoTrazabilidadDTO dto) throws NoSuchElementException {
-        int idEventoTraz = dto.getID_Evento();
-        validarID(idEventoTraz);
-        if (eventoTrazDAO.buscar(idEventoTraz) == null){
+    public void modificar(EventoTrazabilidadDTO dto, int id) throws NoSuchElementException {
+        validarID(id);
+        if (eventoTrazDAO.buscar(id) == null){
             throw new NoSuchElementException("No existe el Evento de trazabilidad");
         }
         validarID(dto.getBienAsociado());

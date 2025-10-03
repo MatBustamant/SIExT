@@ -51,10 +51,9 @@ public class CategoriaBienServices implements ServiceGenerico<CategoriaBienDTO>{
     } 
     
     @Override
-    public void modificar(CategoriaBienDTO dto) throws NoSuchElementException {
-        int idCategoriaBien = dto.getID_Categoria();
-        validarID(idCategoriaBien);
-        if (categoriaBienDAO.buscar(idCategoriaBien) == null){
+    public void modificar(CategoriaBienDTO dto, int id) throws NoSuchElementException {
+        validarID(id);
+        if (categoriaBienDAO.buscar(id) == null){
             throw new NoSuchElementException("No existe la categoria");
         }
         validarString(dto.getNombre(),1);

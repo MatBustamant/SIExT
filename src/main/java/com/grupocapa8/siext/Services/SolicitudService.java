@@ -50,10 +50,9 @@ public class SolicitudService implements ServiceGenerico<SolicitudDTO> {
     } 
     
     @Override
-    public void modificar(SolicitudDTO dto) throws NoSuchElementException {
-        int numSolicitud = dto.getNumSolicitud();
-        validarNumero(numSolicitud);
-        if (solicitudDAO.buscar(numSolicitud) == null){
+    public void modificar(SolicitudDTO dto, int id) throws NoSuchElementException {
+        validarNumero(id);
+        if (solicitudDAO.buscar(id) == null){
             throw new NoSuchElementException("No existe la solicitud");
         }
         validarNumero(dto.getNumSolicitud());

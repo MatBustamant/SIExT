@@ -16,21 +16,6 @@ public class BienService implements ServiceGenerico<BienDTO> {
         this.bienDAO = new BienDAOImpl();
     }
     
-//    public void lecturaDTOs(){
-//        int idBien = 0;
-//        while(bienDAO.buscar(idBien) != null){
-//            BienDTO dto = bienDAO.obtenerBien(idBien);
-//            recibirBienDTO(dto);
-//            idBien = idBien + 1;    
-//        }
-//        if(idBien == 0){
-//            System.out.println("No Existen Bienes almacenados en BD");
-//        }
-//        
-//        
-//         //enviando el dto a la capa de presentacion para que lo muestre y me devuelva el dto modificado
-//    }
-    
     @Override
     public BienDTO buscar(int idBien) throws NoSuchElementException {
         validarID(idBien);
@@ -57,10 +42,9 @@ public class BienService implements ServiceGenerico<BienDTO> {
     } 
     
     @Override
-    public void modificar(BienDTO dto) throws NoSuchElementException {
-        int idBien = dto.getID_Bien();
-        validarID(idBien);
-        if (bienDAO.buscar(idBien) == null){
+    public void modificar(BienDTO dto, int id) throws NoSuchElementException {
+        validarID(id);
+        if (bienDAO.buscar(id) == null){
             throw new NoSuchElementException("No existe el Bien");
         }
         validarString(dto.getNombre(),1);
