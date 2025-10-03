@@ -81,15 +81,14 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
 
     @Override
     public int insertar(SolicitudDTO Solicitud) {
-        String sql = "INSERT INTO Solicitud (Num_Solicitud, Estado, Destino, Descripcion) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Solicitud (Estado, Destino, Descripcion) VALUES (?, ?, ?)";
         int resultado = 0;
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
-            ps.setInt(1, Solicitud.getNumSolicitud());
-            ps.setString(2, Solicitud.getEstado());
-            ps.setString(3, Solicitud.getUbicacionBienes());
-            ps.setString(4, Solicitud.getDescripcion());
+            ps.setString(1, Solicitud.getEstado());
+            ps.setString(2, Solicitud.getUbicacionBienes());
+            ps.setString(3, Solicitud.getDescripcion());
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {

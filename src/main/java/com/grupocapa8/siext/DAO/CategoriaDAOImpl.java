@@ -21,14 +21,13 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
 
     @Override
     public int insertar(CategoriaBienDTO Categoria) {
-        String sql = "INSERT INTO Categoria(ID_Categoria, Nombre) VALUES (?,?)";
+        String sql = "INSERT INTO Categoria(Nombre) VALUES (?)";
         int resultado = 0;
         
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
-            ps.setInt(1, Categoria.getID_Categoria());
-            ps.setString(2, Categoria.getNombre());
+            ps.setString(1, Categoria.getNombre());
 
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {

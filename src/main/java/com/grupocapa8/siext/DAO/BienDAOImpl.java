@@ -85,18 +85,17 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
 
     @Override
     public int insertar(BienDTO bien) {
-        String sql = "INSERT INTO Bien (ID_Bien, Nombre, ID_Categoria, Estado, Ubicacion) VALUES (?,?,?,?,?)";
+        String sql = "INSERT INTO Bien (Nombre, ID_Categoria, Estado, Ubicacion) VALUES (?,?,?,?)";
         int resultado = 0;
         int idCategoria = categoriaDAO.buscar(bien.getNombreCatBienes()).getID_Categoria();
 
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setInt(1, bien.getID_Bien());
-            ps.setString(2, bien.getNombre());
-            ps.setInt(3, idCategoria); //el id de categoria que mande a buscar antes
-            ps.setString(4, bien.getEstadoBien());
-            ps.setString(5, bien.getUbicacionBien());
+            ps.setString(1, bien.getNombre());
+            ps.setInt(2, idCategoria); //el id de categoria que mande a buscar antes
+            ps.setString(3, bien.getEstadoBien());
+            ps.setString(4, bien.getUbicacionBien());
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {

@@ -66,15 +66,14 @@ public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
 
     @Override
     public int insertar(UsuarioDTO Usuario) {
-        String sql = "INSERT INTO Usuario (ID_Usuario, Nombre_Usuario, Contraseña, Rol) VALUES (?,?,?,?)";
+        String sql = "INSERT INTO Usuario (Nombre_Usuario, Contraseña, Rol) VALUES (?,?,?)";
         int resultado = 0;
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
-                ps.setInt(1, Usuario.getID_Usuario());
-                ps.setString(2, Usuario.getNombre());
-                ps.setString(3, Usuario.getContraseña());
-                ps.setString(4, Usuario.getRol());
+                ps.setString(1, Usuario.getNombre());
+                ps.setString(2, Usuario.getContraseña());
+                ps.setString(3, Usuario.getRol());
 
                 resultado = ps.executeUpdate();
             

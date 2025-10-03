@@ -13,7 +13,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -85,14 +84,13 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
 
     @Override
     public int insertar(EventoTrazabilidadDTO Evento) {
-        String sql = "INSERT INTO EventoTrazabilidad (ID_Evento, ID_Bien, TipoEvento) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO EventoTrazabilidad (ID_Bien, TipoEvento) VALUES (?, ?)";
         int resultado = 0;
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
-            ps.setInt(1, Evento.getID_Evento());
-            ps.setInt(2, Evento.getBienAsociado());
-            ps.setString(3, Evento.getTipoEvento());
+            ps.setInt(1, Evento.getBienAsociado());
+            ps.setString(2, Evento.getTipoEvento());
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
