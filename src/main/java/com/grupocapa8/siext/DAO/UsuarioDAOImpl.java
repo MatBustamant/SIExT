@@ -18,12 +18,13 @@ public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
     @Override
     public UsuarioDTO buscar(int id) {
         UsuarioDTO usuario = null;
-        String sql = "SELECT ID_Usuario, Nombre_Usuario, Contraseña, Rol FROM Usuario WHERE ID_Usuario = ?";
+        String sql = "SELECT ID_Usuario, Nombre_Usuario, Contraseña, Rol FROM Usuario WHERE ID_Usuario = ?, Eliminado = ?";
         
         try(Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, id);
+            ps.setInt(2,1);
             try(ResultSet rs = ps.executeQuery()) {
                 if(rs.next()){
                     usuario = new UsuarioDTO();
@@ -43,11 +44,13 @@ public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
     @Override
     public List<UsuarioDTO> buscarTodos() {
         List<UsuarioDTO> usuarios = new ArrayList<>();
-        String sql = "SELECT * FROM Usuario";
+        String sql = "SELECT * FROM Usuario WHERE Eliminado = ?";
         
         try (Connection con = BasedeDatos.getConnection();
-                PreparedStatement ps = con.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1,1);
+        
+            try(ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 UsuarioDTO usuario = new UsuarioDTO();
@@ -57,6 +60,7 @@ public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
                 usuario.setRol(rs.getString("Rol"));
 
                 usuarios.add(usuario);
+            }
             }
         } catch (SQLException ex) {
             System.getLogger(UsuarioDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
@@ -106,13 +110,14 @@ public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
 
     @Override
     public int eliminar(int id) {
-        String sql = "DELETE FROM Usuario WHERE id = ?";
+        String sql = "UPDATE Usuario SET Eliminado = ? WHERE id = ?";
         int resultado = 0;
         
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
-            ps.setInt(1, id);
+            ps.setInt(1, 1);
+            ps.setInt(2, id);
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {

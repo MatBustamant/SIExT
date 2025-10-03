@@ -31,12 +31,13 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
     public BienDTO buscar(int id) {
 
         BienDTO bien = null;
-        String sql = "SELECT * FROM Bien WHERE ID_Bien = ?";
+        String sql = "SELECT * FROM Bien WHERE ID_Bien = ?, Eliminado = ?";
 
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, id);
+            ps.setInt(2, 1);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     bien = new BienDTO();
@@ -60,24 +61,28 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
     public List<BienDTO> buscarTodos() {
         List<BienDTO> bienes = new ArrayList<>();
 
-        String sql = "SELECT * FROM Bien";
+        String sql = "SELECT * FROM Bien WHERE Eliminado = ?";
         try (Connection con = BasedeDatos.getConnection();
-                PreparedStatement ps = con.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setInt(1, 1);
+        
+            try (ResultSet rs = ps.executeQuery()) {
 
-            while (rs.next()) {
-                BienDTO bien = new BienDTO();
-                bien.setID_Bien(rs.getInt("ID_Bien"));
-                bien.setNombre(rs.getString("Nombre"));
-                int categoriaID = rs.getInt("ID_Categoria");
-                bien.setNombreCatBienes(categoriaDAO.buscar(categoriaID).getNombre());  //Ocurre que ID_Categoria es clave foranea, NO tengo el nombre de la cat
-                //llamo a una busqueda en la tabla Categoria, enviandole el id que tengo desde tabla Bien
-                //Porque en el DTO no me interesa el idcat, sino nombre de categoria, entonces debo buscarlo 
-                //para ponerlo en la lista y sea compatible con BienDTO
-                bien.setUbicacionBien(rs.getString("Ubicacion"));
-                bien.setEstadoBien(rs.getString("Estado"));
+                while (rs.next()) {
+                    BienDTO bien = new BienDTO();
+                    bien.setID_Bien(rs.getInt("ID_Bien"));
+                    bien.setNombre(rs.getString("Nombre"));
+                    int categoriaID = rs.getInt("ID_Categoria");
+                    bien.setNombreCatBienes(categoriaDAO.buscar(categoriaID).getNombre());  //Ocurre que ID_Categoria es clave foranea, NO tengo el nombre de la cat
+                    //llamo a una busqueda en la tabla Categoria, enviandole el id que tengo desde tabla Bien
+                    //Porque en el DTO no me interesa el idcat, sino nombre de categoria, entonces debo buscarlo 
+                    //para ponerlo en la lista y sea compatible con BienDTO
+                    bien.setUbicacionBien(rs.getString("Ubicacion"));
+                    bien.setEstadoBien(rs.getString("Estado"));
 
-                bienes.add(bien);
+                    bienes.add(bien);
+                }
             }
         } catch (SQLException ex) {
             System.getLogger(BienDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
@@ -141,13 +146,14 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
 
     @Override
     public int eliminar(int id) {
-        String sql = "DELETE FROM Bien WHERE ID_Bien = ?";
+        String sql = "UPDATE Bien SET Eliminado = ? WHERE ID_Bien = ?";
         int resultado = 0;
         
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
-            ps.setInt(1, id);
+            ps.setInt(1, 1);
+            ps.setInt(2, id);
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {

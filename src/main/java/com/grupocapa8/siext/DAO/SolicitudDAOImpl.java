@@ -23,11 +23,12 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
     @Override
     public SolicitudDTO buscar(int id) {
         SolicitudDTO soli = null;
-        String sql = "SELECT * FROM Solicitud WHERE Num_Solicitud = ?";
+        String sql = "SELECT * FROM Solicitud WHERE Num_Solicitud = ?, Eliminado = ?";
         try (Connection con = getConnection();
             PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, id);
+            ps.setInt(2, 1);
             try (ResultSet rs = ps.executeQuery()){
                 if (rs.next()){
                     soli = new SolicitudDTO();
@@ -52,10 +53,12 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
     @Override
     public List<SolicitudDTO> buscarTodos() {
         List<SolicitudDTO> solicitudes = new ArrayList<>();
-        String sql = "SELECT * FROM Solicitud";
+        String sql = "SELECT * FROM Solicitud WHERE Eliminado = ?";
         try (Connection con = getConnection();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1,1);
+        
+            try(ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 SolicitudDTO soli = new SolicitudDTO();
@@ -72,7 +75,7 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
                 
                 solicitudes.add(soli);
             }
-            
+            }
         } catch (SQLException ex) {
             System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
@@ -119,12 +122,13 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
 
     @Override
     public int eliminar(int id) {
-        String sql = "DELETE FROM Solicitud WHERE Num_Solicitud = ?";
+        String sql = "UPDATE Solicitud SET Eliminado = ? WHERE Num_Solicitud = ?";
         int resultado = 0;
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
-            ps.setInt(1, id);
+            ps.setInt(1, 1);
+            ps.setInt(2, id);
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {

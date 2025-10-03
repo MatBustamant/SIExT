@@ -61,12 +61,13 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
     public CategoriaBienDTO buscar(int id) {
 
         CategoriaBienDTO categoriaBien = null;
-        String sql = "SELECT * FROM Categoria WHERE ID_Categoria = ?";
+        String sql = "SELECT * FROM Categoria WHERE ID_Categoria = ?, Eliminado = ?";
         
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, id);
+            ps.setInt(2,1);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     categoriaBien = new CategoriaBienDTO();
@@ -86,10 +87,12 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
     public List<CategoriaBienDTO> buscarTodos() {
         List<CategoriaBienDTO> categoriaBienes = new ArrayList<>();
 
-        String sql = "SELECT * FROM Categoria";
+        String sql = "SELECT * FROM Categoria WHERE Eliminado = ?";
         try (Connection con = BasedeDatos.getConnection();
-                PreparedStatement ps = con.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, 1);
+        
+            try(ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 CategoriaBienDTO categoriaBien = new CategoriaBienDTO();
@@ -97,6 +100,7 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
                 categoriaBien.setNombre(rs.getString("Nombre"));
 
                 categoriaBienes.add(categoriaBien);
+            }
             }
         } catch (SQLException ex) {
             System.getLogger(CategoriaDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
@@ -107,13 +111,14 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
 
     @Override
     public int eliminar(int id) {
-        String sql = "DELETE FROM Categoria WHERE ID_Categoria = ?";
+        String sql = "UPDATE Categoria SET Eliminado = ? WHERE ID_Categoria = ?";
         int resultado = 0;
         
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
-            ps.setInt(1, id);
+            ps.setInt(1, 1);
+            ps.setInt(2, id);
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
