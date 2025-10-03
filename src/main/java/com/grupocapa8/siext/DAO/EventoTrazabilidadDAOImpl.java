@@ -11,8 +11,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,14 +43,9 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
                     evento.setTipoEvento(rs.getString("TipoEvento"));
                     
                     String fechaString = rs.getString("Fecha");
-                    LocalDate fecha = LocalDate.parse(fechaString, 
-                    DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                    Instant fecha = LocalDateTime.parse(fechaString, 
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toInstant(ZoneOffset.UTC);
                     evento.setFechaEvento(fecha);
-                    
-                    String horaString = rs.getString("Hora");
-                    LocalTime hora = LocalTime.parse(horaString, DateTimeFormatter.ofPattern("HH:mm:ss"));
-                    evento.setHorarioEvento(hora);
-                    evento.setHorarioEvento(hora);
                 }
             }
             
@@ -73,13 +70,9 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
                 evento.setTipoEvento(rs.getString("TipoEvento"));
                 
                 String fechaString = rs.getString("Fecha");
-                LocalDate fecha = LocalDate.parse(fechaString,
-                DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                Instant fecha = LocalDateTime.parse(fechaString,
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toInstant(ZoneOffset.UTC);
                 evento.setFechaEvento(fecha);
-                
-                String horaString = rs.getString("Hora");
-                LocalTime hora = LocalTime.parse(horaString, DateTimeFormatter.ofPattern("HH:mm:ss"));
-                evento.setHorarioEvento(hora);
                 
                 eventos.add(evento);
             }

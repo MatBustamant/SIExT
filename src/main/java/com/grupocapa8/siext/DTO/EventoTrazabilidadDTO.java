@@ -1,7 +1,6 @@
 package com.grupocapa8.siext.DTO;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.Instant;
 
 /**
  *
@@ -9,8 +8,7 @@ import java.time.LocalTime;
  */
 public class EventoTrazabilidadDTO {
     private int ID_Evento;
-    private LocalDate FechaEvento;
-    private LocalTime HorarioEvento;
+    private Instant FechaEvento;
     private int BienAsociado;
     private String TipoEvento;
 
@@ -18,9 +16,8 @@ public class EventoTrazabilidadDTO {
     public EventoTrazabilidadDTO(){
     }
     
-    public EventoTrazabilidadDTO(LocalDate FechaEvento, LocalTime HorarioEvento, Integer BienAsociado, String TipoEvento) {
+    public EventoTrazabilidadDTO(Instant FechaEvento, Integer BienAsociado, String TipoEvento) {
         this.FechaEvento = FechaEvento;
-        this.HorarioEvento = HorarioEvento;
         this.BienAsociado = BienAsociado;
         this.TipoEvento = TipoEvento;
     }
@@ -33,20 +30,12 @@ public class EventoTrazabilidadDTO {
         this.ID_Evento = ID_Evento;
     }
 
-    public LocalDate getFechaEvento() {
+    public Instant getFechaEvento() {
         return FechaEvento;
     }
 
-    public void setFechaEvento(LocalDate FechaEvento) {
+    public void setFechaEvento(Instant FechaEvento) {
         this.FechaEvento = FechaEvento;
-    }
-
-    public LocalTime getHorarioEvento() {
-        return HorarioEvento;
-    }
-
-    public void setHorarioEvento(LocalTime HorarioEvento) {
-        this.HorarioEvento = HorarioEvento;
     }
 
     public Integer getBienAsociado() {

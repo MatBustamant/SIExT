@@ -11,7 +11,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,9 +33,9 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
                     soli = new SolicitudDTO();
                     soli.setNumSolicitud(rs.getInt("Num_Solicitud"));
                     
-                    String fechaString = rs.getString("Fecha");
-                    LocalDate fecha = LocalDate.parse(fechaString, 
-                    DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                    String fechaString = rs.getString("Fecha_Solicitud");
+                    Instant fecha = LocalDateTime.parse(fechaString, 
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toInstant(ZoneOffset.UTC);
                     soli.setFechaInicioSolicitud(fecha);
                     
                     soli.setUbicacionBienes(rs.getString("Destino"));
@@ -59,9 +61,9 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
                 SolicitudDTO soli = new SolicitudDTO();
                 soli.setNumSolicitud(rs.getInt("Num_Solicitud"));
                 
-                String fechaString = rs.getString("Fecha");
-                LocalDate fecha = LocalDate.parse(fechaString, 
-                DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                String fechaString = rs.getString("Fecha_Solicitud");
+                Instant fecha = LocalDateTime.parse(fechaString, 
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toInstant(ZoneOffset.UTC);
                 soli.setFechaInicioSolicitud(fecha);
                 
                 soli.setUbicacionBienes(rs.getString("Destino"));

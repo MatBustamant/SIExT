@@ -6,7 +6,6 @@ package com.grupocapa8.siext.ConexionBD;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
@@ -14,7 +13,7 @@ import java.sql.SQLException;
  * @author oveja
  */
 public class BasedeDatos {
-     private static String url = "jdbc:sqlite:bd.db";
+     private static String url = "jdbc:sqlite:bd.sqlite";
      
      public static Connection getConnection() throws SQLException {
          Connection conexion = null;
