@@ -61,13 +61,13 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
     public CategoriaBienDTO buscar(int id) {
 
         CategoriaBienDTO categoriaBien = null;
-        String sql = "SELECT * FROM Categoria WHERE ID_Categoria = ?, Eliminado = ?";
+        String sql = "SELECT * FROM Categoria WHERE ID_Categoria = ? AND Eliminado = ?";
         
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, id);
-            ps.setInt(2,1);
+            ps.setInt(2,0);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     categoriaBien = new CategoriaBienDTO();
@@ -90,7 +90,7 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
         String sql = "SELECT * FROM Categoria WHERE Eliminado = ?";
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, 1);
+            ps.setInt(1, 0);
         
             try(ResultSet rs = ps.executeQuery()) {
 

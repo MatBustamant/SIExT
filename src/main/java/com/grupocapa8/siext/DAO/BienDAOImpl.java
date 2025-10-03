@@ -31,13 +31,13 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
     public BienDTO buscar(int id) {
 
         BienDTO bien = null;
-        String sql = "SELECT * FROM Bien WHERE ID_Bien = ?, Eliminado = ?";
+        String sql = "SELECT * FROM Bien WHERE ID_Bien = ? AND Eliminado = ?";
 
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, id);
-            ps.setInt(2, 1);
+            ps.setInt(2, 0);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     bien = new BienDTO();
@@ -65,7 +65,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
-            ps.setInt(1, 1);
+            ps.setInt(1, 0);
         
             try (ResultSet rs = ps.executeQuery()) {
 

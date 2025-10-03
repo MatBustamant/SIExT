@@ -23,12 +23,12 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
     @Override
     public SolicitudDTO buscar(int id) {
         SolicitudDTO soli = null;
-        String sql = "SELECT * FROM Solicitud WHERE Num_Solicitud = ?, Eliminado = ?";
+        String sql = "SELECT * FROM Solicitud WHERE Num_Solicitud = ? AND Eliminado = ?";
         try (Connection con = getConnection();
             PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, id);
-            ps.setInt(2, 1);
+            ps.setInt(2, 0);
             try (ResultSet rs = ps.executeQuery()){
                 if (rs.next()){
                     soli = new SolicitudDTO();
@@ -56,7 +56,7 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
         String sql = "SELECT * FROM Solicitud WHERE Eliminado = ?";
         try (Connection con = getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1,1);
+            ps.setInt(1,0);
         
             try(ResultSet rs = ps.executeQuery()) {
 

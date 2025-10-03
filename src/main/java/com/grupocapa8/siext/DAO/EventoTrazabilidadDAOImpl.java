@@ -28,13 +28,13 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
     public EventoTrazabilidadDTO buscar(int id) {
 
         EventoTrazabilidadDTO evento = null;
-        String sql = "SELECT * FROM EventoTrazabilidad WHERE ID_Evento = ?, Eliminado = ?";
+        String sql = "SELECT * FROM EventoTrazabilidad WHERE ID_Evento = ? AND Eliminado = ?";
         
         try (Connection con = getConnection();
             PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, id);
-            ps.setInt(2, 1);
+            ps.setInt(2, 0);
             try (ResultSet rs = ps.executeQuery()){
                 if (rs.next()){
                     evento = new EventoTrazabilidadDTO();
@@ -61,7 +61,7 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
         String sql = "SELECT * FROM EventoTrazabilidad WHERE Eliminado = ?";
         try (Connection con = getConnection();
             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, 1);
+            ps.setInt(1, 0);
         
             try(ResultSet rs = ps.executeQuery()) {
 

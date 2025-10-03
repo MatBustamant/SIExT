@@ -18,13 +18,13 @@ public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
     @Override
     public UsuarioDTO buscar(int id) {
         UsuarioDTO usuario = null;
-        String sql = "SELECT ID_Usuario, Nombre_Usuario, Contraseña, Rol FROM Usuario WHERE ID_Usuario = ?, Eliminado = ?";
+        String sql = "SELECT ID_Usuario, Nombre_Usuario, Contraseña, Rol FROM Usuario WHERE ID_Usuario = ? AND Eliminado = ?";
         
         try(Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, id);
-            ps.setInt(2,1);
+            ps.setInt(2,0);
             try(ResultSet rs = ps.executeQuery()) {
                 if(rs.next()){
                     usuario = new UsuarioDTO();
@@ -48,7 +48,7 @@ public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
         
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1,1);
+            ps.setInt(1,0);
         
             try(ResultSet rs = ps.executeQuery()) {
 
