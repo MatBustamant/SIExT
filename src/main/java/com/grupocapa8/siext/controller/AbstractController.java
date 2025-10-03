@@ -14,7 +14,9 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  *
@@ -34,28 +36,55 @@ public abstract class AbstractController<E> {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("leer/{id}")
-    public E buscarPorId(@PathParam("id") int id) {
-        return servicio.buscar(id);
+    public Response buscarPorId(@PathParam("id") int id) {
+        try {
+            E entidad = servicio.buscar(id);
+            return Response.ok(entidad).build();
+        } catch (NoSuchElementException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity("{}").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"" + e.getMessage() + "\"}").build();
+        }
     }
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("leer")
-    public List<E> buscarTodos() {
-        return servicio.buscarTodos();
+    public Response buscarTodos() {
+        try {
+            List<E> entidades = servicio.buscarTodos();
+            return Response.ok(entidades).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"" + e.getMessage() + "\"}").build();
+        }
     }
     
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("modificar/{id}")
-    public void modificar(E entidad, @PathParam("id") int id) {
-        servicio.modificar(entidad);
+    public Response modificar(E entidad, @PathParam("id") int id) {
+        try {
+            servicio.modificar(entidad);
+            return Response.ok().build();
+        } catch (NoSuchElementException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity("{}").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"" + e.getMessage() + "\"}").build();
+        }
     }
     
     @DELETE
     @Path("eliminar/{id}")
-    public void eliminar(@PathParam("id") int id) {
-        servicio.eliminar(id);
+    public Response eliminar(@PathParam("id") int id) {
+        try {
+            servicio.eliminar(id);
+            return Response.ok().build();
+        } catch (NoSuchElementException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity("{}").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"" + e.getMessage() + "\"}").build();
+        }
     }
     
 }
+    
