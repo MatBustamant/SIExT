@@ -16,8 +16,7 @@ CREATE TABLE IF NOT EXISTS "Categoria" (
 CREATE TABLE IF NOT EXISTS "EventoTrazabilidad" (
 	"ID_Evento"	INTEGER NOT NULL,
 	"ID_Bien"	INTEGER NOT NULL,
-	"Fecha"	TEXT NOT NULL DEFAULT (date('now')),
-	"Hora"	TEXT NOT NULL DEFAULT (time('now')),
+	"Fecha"	TEXT NOT NULL DEFAULT (datetime('now')),
 	"TipoEvento"	TEXT NOT NULL,
 	PRIMARY KEY("ID_Evento" AUTOINCREMENT),
 	FOREIGN KEY("ID_Bien") REFERENCES "Bien"("ID_Bien")
