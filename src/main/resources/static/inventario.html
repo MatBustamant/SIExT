@@ -57,41 +57,6 @@
     </div>
 
     <main class="default-block-container">
-        <!-- Listado de insumos -->
-        <!-- <section>
-            <h2>Insumos</h2>
-            <div class="form-grid">
-                <div>
-                    <input type="text" id="filterInsumoInput" placeholder="Filtrar por nombre o ID...">
-                </div>
-                <div>
-                    <select id="filterInsumoCategoria"></select>
-                </div>
-                <div>
-                    <select id="filterInsumoClase"></select>
-                </div>
-                <div>
-                    <input type="checkbox" id="filterInsumoReposicion">
-                    <label>Solo a reponer</label>
-                </div>
-            </div>
-
-            <table id="insumosTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Producto</th>
-                        <th>Categoría</th>
-                        <th>Clase</th>
-                        <th>Stock</th>
-                        <th>Mínimo</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-            <div class="informativo" id="counterInsumos"></div>
-        </section> -->
-
         <!-- Listado de bienes -->
         <section>
             <h2>Bienes</h2>
@@ -112,10 +77,6 @@
                 <div>
                     <input type="text" id="filterBienUbicacion" placeholder="Filtrar por ubicación..."></select>
                 </div>
-                <!-- <div>
-                    <input type="checkbox" id="filterBienReposicion">
-                    <label>Solo a reponer</label>
-                </div> -->
             </div>
             <table id="bienesTable">
                 <thead>
@@ -136,24 +97,22 @@
 
     <footer>SIExT | 2025</footer>
 
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            recargarBienes();
+            recargarCategorias();
+        });
+    </script>
     <script>
         function cargarCategorias() {
             const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
             const productos = JSON.parse(localStorage.getItem("productos")) || [];
 
-            // const insumoSelect = document.getElementById("filterInsumoCategoria");
             const bienSelect = document.getElementById("filterBienCategoria");
-            // const insumoClaseSelect = document.getElementById("filterInsumoClase");
 
-            // insumoSelect.innerHTML = '<option value="">Todas las categorías</option>';
             bienSelect.innerHTML = '<option value="">Todas las categorías</option>';
-            // insumoClaseSelect.innerHTML = '<option value="">Todas las clases</option>';
-
-            // categorias.forEach(cat => {
-            //     const opt1 = document.createElement("option");
-            //     opt1.value = opt1.textContent = cat.nombre;
-            //     insumoSelect.appendChild(opt1);
-            // });
 
             // Solo categorías con Bienes
             // const categoriasBienes = [...new Set(productos.filter(p => p.clase === "Bien").map(p => p.categoria))];
@@ -162,138 +121,45 @@
                 opt.value = opt.textContent = cat.nombre;
                 bienSelect.appendChild(opt);
             });
-
-            // Clases de Insumos
-            // const clasesInsumos = [...new Set(productos.filter(p => p.clase !== "Bien").map(p => p.clase))];
-            // clasesInsumos.forEach(clase => {
-            //     const opt = document.createElement("option");
-            //     opt.value = opt.textContent = clase;
-            //     insumoClaseSelect.appendChild(opt);
-            // });
         }
 
 
         function renderInventario() {
-            const productos = JSON.parse(localStorage.getItem("productos")) || [];
+            const bienes = JSON.parse(localStorage.getItem("bienes")) || [];
             const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
-
-            // const insumoFiltroTexto = document.getElementById("filterInsumoInput").value.toUpperCase();
-            // const insumoFiltroCategoria = document.getElementById("filterInsumoCategoria").value;
-            // const insumoFiltroClase = document.getElementById("filterInsumoClase").value;
-            // const insumoReposicion = document.getElementById("filterInsumoReposicion").checked;
 
             const bienFiltroTexto = document.getElementById("filterBienInput").value.toUpperCase();
             const bienFiltroCategoria = document.getElementById("filterBienCategoria").value;
             const bienFiltroEstado = document.getElementById("filterBienEstado").value;
             const bienFiltroUbicacion = document.getElementById("filterBienUbicacion").value.toUpperCase();
-            // const bienReposicion = document.getElementById("filterBienReposicion").checked;
 
-            // const insumosTable = document.getElementById("insumosTable").querySelector("tbody");
             const bienesTable = document.getElementById("bienesTable").querySelector("tbody");
-            // insumosTable.innerHTML = "";
             bienesTable.innerHTML = "";
 
-            // let countInsumos = 0, countBienes = 0;
             let countBienes = 0;
 
-            // --- Insumos individuales ---
-            // productos.forEach(prod => {
-            //     const matchTexto = txt => prod.nombre.toUpperCase().includes(txt) || String(prod.id).includes(txt);
-            //     const matchCategoria = (cat, filtro) => !filtro || prod.categoria === filtro;
-            //     const necesitaReposicion = prod.stock <= prod.minimoReposicion;
+            bienes.forEach(prod => {
+                const matchTexto = txt => prod.nombre.toUpperCase().includes(txt) || String(prod.id_Bien).includes(txt);
+                const matchCategoria = (cat, filtro) => !filtro || cat === filtro;
+                const matchEstado = (estado, filtro) => !filtro || estado === filtro;
+                const matchUbicacion = (ubicacion, filtro) => !filtro || ubicacion.toUpperCase().includes(filtro);
 
-            //     if (prod.clase !== "Bien") {
-            //         if (matchTexto(insumoFiltroTexto) && matchCategoria(prod.categoria, insumoFiltroCategoria)
-            //             && (!insumoFiltroClase || prod.clase === insumoFiltroClase)
-            //             && (!insumoReposicion || necesitaReposicion)) {
-            //             const row = document.createElement("tr");
-            //             row.innerHTML = `
-            //         <td>${prod.id}</td>
-            //         <td>${prod.nombre}</td>
-            //         <td>${prod.categoria}</td>
-            //         <td>${prod.clase}</td>
-            //         <td>${prod.stock}</td>
-            //         <td>${prod.minimoReposicion}</td>`;
-            //             insumosTable.appendChild(row);
-            //             countInsumos++;
-            //         }
-            //     }
-            // });
-
-            productos.forEach(prod => {
-                const matchTexto = txt => prod.nombre.toUpperCase().includes(txt) || String(prod.id).includes(txt);
-                const matchCategoria = (cat, filtro) => !filtro || prod.categoria === filtro;
-                const matchEstado = (estado, filtro) => !filtro || prod.estado === filtro;
-                const matchUbicacion = (ubicacion, filtro) => !filtro || prod.ubicacion.toUpperCase().includes(filtro);
-
-                    if (matchTexto(bienFiltroTexto) && matchCategoria(prod.categoria, bienFiltroCategoria)
-                        && matchEstado(prod.estado, bienFiltroEstado)
-                        && matchUbicacion(prod.ubicacion, bienFiltroUbicacion)
+                    if (matchTexto(bienFiltroTexto) && matchCategoria(prod.nombreCatBienes, bienFiltroCategoria)
+                        && matchEstado(prod.estadoBien, bienFiltroEstado)
+                        && matchUbicacion(prod.ubicacionBien, bienFiltroUbicacion)
                     ) {
                         const row = document.createElement("tr");
                         row.innerHTML = `
-                    <td>${prod.id}</td>
+                    <td>${prod.id_Bien}</td>
                     <td>${prod.nombre}</td>
-                    <td>${prod.categoria}</td>
-                <td><span class="badge ${prod.estado === "EN CONDICIONES" ? 'disponible' : 'averiado'}">${prod.estado}</span></td>
-                <td>${prod.ubicacion}</td>`;
+                    <td>${prod.nombreCatBienes}</td>
+                <td><span class="badge ${prod.estadoBien === "EN CONDICIONES" ? 'disponible' : 'averiado'}">${prod.estadoBien}</span></td>
+                <td>${prod.ubicacionBien}</td>`;
                         bienesTable.appendChild(row);
                         countBienes++;
                     }
             });
 
-            // --- Agrupar Bienes por categoría ---
-            // const bienesPorCategoria = {};
-
-            // productos.forEach(prod => {
-            //     // if (prod.clase === "Bien") {
-            //         const matchTexto = txt => prod.nombre.toUpperCase().includes(txt) || String(prod.id).includes(txt);
-            //         const matchCategoria = (cat, filtro) => !filtro || prod.categoria === filtro;
-
-            //         if (matchTexto(bienFiltroTexto) && matchCategoria(prod.categoria, bienFiltroCategoria)) {
-            //             if (!bienesPorCategoria[prod.categoria]) {
-            //                 bienesPorCategoria[prod.categoria] = [];
-            //             }
-            //             bienesPorCategoria[prod.categoria].push(prod);
-            //         }
-            //     // }
-            // });
-
-            // // --- Render Bienes agrupados ---
-            // Object.keys(bienesPorCategoria).forEach(categoria => {
-            //     const bienes = bienesPorCategoria[categoria];
-            //     const cantidad = bienes.length;
-
-            //     const catData = categorias.find(c => c.nombre === categoria);
-            //     // const minimo = catData ? catData.detalle.minimoReposicion : 0;
-
-            //     // Si está tildado "solo a reponer" y no lo necesita, omitir
-            //     // if (bienReposicion && cantidad >= minimo) return;
-
-            //     // Cabecera de categoría
-            //     const headerRow = document.createElement("tr");
-            //     headerRow.style.backgroundColor = "#e9ecef";
-            // //     headerRow.innerHTML = `
-            // // <td colspan="5"><strong>${categoria}</strong> | Cantidad: ${cantidad} | Mínimo: ${minimo}</td>`;
-            //     headerRow.innerHTML = `
-            // <td colspan="5"><strong>${categoria}</strong> | Cantidad: ${cantidad} | Mínimo: ${minimo}</td>`;
-            //     bienesTable.appendChild(headerRow);
-
-            //     // Filas de bienes individuales
-            //     bienes.forEach(prod => {
-            //         const row = document.createElement("tr");
-            //         row.innerHTML = `
-            //     <td>${prod.id}</td>
-            //     <td>${prod.nombre}</td>
-            //     <td>${prod.categoria}</td>
-            //     <td><span class="badge ${prod.estado === "EN CONDICIONES" ? 'disponible' : 'averiado'}">${prod.estado}</span></td>
-            //     <td>${prod.ubicacion}</td>`;
-            //         bienesTable.appendChild(row);
-            //         countBienes++;
-            //     });
-            // });
-
-            // document.getElementById("counterInsumos").textContent = `Mostrando ${countInsumos} insumo(s).`;
             document.getElementById("counterBienes").textContent = `Mostrando ${countBienes} bien(es).`;
         }
 
