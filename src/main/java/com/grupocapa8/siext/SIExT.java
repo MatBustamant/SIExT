@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.net.URI;
+import org.glassfish.grizzly.http.server.CLStaticHttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJaxbJsonProvider;
@@ -38,6 +39,11 @@ public class SIExT {
             // Con esto se configura el arranque del servidor Grizzly
             final HttpServer server = GrizzlyHttpServerFactory.createHttpServer(BASE_URI, resourceConfig, false);
             
+            // Agregar handler para archivos estáticos así puedo levantar el servidor web tmb (desde /static en resources)
+            ClassLoader classLoader = SIExT.class.getClassLoader();
+            CLStaticHttpHandler staticHandler = new CLStaticHttpHandler(classLoader, "static/");
+            server.getServerConfiguration().addHttpHandler(staticHandler, "/");
+
             // Con esto, si la JVM se detiene, nos aseguramos de que el servidor Grizzly cierre todas las conexiones de forma correcta.
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 @Override
