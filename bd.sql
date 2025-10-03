@@ -5,12 +5,14 @@ CREATE TABLE IF NOT EXISTS "Bien" (
 	"ID_Categoria"	INTEGER NOT NULL,
 	"Estado"	TEXT NOT NULL,
 	"Ubicacion"	TEXT NOT NULL,
+	"Eliminado" INTEGER NOT NULL DEFAULT 0,
 	PRIMARY KEY("ID_Bien" AUTOINCREMENT),
 	FOREIGN KEY("ID_Categoria") REFERENCES "Categoria"("ID_Categoria")
 );
 CREATE TABLE IF NOT EXISTS "Categoria" (
 	"ID_Categoria"	INTEGER NOT NULL,
 	"Nombre"	TEXT NOT NULL,
+	"Eliminado" INTEGER NOT NULL DEFAULT 0,
 	PRIMARY KEY("ID_Categoria" AUTOINCREMENT)
 );
 CREATE TABLE IF NOT EXISTS "EventoTrazabilidad" (
@@ -18,6 +20,7 @@ CREATE TABLE IF NOT EXISTS "EventoTrazabilidad" (
 	"ID_Bien"	INTEGER NOT NULL,
 	"Fecha"	TEXT NOT NULL DEFAULT (datetime('now')),
 	"TipoEvento"	TEXT NOT NULL,
+	"Eliminado" INTEGER NOT NULL DEFAULT 0,
 	PRIMARY KEY("ID_Evento" AUTOINCREMENT),
 	FOREIGN KEY("ID_Bien") REFERENCES "Bien"("ID_Bien")
 );
@@ -27,6 +30,7 @@ CREATE TABLE IF NOT EXISTS "Solicitud" (
 	"Destino"	TEXT NOT NULL,
 	"Fecha_Solicitud"	TEXT NOT NULL DEFAULT (datetime('now')),
 	"Descripcion"	TEXT NOT NULL,
+	"Eliminado" INTEGER NOT NULL DEFAULT 0,
 	PRIMARY KEY("Num_Solicitud" AUTOINCREMENT)
 );
 CREATE TABLE IF NOT EXISTS "Usuario" (
@@ -34,6 +38,7 @@ CREATE TABLE IF NOT EXISTS "Usuario" (
 	"Nombre_Usuario"	TEXT NOT NULL,
 	"Contraseña"	TEXT NOT NULL,
 	"Rol"	TEXT NOT NULL,
+	"Eliminado" INTEGER NOT NULL DEFAULT 0,
 	PRIMARY KEY("ID_Usuario" AUTOINCREMENT)
 );
 COMMIT;
