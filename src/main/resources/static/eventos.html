@@ -278,6 +278,7 @@
             }
             alert("Evento eliminado.");
             await recargarEventos();
+            await recargarBienes();
             renderEventos();
             document.getElementById("modificarEventoSection").classList.add("hidden");
             document.getElementById("modificarEventoForm").reset();
