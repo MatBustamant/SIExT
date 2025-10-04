@@ -1,28 +1,20 @@
 package com.grupocapa8.siext.Services;
 
 import com.grupocapa8.siext.DAO.SolicitudDAOImpl;
+import com.grupocapa8.siext.DAO.UbicacionDAOImpl;
 import com.grupocapa8.siext.DTO.SolicitudDTO;
+import com.grupocapa8.siext.DTO.UbicacionDTO;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 public class SolicitudService implements ServiceGenerico<SolicitudDTO> {
     private final SolicitudDAOImpl solicitudDAO; //acceso a la BD
+    private final UbicacionDAOImpl ubiDAO;
 
     public SolicitudService() {
         this.solicitudDAO = new SolicitudDAOImpl();
+        this.ubiDAO = new UbicacionDAOImpl();
     }
-    
-//    public void lecturaDTOs(){
-//        int numSolicitud = 0;
-//        while(solicitudDAO.BuscarSolicitud(numSolicitud)){
-//            SolicitudDTO dto = solicitudDAO.obtenerSolicitud(numSolicitud);
-//            recibirSolicitudDTO(dto);
-//            numSolicitud = numSolicitud + 1;    
-//        }
-//        if(numSolicitud == 0){
-//            System.out.println("No Existe la solicitud en la BD");
-//        }
-//    }
     
     @Override
     public SolicitudDTO buscar(int numSolicitud) throws NoSuchElementException {
@@ -41,10 +33,18 @@ public class SolicitudService implements ServiceGenerico<SolicitudDTO> {
     
     @Override
     public void crear(SolicitudDTO dto){
-        validarNumero(dto.getNumSolicitud());
-        // validarFecha(dto.getFechaInicioSolicitud()); ver que hacer
-        validarString(dto.getEstado(),3);
-        validarString(dto.getUbicacionBienes(),1);
+        String estado = dto.getEstado().toUpperCase();
+        validarString(estado,3);
+        String ubicacion = dto.getUbicacionBienes().toUpperCase();
+        validarString(ubicacion,1);
+        
+        dto.setEstado(estado);
+        dto.setUbicacionBienes(ubicacion);
+        
+        if (ubiDAO.buscar(ubicacion) == null) {
+            UbicacionDTO nuevaUbicacion = new UbicacionDTO(0, ubicacion);
+            ubiDAO.insertar(nuevaUbicacion);
+        }
         // Convertir DTO a entidad y guardarlo en BD
         solicitudDAO.insertar(dto);
     } 
@@ -55,11 +55,21 @@ public class SolicitudService implements ServiceGenerico<SolicitudDTO> {
         if (solicitudDAO.buscar(id) == null){
             throw new NoSuchElementException("No existe la solicitud");
         }
-        validarNumero(dto.getNumSolicitud());
-        // validarFecha(dto.getFechaInicioSolicitud()); ver que hacer
-        validarString(dto.getEstado(),3);
-        validarString(dto.getUbicacionBienes(),1);
         
+        String estado = dto.getEstado().toUpperCase();
+        validarString(estado,3);
+        String ubicacion = dto.getUbicacionBienes().toUpperCase();
+        validarString(ubicacion,1);
+        
+        dto.setEstado(estado);
+        dto.setUbicacionBienes(ubicacion);
+        dto.setNumSolicitud(id);
+        
+        if (ubiDAO.buscar(ubicacion) == null) {
+            UbicacionDTO nuevaUbicacion = new UbicacionDTO(0, ubicacion);
+            ubiDAO.insertar(nuevaUbicacion);
+        }
+        // Convertir DTO a entidad y guardarlo en BD
         solicitudDAO.actualizar(dto);
     }
     
