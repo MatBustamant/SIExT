@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Informe | Solicitudes por Departamento</title>
+  <link href="icons/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/tablas.css">
+  <link rel="stylesheet" href="css/informes.css">
+  <link rel="icon" href="images/icon.png">
+</head>
+
+<body>
+
+  <h1>Informe de Solicitudes por Departamento</h1>
+  <div class="informativo">Generado: <span id="fechaActual"></span></div>
+  <div class="informativo">Período: <span id="periodoSeleccionado"></span></div>
+
+  <button class="btn" onclick="window.print()"><i class="bi bi-printer"></i>Imprimir</button>
+  <a href="informes.html" class="btn"><i class="bi bi-arrow-left"></i>Volver a Informes</a>
+
+  <table id="tablaSolicitudes">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Departamento</th>
+        <th>Descripción</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+    <tfoot></tfoot>
+  </table>
+
+  <footer>SIExT | 2025</footer>
+
+  <script>
+    document.getElementById("fechaActual").textContent = new Date().toLocaleString();
+
+    const params = new URLSearchParams(window.location.search);
+    const desde = params.get("desde");
+    const hasta = params.get("hasta");
+    document.getElementById("periodoSeleccionado").textContent = `${desde} a ${hasta}`;
+
+    const solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
+
+    const tbody = document.querySelector("#tablaSolicitudes tbody");
+    const tfoot = document.querySelector("#tablaSolicitudes tfoot");
+
+    // Filtrar solicitudes en rango de fechas
+    const solicitudesFiltradas = solicitudes
+      .filter(s => s.fechaInicioSolicitud >= desde && s.fechaInicioSolicitud <= hasta)
+      .map(s => ({
+        fecha: s.fechaInicioSolicitud.split("T")[0] + " " + s.fechaInicioSolicitud.split("T")[1].replace("Z", ""),
+        departamento: s.ubicacionBienes,
+        descripcion: s.descripcion
+      }))
+      .sort((a, b) => a.fecha.localeCompare(b.fecha));
+
+    if (solicitudesFiltradas.length === 0) {
+      const fila = document.createElement("tr");
+      fila.innerHTML = `<td colspan="4" style="text-align:center; padding:1rem;">No se registraron solicitudes en ese período.</td>`;
+      tbody.appendChild(fila);
+    } else {
+      solicitudesFiltradas.forEach(dato => {
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+          <td>${dato.fecha}</td>
+          <td>${dato.departamento}</td>
+          <td>${dato.descripcion}</td>
+        `;
+        tbody.appendChild(fila);
+      });
+    }
+
+    // ---- Totales por departamento ----
+    const totalesPorDepto = solicitudesFiltradas.reduce((acc, s) => {
+      acc[s.departamento] = (acc[s.departamento] || 0) + 1;
+      return acc;
+    }, {});
+
+    // ---- Total general ----
+    const totalGeneral = solicitudesFiltradas.length;
+
+    // Renderizar pie de tabla
+    tfoot.innerHTML = "";
+    Object.entries(totalesPorDepto).forEach(([depto, total]) => {
+      const filaDepto = document.createElement("tr");
+      filaDepto.innerHTML = `
+        <td colspan="2" style="text-align:right; font-weight:bold;">TOTAL ${depto}</td>
+        <td style="font-weight:bold;">${total}</td>
+      `;
+      tfoot.appendChild(filaDepto);
+    });
+
+    const filaTotal = document.createElement("tr");
+    filaTotal.innerHTML = `
+      <td colspan="2" style="text-align:right; font-weight:bold;">TOTAL GENERAL</td>
+      <td style="font-weight:bold;">${totalGeneral}</td>
+    `;
+    tfoot.appendChild(filaTotal);
+  </script>
+
+</body>
+
+</html>
