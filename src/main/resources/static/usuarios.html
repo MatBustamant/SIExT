@@ -39,9 +39,9 @@
                 <label>Rol</label>
                 <select id="nuevoRol" required>
                     <option value="">Seleccionar</option>
-                    <option>Administrativo</option>
-                    <option>Supervisor</option>
-                    <option>Depósito</option>
+                    <option value="ADMINISTRATIVO">Administrativo</option>
+                    <option value="SUPERVISOR">Supervisor</option>
+                    <option value="DEPOSITO">Depósito</option>
                 </select>
 
                 <button type="submit" class="btn"><i class="bi bi-plus-circle"></i>Registrar</button>
@@ -61,15 +61,6 @@
                     </tr>
                 </thead>
                 <tbody id="tablaUsuarios">
-                    <tr>
-                        <td>1</td>
-                        <td>admin</td>
-                        <td>Administrativo</td>
-                        <td>
-                            <!-- HAY QUE CAMBIAR ESTO CUANDO SEA DINÁMICO ALGÚN DÍA-->
-                            <button class="btn" onclick="editarUsuario(event)"><i class="bi bi-pencil"></i></button>
-                        </td>
-                    </tr>
                 </tbody>
             </table>
         </section>
@@ -89,9 +80,9 @@
                 <label>Rol</label>
                 <select id="modRolUsuario" required>
                     <option value="">Seleccionar</option>
-                    <option>Administrativo</option>
-                    <option>Supervisor</option>
-                    <option>Depósito</option>
+                    <option value="ADMINISTRATIVO">Administrativo</option>
+                    <option value="SUPERVISOR">Supervisor</option>
+                    <option value="DEPOSITO">Depósito</option>
                 </select>
 
                 <div class="btn-row">
@@ -100,7 +91,7 @@
                             class="bi bi-x-circle"></i>Cancelar</button>
 
                     <button type="button" class="btn btn-danger" id="btnEliminarUsuario"><i
-                            class="bi bi-trash"></i>Deshabilitar</button>
+                            class="bi bi-trash"></i>Eliminar</button>
                 </div>
             </form>
         </section>
@@ -108,56 +99,167 @@
 
     <footer>SIExT | 2025</footer>
 
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
     <script>
-        // Registro nuevo usuario (simulado)
-        document.getElementById("formNuevoUsuario").addEventListener("submit", e => {
-            e.preventDefault();
-            const usuario = document.getElementById("nuevoUsuario").value;
-            const rol = document.getElementById("nuevoRol").value;
+        recargarUsuarios();
+        function renderUsuarios() {
+            const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
             const tabla = document.getElementById("tablaUsuarios");
-            const id = tabla.rows.length + 1;
+            tabla.innerHTML = "";
 
-            const fila = document.createElement("tr");
-            fila.innerHTML = `
-        <td>${id}</td>
-        <td>${usuario}</td>
-        <td>${rol}</td>
-        <td>
-          <button class="btn onclick='editarUsuario(${id})'><i class="bi bi-pencil"></i></button>
-        </td>
-      `;
-            tabla.appendChild(fila);
-            document.getElementById("formNuevoUsuario").reset();
+            usuarios.forEach(usuario => {
+                const fila = document.createElement("tr");
+                fila.innerHTML = `
+          <td>${usuario.id_Usuario}</td>
+          <td>${usuario.nombre}</td>
+          <td>${usuario.rol}</td>
+          <td>
+            <button class="btn" onclick='editarUsuario(${usuario.id_Usuario})'><i class="bi bi-pencil"></i></button>
+          </td>
+        `;
+                tabla.appendChild(fila);
+            });
+        }
+        renderUsuarios();
+
+        document.getElementById("formNuevoUsuario").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const nombre = document.getElementById("nuevoUsuario").value.toUpperCase();
+            const contraseña = document.getElementById("nuevoPassword").value;
+            const rol = document.getElementById("nuevoRol").value.toUpperCase();
+            if (!nombre || !contraseña || !rol) {
+                alert("Datos incompletos.");
+                return;
+            }
+
+            const usuario = {
+                nombre,
+                contraseña,
+                rol
+            }
+
+            try {
+                const response = await crearUsuario(usuario);
+                if (!response.ok) {
+                    alert(`El servidor no pudo realizar el registro del usuario. Código: ${response.status}`);
+                    return;
+                }
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
+            alert("Usuario registrado.");
+            await recargarUsuarios();
+
+            renderUsuarios();
+            e.target.reset();
         });
 
-        // Abrir edición de usuario HAY QUE CAMBIAR ESTO CUANDO SEA DINÁMICO ALGÚN DÍA
-        function editarUsuario(event) {
-            const fila = event.target.closest("tr");
-                document.getElementById("modUsuarioId").value = fila.cells[0].textContent;
-                document.getElementById("modNombreUsuario").value = fila.cells[1].textContent;
-                document.getElementById("modPasswordUsuario").value = ""; // No mostrar contraseña real
-                document.getElementById("modRolUsuario").value = fila.cells[2].textContent;
-                document.getElementById("modificarUsuarioSection").classList.remove("hidden");
+        function editarUsuario(id) {
+            const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+            const usuario = usuarios.find(u => u.id_Usuario === id);
+            if (!usuario) return;
+
+            document.getElementById("modUsuarioId").value = usuario.id_Usuario;
+            document.getElementById("modNombreUsuario").value = usuario.nombre;
+            document.getElementById("modPasswordUsuario").value = "";
+            document.getElementById("modRolUsuario").value = usuario.rol;
+
+            document.getElementById("modificarUsuarioSection").classList.remove("hidden");
         }
 
-        // Cancelar edición
-        document.getElementById("btnCancelarEdicion").addEventListener("click", () => {
-            document.getElementById("modificarUsuarioSection").classList.add("hidden");
-        });
-
-        // Guardar cambios (simulado)
-        document.getElementById("formModificarUsuario").addEventListener("submit", e => {
+        document.getElementById("formModificarUsuario").addEventListener("submit", async (e) => {
             e.preventDefault();
-            alert("Usuario actualizado (simulado)");
+            const id = +document.getElementById("modUsuarioId").value;
+            let usuario;
+            try {
+                const response = await leerUsuario(id);
+                if (!response.ok) {
+                    document.getElementById("modificarUsuarioSection").classList.add("hidden");
+                    if (response.status == 404) {
+                        alert("Usuario no encontrado.");
+                        return;
+                    }
+                    else if (response.status == 500) {
+                        alert("El servidor no pudo realizar la búsqueda del usuario. Código: 500");
+                        return;
+                    }
+                    else {
+                        alert(`El servidor no pudo realizar la búsqueda del usuario. Código: ${response.status}`);
+                        return;
+                    }
+                }
+                usuario = await response.json();
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
+
+            const usuarioModificado = {
+                nombre: document.getElementById("modNombreUsuario").value.toUpperCase(),
+                contraseña: document.getElementById("modPasswordUsuario").value,
+                rol: document.getElementById("modRolUsuario").value.toUpperCase()
+            }
+
+            try {
+                const response = await modificarUsuario(usuarioModificado, id);
+                if (!response.ok) {
+                    if (response.status == 500) {
+                        alert("El servidor no pudo realizar la modificación del usuario. Código: 500");
+                        return;
+                    } else {
+                    alert(`El servidor no pudo realizar la modificación del usuario. Código: ${response.status}`);
+                    return;
+                    }
+                }
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
+
+            alert("Usuario actualizado.");
+            await recargarUsuarios();
+
+            renderUsuarios();
             document.getElementById("modificarUsuarioSection").classList.add("hidden");
+            e.target.reset();
         });
 
-        // Deshabilitar usuario (simulado)
-        document.getElementById("btnEliminarUsuario").addEventListener("click", () => {
-            if (confirm("¿Deshabilitar este usuario?")) {
-                alert("Usuario deshabilitado (simulado)");
+        // Cancelar edición de datos
+        document.getElementById("btnCancelarEdicion").onclick = () => {
+            if (confirm("¿Deseás cancelar la edición? Se perderán los cambios no guardados.")) {
                 document.getElementById("modificarUsuarioSection").classList.add("hidden");
+                document.getElementById("modificarUsuarioSection").reset();
             }
+        };
+
+        document.getElementById("btnEliminarUsuario").addEventListener("click", async () => {
+            const id = +document.getElementById("modUsuarioId").value;
+            if (!confirm("¿Eliminar este usuario?")) return;
+
+            try {
+                const response = await eliminarUsuario(id);
+                if (!response.ok) {
+                    if (response.status == 500) {
+                        alert("El servidor no pudo realizar la eliminación del usuario. Código: 500");
+                        return;
+                    }
+                    else {
+                        alert(`El servidor no pudo realizar la eliminación del usuario. Código: ${response.status}`);
+                        return;
+                    }
+                }
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
+            alert("Usuario eliminado.");
+            await recargarUsuarios();
+            renderUsuarios();
+            document.getElementById("modificarUsuarioSection").classList.add("hidden");
+            document.getElementById("modificarUsuarioSection").reset();
         });
     </script>
 </body>

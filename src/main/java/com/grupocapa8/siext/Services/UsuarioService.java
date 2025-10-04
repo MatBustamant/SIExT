@@ -15,18 +15,6 @@ public class UsuarioService implements ServiceGenerico<UsuarioDTO> {
     public UsuarioService() {
         this.usuarioDAO = new UsuarioDAOImpl();
     }
-   
-//    public void lecturaDTOs(){
-//        int idUsuario = 0;
-//        while(usuarioDAO.BuscarUsuario(idUsuario)){
-//            UsuarioDTO dto = usuarioDAO.obtenerUsuario(idUsuario);
-//            recibirUsuarioDTO(dto);
-//            idUsuario = idUsuario + 1;    
-//        }
-//        if(idUsuario == 0){
-//            System.out.println("No Existe el usuario en la BD");
-//        }   
-//    }
     
    @Override
     public UsuarioDTO buscar(int idUsuario) throws NoSuchElementException {
@@ -47,12 +35,17 @@ public class UsuarioService implements ServiceGenerico<UsuarioDTO> {
     
    @Override
     public void crear(UsuarioDTO dto){
-        validarString(dto.getNombre(),1);
-        validarString(dto.getRol(),2);
+        String nombre = dto.getNombre();
+        validarString(nombre,1);
+        String rol = dto.getRol();
+        validarString(rol,2);
         validarContraseña(dto.getContraseña());
         String contraseñaHash = BCrypt.hashpw(dto.getContraseña(), BCrypt.gensalt());
         // Convertir DTO a entidad y guardarlo en BD
+        dto.setNombre(nombre);
+        dto.setRol(rol);
         dto.setContraseña(contraseñaHash);
+        
         usuarioDAO.insertar(dto);
     }
     
@@ -62,11 +55,17 @@ public class UsuarioService implements ServiceGenerico<UsuarioDTO> {
         if (usuarioDAO.buscar(id) == null){
             throw new NoSuchElementException("No existe el Usuario");
         }
-        validarString(dto.getNombre(),1);
+        String nombre = dto.getNombre();
+        validarString(nombre,1);
+        String rol = dto.getRol();
         validarString(dto.getRol(),2);
         validarContraseña(dto.getContraseña());
         String contraseñaHash = BCrypt.hashpw(dto.getContraseña(), BCrypt.gensalt());
+        
+        dto.setNombre(nombre);
+        dto.setRol(rol);
         dto.setContraseña(contraseñaHash);
+        dto.setID_Usuario(id);
         
         // Convertir DTO a entidad y guardarlo en BD
         usuarioDAO.actualizar(dto);

@@ -110,7 +110,7 @@ public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
 
     @Override
     public int eliminar(int id) {
-        String sql = "UPDATE Usuario SET Eliminado = ? WHERE id = ?";
+        String sql = "UPDATE Usuario SET Eliminado = ? WHERE ID_Usuario = ?";
         int resultado = 0;
         
         try (Connection con = BasedeDatos.getConnection();
