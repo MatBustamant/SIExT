@@ -11,22 +11,12 @@ import java.util.NoSuchElementException;
  */
 public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabilidadDTO>{
     private final EventoTrazabilidadDAOImpl eventoTrazDAO; //acceso a la BD
+    private final BienService bienService;
 
     public EventoTrazabilidadServices() {
         this.eventoTrazDAO = new EventoTrazabilidadDAOImpl();
+        this.bienService = new BienService();
     }
-    
-//    public void lecturaDTOs(){
-//        int idEventoTraz = 0;
-//        while(eventoTrazDAO.BuscarEventoTraz(idEventoTraz)){
-//            EventoTrazabilidadDTO dto = eventoTrazDAO.obtenerEventoTraz(idEventoTraz);
-//            recibirEventoTrazDTO(dto);
-//            idEventoTraz = idEventoTraz + 1;    
-//        }
-//        if(idEventoTraz == 0){
-//            System.out.println("No Existen Eventos de trazabilidad en la BD");
-//        }
-//    }
     
     @Override
     public EventoTrazabilidadDTO buscar(int idEventoTraz) throws NoSuchElementException {
@@ -45,10 +35,17 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
     
     @Override
     public void crear(EventoTrazabilidadDTO dto){
-        validarID(dto.getBienAsociado());
-        // validarFecha(dto.getFechaEvento()); ver que se va hacer con estas validaciones
-        validarString(dto.getTipoEvento(),1);
-        // validarHorario(dto.getHorarioEvento().getHoraFormateada()); ver que se va hacer con estas validaciones
+        int idBien = dto.getBienAsociado();
+        validarID(idBien);
+        String tipo = dto.getTipoEvento().toUpperCase();
+        validarString(tipo,1);
+        
+        dto.setTipoEvento(tipo);
+        if(tipo.equals("AVERIO")) {
+            bienService.averiar(idBien);
+        } else if (tipo.equals("REPARACION")) {
+            bienService.reparar(idBien);
+        }
         
         eventoTrazDAO.insertar(dto);
     }
@@ -59,10 +56,19 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
         if (eventoTrazDAO.buscar(id) == null){
             throw new NoSuchElementException("No existe el Evento de trazabilidad");
         }
-        validarID(dto.getBienAsociado());
-        // validarFecha(dto.getFechaEvento()); ver que se va hacer con estas validaciones
-        validarString(dto.getTipoEvento(),1);
-        // validarHorario(dto.getHorarioEvento().getHoraFormateada()); ver que se va hacer con estas validaciones
+        int idBien = dto.getBienAsociado();
+        validarID(idBien);
+        String tipo = dto.getTipoEvento().toUpperCase();
+        validarString(tipo,1);
+        
+        dto.setTipoEvento(tipo);
+        if(eventoTrazDAO.buscarMasReciente(idBien).getID_Evento() == id) {
+            if(tipo.equals("AVERIO")) {
+                bienService.averiar(idBien);
+            } else if (tipo.equals("REPARACION")) {
+                bienService.reparar(idBien);
+            }
+        }
         
         eventoTrazDAO.actualizar(dto);
     }
@@ -70,11 +76,27 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
     @Override
     public void eliminar(int idEventoTraz) throws NoSuchElementException {
         validarID(idEventoTraz);
-        if (eventoTrazDAO.buscar(idEventoTraz) == null){ //hacer una validacion del id
+        EventoTrazabilidadDTO evento = eventoTrazDAO.buscar(idEventoTraz);
+        if (evento == null){ //hacer una validacion del id
             throw new NoSuchElementException("No existe el evento de trazabilidad");
         }
         
+        int idBien = evento.getBienAsociado();
+        String tipoDelEventoActual = evento.getTipoEvento();
+        
+        // Eliminamos lo que se nos pide
         eventoTrazDAO.eliminar(idEventoTraz);
+        
+        // Buscamos el evento anterior (El más reciente luego de la eliminación)
+        String tipoDelEventoAnterior = eventoTrazDAO.buscarMasReciente(idBien).getTipoEvento();
+        // Si es distinto al que acabamos de eliminar, tenemos que modificar el estado del bien
+        if(tipoDelEventoAnterior != null && !tipoDelEventoAnterior.equals(tipoDelEventoActual)) {
+            if(tipoDelEventoAnterior.equals("AVERIO")) {
+                bienService.averiar(idBien);
+            } else if (tipoDelEventoAnterior.equals("REPARACION") || tipoDelEventoAnterior.equals("ENTREGA")) {
+                bienService.reparar(idBien);
+            }
+        }
     }
     
     private void validarID(Integer num){
@@ -94,33 +116,5 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
             } 
         }
     }
-/**    public void validarFecha(Fecha fecha) {
-        if (fecha == null || fecha.getFecha() == null) {
-            throw new IllegalArgumentException("La fecha no puede ser nula.");
-        }
-
-        LocalDate f = fecha.getFecha();
-        LocalDate hoy = LocalDate.now();
-
-        // Si el formato de la fecha está mal, el constructor ya lanzará una excepción
-        // por eso no es necesario hacer una validación explícita aquí.
-
-        // Ejemplo: la fecha no puede ser posterior a hoy
-        if (f.isAfter(hoy)) {
-            throw new IllegalArgumentException("La fecha no puede estar en el futuro.");
-        }
-
-        // Ejemplo: la fecha no puede ser anterior a 2024
-        if (f.isBefore(LocalDate.of(2000, 1, 1))) {
-            throw new IllegalArgumentException("La fecha no puede ser anterior al año 2000.");
-        }
-    }
-
-    public void validarHorario(String horarioStr) {
-        if (horarioStr == null || horarioStr.trim().isEmpty()) {
-            throw new IllegalArgumentException("El horario no puede ser nulo ni vacío.");
-        }
-    }
-*/
     
 }

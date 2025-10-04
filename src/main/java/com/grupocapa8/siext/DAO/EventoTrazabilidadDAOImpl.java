@@ -84,6 +84,33 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
         }
         return eventos;
     }
+    
+    public EventoTrazabilidadDTO buscarMasReciente(int idBienAsociado) {
+        String sql = "SELECT * FROM EventoTrazabilidad WHERE ID_Bien = ? AND Eliminado = ? ORDER BY Fecha DESC LIMIT 1";
+        EventoTrazabilidadDTO evento = null;
+        try (Connection con = BasedeDatos.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idBienAsociado);
+            ps.setInt(2, 0);
+            
+            try(ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    evento = new EventoTrazabilidadDTO();
+                    evento.setID_Evento(rs.getInt("ID_Evento"));
+                    evento.setBienAsociado(rs.getInt("ID_Bien"));
+                    evento.setTipoEvento(rs.getString("TipoEvento"));
+                    
+                    String fechaString = rs.getString("Fecha");
+                    Instant fecha = LocalDateTime.parse(fechaString, 
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toInstant(ZoneOffset.UTC);
+                    evento.setFechaEvento(fecha);
+                }
+            }
+        } catch (SQLException ex) {
+            System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+        return evento;
+    }
 
     @Override
     public int insertar(EventoTrazabilidadDTO Evento) {

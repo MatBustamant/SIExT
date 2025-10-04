@@ -104,7 +104,23 @@ public class BienService implements ServiceGenerico<BienDTO> {
         }
        
         bienDAO.actualizar(dto);
-    } 
+    }
+    
+    void averiar(int id) throws NoSuchElementException {
+        validarID(id);
+        if (bienDAO.buscar(id) == null){
+            throw new NoSuchElementException("No existe el Bien");
+        }
+        bienDAO.cambiarEstado("AVERIADO", id);
+    }
+    
+    void reparar(int id) throws NoSuchElementException {
+        validarID(id);
+        if (bienDAO.buscar(id) == null){
+            throw new NoSuchElementException("No existe el Bien");
+        }
+        bienDAO.cambiarEstado("EN CONDICIONES", id);
+    }
    
     @Override
     public void eliminar(int idBien) throws NoSuchElementException {

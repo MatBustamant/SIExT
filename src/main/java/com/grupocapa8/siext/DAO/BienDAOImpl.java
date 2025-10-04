@@ -150,6 +150,21 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
         
         return resultado;
     }
+    
+    public void cambiarEstado(String estado, int id) {
+        String sql = "UPDATE Bien SET Estado = ? WHERE ID_Bien = ?";
+        
+        try (Connection con = BasedeDatos.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setString(1, estado);
+            ps.setInt(2, id);
+            
+            ps.executeUpdate();
+        } catch (SQLException ex) {
+            System.getLogger(BienDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+    }
 
     @Override
     public int eliminar(int id) {
