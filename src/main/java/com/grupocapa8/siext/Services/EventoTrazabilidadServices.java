@@ -62,6 +62,8 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
         validarString(tipo,1);
         
         dto.setTipoEvento(tipo);
+        dto.setID_Evento(id);
+        
         if(eventoTrazDAO.buscarMasReciente(idBien).getID_Evento() == id) {
             if(tipo.equals("AVERIO")) {
                 bienService.averiar(idBien);
