@@ -16,18 +16,6 @@ public class CategoriaBienServices implements ServiceGenerico<CategoriaBienDTO>{
         this.categoriaBienDAO = new CategoriaDAOImpl();
     }
     
-//    public void lecturaDTOs(){
-//        int idCategoriaBien = 0;
-//        while(categoriaBienDAO.BuscarCategoriaBien(idCategoriaBien)){
-//            CategoriaBienDTO dto = categoriaBienDAO.obtenerCategoriaBien(idCategoriaBien);
-//            recibirCategoriaBienDTO(dto);
-//            idCategoriaBien = idCategoriaBien + 1;    
-//        }
-//        if(idCategoriaBien == 0){
-//            System.out.println("No Existen Categoria de Bienes almacenados en BD");
-//        }
-//    }
-    
     @Override
     public CategoriaBienDTO buscar(int idCategoriaBien) throws NoSuchElementException {
         validarID(idCategoriaBien);
@@ -45,7 +33,10 @@ public class CategoriaBienServices implements ServiceGenerico<CategoriaBienDTO>{
     
     @Override
     public void crear(CategoriaBienDTO dto){
-        validarString(dto.getNombre(),1);
+        String nombre = dto.getNombre().trim().toUpperCase();
+        validarString(nombre,1);
+        
+        dto.setNombre(nombre);
 
         categoriaBienDAO.insertar(dto);
     } 
@@ -56,7 +47,11 @@ public class CategoriaBienServices implements ServiceGenerico<CategoriaBienDTO>{
         if (categoriaBienDAO.buscar(id) == null){
             throw new NoSuchElementException("No existe la categoria");
         }
+        String nombre = dto.getNombre().trim().toUpperCase();
         validarString(dto.getNombre(),1);
+        
+        dto.setNombre(nombre);
+        dto.setID_Categoria(id);
        
         categoriaBienDAO.actualizar(dto);
     } 
