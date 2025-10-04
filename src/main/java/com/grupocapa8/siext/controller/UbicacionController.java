@@ -4,19 +4,19 @@
  */
 package com.grupocapa8.siext.controller;
 
-import com.grupocapa8.siext.DTO.SolicitudDTO;
-import com.grupocapa8.siext.Services.SolicitudService;
+import com.grupocapa8.siext.DTO.UbicacionDTO;
+import com.grupocapa8.siext.Services.UbicacionService;
 import jakarta.ws.rs.Path;
 
 /**
  *
  * @author Matias
  */
-@Path("solicitud")
-public class SolicitudController extends AbstractController<SolicitudDTO>{
+@Path("ubicacion")
+public class UbicacionController extends AbstractController<UbicacionDTO>{
 
-    public SolicitudController() {
-        this.servicio = new SolicitudService(); //SolicitudService
+    public UbicacionController() {
+        this.servicio = new UbicacionService();
     }
     
 }

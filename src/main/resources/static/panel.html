@@ -123,10 +123,6 @@
                     <i class="bi bi-card-checklist"></i>
                     GESTIONAR SOLICITUDES
                 </a>
-                <!-- <a href="salidas.html">
-                    <i class="bi bi-box-arrow-up-right"></i>
-                    REGISTRAR SALIDAS
-                </a> -->
                 <a href="eventos.html">
                     <i class="bi bi-exclamation-circle"></i>
                     REGISTRAR EVENTOS
@@ -142,23 +138,7 @@
                     <ul id="ultimosIngresos" class="stat-list"></ul>
                 </article>
                 <article id="statsVariadas" class="stat-card">
-                    <!-- <h3>Productos bajo mínimo de stock</h3>
-                    <p>2</p> -->
-                    <!-- <h3>Solicitudes pendientes de entrega</h3>
-                    <p>3</p>
-                    <h3>Bienes averiados</h3>
-                    <p>5</p> -->
                 </article>
-                <!-- <article class="stat-card">
-                    <h3>Últimas salidas registradas (ejemplo estático)</h3>
-                    <ul class="stat-list">
-                        <li>1 x Monitor LED 24" - Dpto. Informática</li>
-                        <li>2 x Pendrive 16GB - GAME</li>
-                        <li>1 x Resma A4 - Dpto. Alumnos</li>
-                        <li>5 x Cable VGA - Dpto. Informática</li>
-                        <li>1 x Tóner HP - Bedelía</li>
-                    </ul>
-                </article> -->
             </section>
         </section>
 
@@ -169,14 +149,6 @@
                     <i class="bi bi-person-vcard"></i>
                     GESTIONAR USUARIOS
                 </a>
-                <!-- <a href="#">
-                    <i class="bi bi-database-down"></i>
-                    EXPORTAR COPIA DE SEGURIDAD (ejemplo)
-                </a>
-                <a href="#">
-                    <i class="bi bi-shield-exclamation"></i>
-                    OTRAS ACCIONES (ejemplo)
-                </a> -->
             </nav>
         </section>
 
@@ -186,15 +158,24 @@
         SIExT | 2025
     </footer>
 
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            recargarTodo();
+        });
+    </script>
+
     <script>
         // Obtener productos e ingresos del localStorage
-        const productos = JSON.parse(localStorage.getItem("productos")) || [];
-        const ingresos = JSON.parse(localStorage.getItem("ingresos")) || [];
+        const productos = JSON.parse(localStorage.getItem("bienes")) || [];
+        const eventos = JSON.parse(localStorage.getItem("eventos")) || [];
 
         // Ordenar ingresos por fecha descendente
-        const ingresosOrdenados = ingresos
+        const ingresosOrdenados = eventos
             .slice()
-            .sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+            .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
+            .filter(e => e.tipoEvento == "ENTREGA");
 
         // Generar la lista agrupando consecutivos
         const ultimosIngresos = [];
@@ -214,7 +195,7 @@
 
                 if (
                     productoSiguiente.nombre === productoActual.nombre &&
-                    productoSiguiente.categoria === productoActual.categoria
+                    productoSiguiente.nombreCatBienes === productoActual.nombreCatBienes
                 ) {
                     cantidad++;
                     j++;
@@ -243,10 +224,10 @@
         const solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
 
         // Calcular bienes averiados
-        const bienesAveriados = productos.filter(p => p.estado === "AVERIADO").length;
+        const bienesAveriados = productos.filter(p => p.estadoBien === "AVERIADO").length;
 
         // Calcular solicitudes pendientes de entrega
-        const solicitudesPendientes = solicitudes.filter(s => s.estado === "Aprobada").length;
+        const solicitudesPendientes = solicitudes.filter(s => s.estado === "APROBADA").length;
 
         // Seleccionar el artículo
         const statsVariadas = document.getElementById("statsVariadas");

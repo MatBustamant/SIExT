@@ -10,7 +10,7 @@
   <link rel="icon" href="images\icon.png">
 
   <style>
-    ul li > * {
+    ul li>* {
       width: 100%;
     }
 
@@ -58,7 +58,17 @@
         <!-- <li><a href="informe_minimo.html" class="btn"><i class="bi bi-exclamation-triangle"></i>Inventario bajo mínimo
             de
             reposición</a></li> -->
-        <li><a href="#" class="btn"><i class="bi bi-file-bar-graph"></i>Total de solicitudes por departamento</a></li>
+        <li>
+          <button class="btn" id="btnSolicitudes" type="button"><i class="bi bi-file-bar-graph"></i>Total de solicitudes
+            en un período</button>
+          <form id="formSolicitudes" class="hidden">
+            <label>Desde</label>
+            <input type="date" id="desdeSolicitudes" required>
+            <label>Hasta</label>
+            <input type="date" id="hastaSolicitudes" required>
+            <button type="submit" class="btn"><i class="bi bi-search"></i>Ver Informe</button>
+          </form>
+        </li>
         <!-- <li><a href="#" class="btn"><i class="bi bi-box-arrow-up-right"></i>Total de salidas por departamento</a></li> -->
       </ul>
     </section>
@@ -88,6 +98,27 @@
     };
   </script>
 
+
+  <script>
+    const btnSolicitudes = document.getElementById("btnSolicitudes");
+    const formSolicitudes = document.getElementById("formSolicitudes");
+
+    btnSolicitudes.addEventListener("click", () => {
+      formSolicitudes.classList.toggle("hidden");
+      btnSolicitudes.style.backgroundColor = formSolicitudes.classList.contains("hidden") ? "" : "var(--azul-profundo)";
+    });
+
+    document.getElementById("formSolicitudes").onsubmit = e => {
+      e.preventDefault();
+      const desde = document.getElementById("desdeSolicitudes").value;
+      const hasta = document.getElementById("hastaSolicitudes").value;
+      if (!desde || !hasta) {
+        alert("Seleccioná ambas fechas.");
+        return;
+      }
+      window.location.href = `informe_solicitudes_dpto.html?desde=${desde}&hasta=${hasta}`;
+    };
+  </script>
 </body>
 
 </html>

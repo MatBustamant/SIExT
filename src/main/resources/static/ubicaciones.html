@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Editar ubicaciones - SIExT</title>
+    <link href="icons/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/tablas.css">
+    <link rel="icon" href="images/icon.png">
+</head>
+
+<body>
+    <header>SIExT | Editar ubicaciones</header>
+
+    <div class="default-block-container">
+        <nav>
+            <h2>Acciones rápidas</h2>
+            <ul>
+                <li><a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver a Panel</a></li>
+                <li><a href="inventario.html" class="btn"><i class="bi bi-card-list"></i></i>Ver Inventario</a></li>
+                <li><a href="productos.html" class="btn"><i class="bi bi-box-seam"></i>Gestionar Productos</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main class="default-block-container">
+        <!-- Formulario para agregar nueva ubicación -->
+        <section>
+            <h2>Agregar nueva ubicación</h2>
+            <form id="ubicacionForm">
+                <label>Nombre de Ubicación</label>
+                <input list="ubicacionesExistentes" type="text" id="nombreUbicacion" required>
+                <datalist id="ubicacionesExistentes"></datalist>
+                <button type="submit" class="btn"><i class="bi bi-plus-circle"></i>Registrar</button>
+            </form>
+        </section>
+
+        <!-- Gestión de ubicaciones -->
+        <section>
+            <h2>Ubicaciones registradas</h2>
+            <!-- Filtros -->
+            <div class="form-grid">
+                <div>
+                    <input type="text" id="filterNombreCat" placeholder="Filtrar por nombre o ID...">
+                </div>
+            </div>
+
+            <table id="tablaUbicaciones">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Ubicación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <div class="informativo" id="contadorUbicaciones"></div>
+        </section>
+
+        <!-- Formulario para modificar ubicación seleccionada -->
+        <section id="modificarUbicacionSection" class="hidden">
+            <h2>Actualizar ubicación</h2>
+            <form id="modificarUbicacionForm">
+                <input type="hidden" id="modUbicacionId">
+                <label>Nombre de Ubicación</label>
+                <input list="modUbicacionesExistentes" type="text" id="modNombreUbicacion" required>
+                <datalist id="modUbicacionesExistentes"></datalist>
+                <div class="btn-row">
+                    <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
+                    <button type="button" class="btn" id="cancelarBtn"><i class="bi bi-x-circle"></i>Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="eliminarUbicacionBtn"><i
+                            class="bi bi-trash"></i>Eliminar</button>
+                </div>
+            </form>
+        </section>
+
+    </main>
+
+    <footer>SIExT | 2025</footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        function ubicacionExiste(nombre) {
+            const ubicaciones = JSON.parse(localStorage.getItem("ubicaciones")) || [];
+
+            if (ubicaciones.some(c => c.nombre === nombre)) {
+                alert("Esa ubicación ya existe.");
+                return true;
+            }
+            return false;
+        }
+
+        function cargarUbicacionesExistentes(idSelect) {
+            const sel = document.getElementById(idSelect);
+            sel.innerHTML = "";
+            const cats = JSON.parse(localStorage.getItem("ubicaciones")) || [];
+            if (cats.length === 0) {
+                sel.disabled = true;
+                sel.innerHTML = "<option>Sin ubicaciones</option>";
+                return;
+            }
+            cats.forEach(c => {
+                const o = document.createElement("option");
+                o.textContent = c.nombre;
+                sel.appendChild(o);
+            });
+            sel.disabled = false;
+        }
+
+        function renderizarUbicaciones() {
+            const ubicaciones = JSON.parse(localStorage.getItem("ubicaciones")) || [];
+            const filtroNombreId = document.getElementById("filterNombreCat").value.toUpperCase();
+            const tbody = document.querySelector("#tablaUbicaciones tbody");
+            tbody.innerHTML = "";
+            let count = 0;
+
+            ubicaciones.forEach(cat => {
+                if (
+                    (cat.nombre.toUpperCase().includes(filtroNombreId) || String(cat.id_Ubicacion).includes(filtroNombreId))
+                ) {
+                    const fila = document.createElement("tr");
+                    fila.innerHTML = `
+                <td>${cat.id_Ubicacion}</td>
+                <td>${cat.nombre}</td>
+                <td>
+                    <button class='btn' onclick='editarUbicacion(${cat.id_Ubicacion})'><i class='bi bi-pencil'></i></button>
+                </td>`;
+                    tbody.appendChild(fila);
+                    count++;
+                }
+            });
+            document.getElementById("contadorUbicaciones").textContent = `Mostrando ${count} ubicación(s).`;
+        }
+        recargarUbicaciones();
+        cargarUbicacionesExistentes("ubicacionesExistentes");
+        cargarUbicacionesExistentes("modUbicacionesExistentes");
+        renderizarUbicaciones();
+
+        document.getElementById("filterNombreCat").addEventListener("input", renderizarUbicaciones);
+
+        document.getElementById("ubicacionForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const nombre = document.getElementById("nombreUbicacion").value.trim().toUpperCase();
+            if (!nombre) {
+                alert("Datos incompletos.");
+                return;
+            }
+
+            const ubicacion = {
+                nombre
+            }
+
+            if (ubicacionExiste(ubicacion.nombre)) return;
+
+            try {
+                const response = await crearUbicacion(ubicacion);
+                if (!response.ok) {
+                    alert(`El servidor no pudo realizar el registro de la ubicación. Código: ${response.status}`);
+                    return;
+                }
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
+            alert("Ubicación registrada.");
+            await recargarUbicaciones();
+
+            renderizarUbicaciones();
+            cargarUbicacionesExistentes("ubicacionesExistentes");
+            cargarUbicacionesExistentes("modUbicacionesExistentes");
+            e.target.reset();
+        });
+
+        function editarUbicacion(id) {
+            const ubicaciones = JSON.parse(localStorage.getItem("ubicaciones")) || [];
+            const cat = ubicaciones.find(c => c.id_Ubicacion === id);
+            if (!cat) return;
+
+            document.getElementById("modUbicacionId").value = cat.id_Ubicacion;
+            document.getElementById("modNombreUbicacion").value = cat.nombre;
+
+            document.getElementById("modificarUbicacionSection").classList.remove("hidden");
+        }
+
+        document.getElementById("modificarUbicacionForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const id = +document.getElementById("modUbicacionId").value;
+
+            let ubicacion;
+            try {
+                const response = await leerUbicacion(id);
+                if (!response.ok) {
+                    document.getElementById("modificarUbicacionSection").classList.add("hidden");
+                    if (response.status == 404) {
+                        alert("Ubicación no encontrada.");
+                        return;
+                    }
+                    else if (response.status == 500) {
+                        alert("El servidor no pudo realizar la búsqueda de la ubicación. Código: 500");
+                        return;
+                    }
+                    else {
+                        alert(`El servidor no pudo realizar la búsqueda de la ubicación. Código: ${response.status}`);
+                        return;
+                    }
+                }
+                ubicacion = await response.json();
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
+
+            const ubicacionModificada = {
+                nombre: document.getElementById("modNombreUbicacion").value.trim().toUpperCase(),
+            }
+
+            if (ubicacionExiste(ubicacionModificada.nombre)) return;
+
+            try {
+                const response = await modificarUbicacion(ubicacionModificada, id);
+                if (!response.ok) {
+                    if (response.status == 500) {
+                        alert("El servidor no pudo realizar la modificación de la ubicación. Código: 500");
+                        return;
+                    } else {
+                    alert(`El servidor no pudo realizar la modificación de la ubicación. Código: ${response.status}`);
+                    return;
+                    }
+                }
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
+
+            alert("Ubicación actualizada.");
+            await recargarUbicaciones();
+
+            renderizarUbicaciones();
+            cargarUbicacionesExistentes("ubicacionesExistentes");
+            cargarUbicacionesExistentes("modUbicacionesExistentes");
+            document.getElementById("modificarUbicacionSection").classList.add("hidden");
+            e.target.reset();
+        });
+
+        // Cancelar edición de datos
+        document.getElementById("cancelarBtn").onclick = () => {
+            if (confirm("¿Deseás cancelar la edición? Se perderán los cambios no guardados.")) {
+                document.getElementById("modificarUbicacionSection").classList.add("hidden");
+                document.getElementById("modificarUbicacionSection").reset();
+            }
+        };
+
+        document.getElementById("eliminarUbicacionBtn").addEventListener("click", async () => {
+            const id = +document.getElementById("modUbicacionId").value;
+            if (!confirm("¿Eliminar esta ubicación?")) return;
+
+            try {
+                const response = await eliminarUbicacion(id);
+                if (!response.ok) {
+                    if (response.status == 500) {
+                        alert("El servidor no pudo realizar la eliminación de la ubicación. Código: 500");
+                        return;
+                    }
+                    else {
+                        alert(`El servidor no pudo realizar la eliminación de la ubicación. Código: ${response.status}`);
+                        return;
+                    }
+                }
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
+            alert("Ubicación eliminada.");
+            await recargarUbicaciones();
+            renderizarUbicaciones();
+            cargarUbicacionesExistentes("ubicacionesExistentes");
+            cargarUbicacionesExistentes("modUbicacionesExistentes");
+            document.getElementById("modificarUbicacionSection").classList.add("hidden");
+            document.getElementById("modificarUbicacionSection").reset();
+        });
+
+        renderizarUbicaciones();
+    </script>
+
+</body>
+
+</html>

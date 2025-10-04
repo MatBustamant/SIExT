@@ -4,60 +4,87 @@
  */
 package com.grupocapa8.siext.controller;
 
+import com.grupocapa8.siext.Services.ServiceGenerico;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  *
  * @author Matias
  */
-public abstract class AbstractController<E, ID> {
+public abstract class AbstractController<E> {
     
-    protected Object servicio;
+    protected ServiceGenerico<E> servicio;
     
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("crear")
     public void crear(E entidad) {
-        // servicio.crear(entidad);
-        throw new UnsupportedOperationException("servicios no creados todavía");
+        servicio.crear(entidad);
     }
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("leer/{id}")
-    public E buscarPorId(ID id) {
-        // return servicio.buscarPorId(id);
-        throw new UnsupportedOperationException("servicios no creados todavía");
+    public Response buscarPorId(@PathParam("id") int id) {
+        try {
+            E entidad = servicio.buscar(id);
+            return Response.ok(entidad).build();
+        } catch (NoSuchElementException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity("{}").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"" + e.getMessage() + "\"}").build();
+        }
     }
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("leer")
-    public E[] buscarTodos() {
-        // return servicio.buscarTodos();
-        throw new UnsupportedOperationException("servicios no creados todavía");
+    public Response buscarTodos() {
+        try {
+            List<E> entidades = servicio.buscarTodos();
+            return Response.ok(entidades).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"" + e.getMessage() + "\"}").build();
+        }
     }
     
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("modificar/{id}")
-    public void modificar(E entidad, ID id) {
-        // return servicio.modificar(entidad);
-        throw new UnsupportedOperationException("servicios no creados todavía");
+    public Response modificar(E entidad, @PathParam("id") int id) {
+        try {
+            servicio.modificar(entidad, id);
+            return Response.ok().build();
+        } catch (NoSuchElementException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity("{}").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"" + e.getMessage() + "\"}").build();
+        }
     }
     
     @DELETE
     @Path("eliminar/{id}")
-    public void eliminar(ID id) {
-        // return servicio.eliminar(id);
-        throw new UnsupportedOperationException("servicios no creados todavía");
+    public Response eliminar(@PathParam("id") int id) {
+        try {
+            servicio.eliminar(id);
+            return Response.ok().build();
+        } catch (NoSuchElementException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity("{}").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"" + e.getMessage() + "\"}").build();
+        }
     }
     
 }
+    

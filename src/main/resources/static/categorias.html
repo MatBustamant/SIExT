@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Editar categorías - SIExT</title>
+    <link href="icons/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/tablas.css">
+    <link rel="icon" href="images/icon.png">
+</head>
+
+<body>
+    <header>SIExT | Editar categorías</header>
+
+    <div class="default-block-container">
+        <nav>
+            <h2>Acciones rápidas</h2>
+            <ul>
+                <li><a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver a Panel</a></li>
+                <li><a href="inventario.html" class="btn"><i class="bi bi-card-list"></i></i>Ver Inventario</a></li>
+                <li><a href="productos.html" class="btn"><i class="bi bi-box-seam"></i>Gestionar Productos</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main class="default-block-container">
+        <!-- Formulario para agregar nueva categoría -->
+        <section>
+            <h2>Agregar nueva categoría</h2>
+            <form id="categoriaForm">
+                <label>Nombre de Categoría</label>
+                <input list="categoriasExistentes" type="text" id="nombreCategoria" required>
+                <datalist id="categoriasExistentes"></datalist>
+                <button type="submit" class="btn"><i class="bi bi-plus-circle"></i>Registrar</button>
+            </form>
+        </section>
+
+        <!-- Gestión de categorías -->
+        <section>
+            <h2>Categorías registradas</h2>
+            <!-- Filtros -->
+            <div class="form-grid">
+                <div>
+                    <input type="text" id="filterNombreCat" placeholder="Filtrar por nombre o ID...">
+                </div>
+            </div>
+
+            <table id="tablaCategorias">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Categoría</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <div class="informativo" id="contadorCategorias"></div>
+        </section>
+
+        <!-- Formulario para modificar categoría seleccionada -->
+        <section id="modificarCategoriaSection" class="hidden">
+            <h2>Actualizar categoría</h2>
+            <form id="modificarCategoriaForm">
+                <input type="hidden" id="modCategoriaId">
+                <label>Nombre de Categoría</label>
+                <input list="modCategoriasExistentes" type="text" id="modNombreCategoria" required>
+                <datalist id="modCategoriasExistentes"></datalist>
+                <div class="btn-row">
+                    <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
+                    <button type="button" class="btn" id="cancelarBtn"><i class="bi bi-x-circle"></i>Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="eliminarCategoriaBtn"><i
+                            class="bi bi-trash"></i>Eliminar</button>
+                </div>
+            </form>
+        </section>
+
+    </main>
+
+    <footer>SIExT | 2025</footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        function categoriaExiste(nombre) {
+            const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
+
+            if (categorias.some(c => c.nombre === nombre)) {
+                alert("Esa categoría ya existe.");
+                return true;
+            }
+            return false;
+        }
+
+        function cargarCategoriasExistentes(idSelect) {
+            const sel = document.getElementById(idSelect);
+            sel.innerHTML = "";
+            const cats = JSON.parse(localStorage.getItem("categorias")) || [];
+            if (cats.length === 0) {
+                sel.disabled = true;
+                sel.innerHTML = "<option>Sin categorías</option>";
+                return;
+            }
+            cats.forEach(c => {
+                const o = document.createElement("option");
+                o.textContent = c.nombre;
+                sel.appendChild(o);
+            });
+            sel.disabled = false;
+        }
+
+        function renderizarCategorias() {
+            const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
+            const filtroNombreId = document.getElementById("filterNombreCat").value.toUpperCase();
+            const tbody = document.querySelector("#tablaCategorias tbody");
+            tbody.innerHTML = "";
+            let count = 0;
+
+            categorias.forEach(cat => {
+                if (
+                    (cat.nombre.toUpperCase().includes(filtroNombreId) || String(cat.id_Categoria).includes(filtroNombreId))
+                ) {
+                    const fila = document.createElement("tr");
+                    fila.innerHTML = `
+                <td>${cat.id_Categoria}</td>
+                <td>${cat.nombre}</td>
+                <td>
+                    <button class='btn' onclick='editarCategoria(${cat.id_Categoria})'><i class='bi bi-pencil'></i></button>
+                </td>`;
+                    tbody.appendChild(fila);
+                    count++;
+                }
+            });
+            document.getElementById("contadorCategorias").textContent = `Mostrando ${count} categoría(s).`;
+        }
+        recargarCategorias();
+        cargarCategoriasExistentes("categoriasExistentes");
+        cargarCategoriasExistentes("modCategoriasExistentes");
+        renderizarCategorias();
+
+        document.getElementById("filterNombreCat").addEventListener("input", renderizarCategorias);
+
+        document.getElementById("categoriaForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const nombre = document.getElementById("nombreCategoria").value.trim().toUpperCase();
+            if (!nombre) {
+                alert("Datos incompletos.");
+                return;
+            }
+
+            const categoria = {
+                nombre
+            }
+
+            if (categoriaExiste(categoria.nombre)) return;
+
+            try {
+                const response = await crearCategoria(categoria);
+                if (!response.ok) {
+                    alert(`El servidor no pudo realizar el registro de la categoría. Código: ${response.status}`);
+                    return;
+                }
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
+            alert("Categoría registrada.");
+            await recargarCategorias();
+
+            renderizarCategorias();
+            cargarCategoriasExistentes("categoriasExistentes");
+            cargarCategoriasExistentes("modCategoriasExistentes");
+            e.target.reset();
+        });
+
+        function editarCategoria(id) {
+            const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
+            const cat = categorias.find(c => c.id_Categoria === id);
+            if (!cat) return;
+
+            document.getElementById("modCategoriaId").value = cat.id_Categoria;
+            document.getElementById("modNombreCategoria").value = cat.nombre;
+
+            document.getElementById("modificarCategoriaSection").classList.remove("hidden");
+        }
+
+        document.getElementById("modificarCategoriaForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const id = +document.getElementById("modCategoriaId").value;
+
+            let categoria;
+            try {
+                const response = await leerCategoria(id);
+                if (!response.ok) {
+                    document.getElementById("modificarCategoriaSection").classList.add("hidden");
+                    if (response.status == 404) {
+                        alert("Categoría no encontrada.");
+                        return;
+                    }
+                    else if (response.status == 500) {
+                        alert("El servidor no pudo realizar la búsqueda de la categoría. Código: 500");
+                        return;
+                    }
+                    else {
+                        alert(`El servidor no pudo realizar la búsqueda de la categoría. Código: ${response.status}`);
+                        return;
+                    }
+                }
+                categoria = await response.json();
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
+
+            const categoriaModificada = {
+                nombre: document.getElementById("modNombreCategoria").value.trim().toUpperCase(),
+            }
+
+            if (categoriaExiste(categoriaModificada.nombre)) return;
+
+            try {
+                const response = await modificarCategoria(categoriaModificada, id);
+                if (!response.ok) {
+                    if (response.status == 500) {
+                        alert("El servidor no pudo realizar la modificación de la categoría. Código: 500");
+                        return;
+                    } else {
+                    alert(`El servidor no pudo realizar la modificación de la categoría. Código: ${response.status}`);
+                    return;
+                    }
+                }
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
+
+            alert("Categoría actualizada.");
+            await recargarCategorias();
+
+            renderizarCategorias();
+            cargarCategoriasExistentes("categoriasExistentes");
+            cargarCategoriasExistentes("modCategoriasExistentes");
+            document.getElementById("modificarCategoriaSection").classList.add("hidden");
+            e.target.reset();
+        });
+
+        // Cancelar edición de datos
+        document.getElementById("cancelarBtn").onclick = () => {
+            if (confirm("¿Deseás cancelar la edición? Se perderán los cambios no guardados.")) {
+                document.getElementById("modificarCategoriaSection").classList.add("hidden");
+                document.getElementById("modificarCategoriaSection").reset();
+            }
+        };
+
+        document.getElementById("eliminarCategoriaBtn").addEventListener("click", async () => {
+            const id = +document.getElementById("modCategoriaId").value;
+            if (!confirm("¿Eliminar esta categoría?")) return;
+
+            try {
+                const response = await eliminarCategoria(id);
+                if (!response.ok) {
+                    if (response.status == 500) {
+                        alert("El servidor no pudo realizar la eliminación de la categoría. Código: 500");
+                        return;
+                    }
+                    else {
+                        alert(`El servidor no pudo realizar la eliminación de la categoría. Código: ${response.status}`);
+                        return;
+                    }
+                }
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
+            alert("Categoría eliminada.");
+            await recargarCategorias();
+            renderizarCategorias();
+            cargarCategoriasExistentes("categoriasExistentes");
+            cargarCategoriasExistentes("modCategoriasExistentes");
+            document.getElementById("modificarCategoriaSection").classList.add("hidden");
+            document.getElementById("modificarCategoriaSection").reset();
+        });
+
+        renderizarCategorias();
+    </script>
+
+</body>
+
+</html>

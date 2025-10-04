@@ -31,18 +31,15 @@
         <section>
             <h2>Registrar nueva solicitud</h2>
             <form id="solicitudForm">
-                <!-- <label>Fecha</label> -->
-                <!-- <input type="date" id="fecha" required> -->
-                <!-- <label>Legajo solicitante</label> -->
-                <!-- <input type="text" id="legajo" required> -->
                 <label>Ubicación destino</label>
-                <input type="text" id="ubicacion" required>
+                <input list="ubicacionesSugeridas" type="text" id="ubicacion" required>
+                <datalist id="ubicacionesSugeridas"></datalist>
                 <label>Estado</label>
                 <select id="estado" required>
-                    <option>Pendiente de aprobación</option>
-                    <option>Aprobada</option>
-                    <option>No aprobada</option>
-                    <option>Completada</option>
+                    <option value="POR REVISAR">Pendiente de aprobación</option>
+                    <option value="APROBADA">Aprobada</option>
+                    <option value="DESAPROBADA">No aprobada</option>
+                    <option value="SATISFECHA">Completada</option>
                 </select>
                 <label>Descripción</label>
                 <textarea id="descripcion" rows="4" required></textarea>
@@ -58,7 +55,6 @@
                     <tr>
                         <th>N° Solicitud</th>
                         <th>Fecha</th>
-                        <!-- <th>Legajo</th> -->
                         <th>Ubicación</th>
                         <th>Estado</th>
                         <th>Acciones</th>
@@ -73,18 +69,15 @@
             <h2>Editar solicitud</h2>
             <form id="modificarSolicitudForm">
                 <input type="hidden" id="modSolicitudId">
-                <!-- <label>Fecha</label> -->
-                <!-- <input type="date" id="modFecha" required> -->
-                <!-- <label>Legajo solicitante</label> -->
-                <!-- <input type="text" id="modLegajo" required> -->
                 <label>Ubicación destino</label>
-                <input type="text" id="modUbicacion" required>
+                <input list="modUbicacionesSugeridas" type="text" id="modUbicacion" required>
+                <datalist id="modUbicacionesSugeridas"></datalist>
                 <label>Estado</label>
                 <select id="modEstado" required>
-                    <option>Pendiente de aprobación</option>
-                    <option>Aprobada</option>
-                    <option>No aprobada</option>
-                    <option>Completada</option>
+                    <option value="POR REVISAR">Pendiente de aprobación</option>
+                    <option value="APROBADA">Aprobada</option>
+                    <option value="DESAPROBADA">No aprobada</option>
+                    <option value="SATISFECHA">Completada</option>
                 </select>
                 <label>Descripción</label>
                 <textarea id="modDescripcion" rows="4" required></textarea>
@@ -102,34 +95,38 @@
     <footer>SIExT | 2025</footer>
 
     <script>
-        if (!localStorage.getItem("solicitudes")) {
-            const solicitudesIniciales = [
-                {
-                    id: 1,
-                    fecha: "2025-06-15",
-                    ubicacion: "GAME",
-                    estado: "Pendiente de aprobación",
-                    descripcion: "5 resmas A4, 2 toners HP 85A"
-                },
-                {
-                    id: 2,
-                    fecha: "2025-06-16",
-                    ubicacion: "Parque Industrial",
-                    estado: "Aprobada",
-                    descripcion: "20 metros cable 2,5mm, 5 tubos LED 18W"
-                },
-                {
-                    id: 3,
-                    fecha: "2025-06-17",
-                    ubicacion: "Bedelía",
-                    estado: "Aprobada",
-                    descripcion: "1 Mouse"
-                }
-            ];
-            localStorage.setItem("solicitudes", JSON.stringify(solicitudesIniciales));
-        }
+        // if (!localStorage.getItem("solicitudes")) {
+        //     const solicitudesIniciales = [
+        //         {
+        //             id: 1,
+        //             fecha: "2025-06-15",
+        //             ubicacion: "GAME",
+        //             estado: "Pendiente de aprobación",
+        //             descripcion: "5 resmas A4, 2 toners HP 85A"
+        //         },
+        //         {
+        //             id: 2,
+        //             fecha: "2025-06-16",
+        //             ubicacion: "Parque Industrial",
+        //             estado: "Aprobada",
+        //             descripcion: "20 metros cable 2,5mm, 5 tubos LED 18W"
+        //         },
+        //         {
+        //             id: 3,
+        //             fecha: "2025-06-17",
+        //             ubicacion: "Bedelía",
+        //             estado: "Aprobada",
+        //             descripcion: "1 Mouse"
+        //         }
+        //     ];
+        //     localStorage.setItem("solicitudes", JSON.stringify(solicitudesIniciales));
+        // }
     </script>
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
     <script>
+        recargarSolicitudes();
+        recargarUbicaciones();
         function renderSolicitudes() {
             const solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
             const tbody = document.querySelector("#tablaSolicitudes tbody");
@@ -137,72 +134,179 @@
             solicitudes.forEach(sol => {
                 const fila = document.createElement("tr");
                 fila.innerHTML = `
-                    <td>${sol.id}</td>
-                    <td>${sol.fecha}</td>
-                    <td>${sol.ubicacion}</td>
+                    <td>${sol.numSolicitud}</td>
+                    <td>${new Date(sol.fechaInicioSolicitud).toLocaleString()}</td>
+                    <td>${sol.ubicacionBienes}</td>
                     <td>${sol.estado}</td>
                     <td>
-                        <button class="btn" onclick="editarSolicitud(${sol.id})"><i class="bi bi-pencil"></i></button>
+                        <button class="btn" onclick="editarSolicitud(${sol.numSolicitud})"><i class="bi bi-pencil"></i></button>
                     </td>`;
                 tbody.appendChild(fila);
             });
         }
 
-        document.getElementById("solicitudForm").addEventListener("submit", e => {
-            e.preventDefault();
-            const solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
-            solicitudes.push({
-                id: Date.now(),
-                fecha: document.getElementById("fecha").value,
-                legajo: document.getElementById("legajo").value.trim(),
-                ubicacion: document.getElementById("ubicacion").value.trim(),
-                estado: document.getElementById("estado").value,
-                descripcion: document.getElementById("descripcion").value.trim()
+        function cargarUbicaciones(idSelect) {
+            const sel = document.getElementById(idSelect);
+            sel.innerHTML = "";
+            const cats = JSON.parse(localStorage.getItem("ubicaciones")) || [];
+            if (cats.length === 0) {
+                sel.disabled = true;
+                sel.innerHTML = "<option>Sin ubicaciones</option>";
+                return;
+            }
+            cats.forEach(c => {
+                const o = document.createElement("option");
+                o.textContent = c.nombre;
+                sel.appendChild(o);
             });
-            localStorage.setItem("solicitudes", JSON.stringify(solicitudes));
-            alert("Solicitud registrada correctamente");
-            e.target.reset();
+            sel.disabled = false;
+        }
+
+        cargarUbicaciones("ubicacionesSugeridas");
+        cargarUbicaciones("modUbicacionesSugeridas");
+
+        document.getElementById("solicitudForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const ubicacion = document.getElementById("ubicacion").value.trim().toUpperCase();
+            const estado = document.getElementById("estado").value;
+            const descripcion = document.getElementById("descripcion").value.trim();
+            if (!ubicacion || !estado || !descripcion) {
+                alert("Datos incompletos.");
+                return;
+            }
+
+            const solicitud = {
+                ubicacionBienes: ubicacion,
+                estado: estado,
+                descripcion: descripcion,
+            }
+
+            try {
+                const response = await crearSolicitud(solicitud);
+                if (!response.ok) {
+                    alert(`El servidor no pudo realizar el registro de la solicitud. Código: ${response.status}`);
+                    return;
+                }
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
+            alert("Solicitud registrada.");
+            await recargarSolicitudes();
+            await recargarUbicaciones();
+
+            cargarUbicaciones("ubicacionesSugeridas");
+            cargarUbicaciones("modUbicacionesSugeridas");
             renderSolicitudes();
+            e.target.reset();
         });
 
         function editarSolicitud(id) {
             const solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
-            const sol = solicitudes.find(s => s.id === id);
+            const sol = solicitudes.find(s => s.numSolicitud === id);
             if (!sol) return;
-            document.getElementById("modSolicitudId").value = sol.id;
-            // document.getElementById("modFecha").value = sol.fecha;
-            // document.getElementById("modLegajo").value = sol.legajo;
-            document.getElementById("modUbicacion").value = sol.ubicacion;
+            document.getElementById("modSolicitudId").value = sol.numSolicitud;
+            document.getElementById("modUbicacion").value = sol.ubicacionBienes;
             document.getElementById("modEstado").value = sol.estado;
             document.getElementById("modDescripcion").value = sol.descripcion;
             document.getElementById("modificarSolicitudSection").classList.remove("hidden");
         }
 
-        document.getElementById("modificarSolicitudForm").addEventListener("submit", e => {
+        document.getElementById("modificarSolicitudForm").addEventListener("submit", async (e) => {
             e.preventDefault();
             const id = +document.getElementById("modSolicitudId").value;
-            const solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
-            const sol = solicitudes.find(s => s.id === id);
-            if (!sol) return;
-            // sol.fecha = document.getElementById("modFecha").value;
-            // sol.legajo = document.getElementById("modLegajo").value.trim();
-            sol.ubicacion = document.getElementById("modUbicacion").value.trim();
-            sol.estado = document.getElementById("modEstado").value;
-            sol.descripcion = document.getElementById("modDescripcion").value.trim();
-            localStorage.setItem("solicitudes", JSON.stringify(solicitudes));
-            document.getElementById("modificarSolicitudSection").classList.add("hidden");
+            let solicitud;
+            try {
+                const response = await leerSolicitud(id);
+                if (!response.ok) {
+                    document.getElementById("modificarSolicitudSection").classList.add("hidden");
+                    if (response.status == 404) {
+                        alert("Solicitud no encontrada.");
+                        return;
+                    }
+                    else if (response.status == 500) {
+                        alert("El servidor no pudo realizar la búsqueda de la solicitud. Código: 500");
+                        return;
+                    }
+                    else {
+                        alert(`El servidor no pudo realizar la búsqueda de la solicitud. Código: ${response.status}`);
+                        return;
+                    }
+                }
+                solicitud = await response.json();
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
+
+            const solicitudModificada = {
+                ubicacionBienes: document.getElementById("modUbicacion").value.trim().toUpperCase(),
+                estado: document.getElementById("modEstado").value.toUpperCase(),
+                descripcion: document.getElementById("modDescripcion").value.trim(),
+            }
+
+            try {
+                const response = await modificarSolicitud(solicitudModificada, id);
+                if (!response.ok) {
+                    if (response.status == 500) {
+                        alert("El servidor no pudo realizar la modificación de la solicitud. Código: 500");
+                        return;
+                    } else {
+                    alert(`El servidor no pudo realizar la modificación de la solicitud. Código: ${response.status}`);
+                    return;
+                    }
+                }
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
+
+            alert("Solicitud actualizada.");
+            await recargarSolicitudes();
+            await recargarUbicaciones();
+
+            cargarUbicaciones("ubicacionesSugeridas");
+            cargarUbicaciones("modUbicacionesSugeridas");
             renderSolicitudes();
+            document.getElementById("modificarSolicitudSection").classList.add("hidden");
+            e.target.reset();
         });
 
-        document.getElementById("eliminarSolicitudBtn").addEventListener("click", () => {
+        document.getElementById("eliminarSolicitudBtn").addEventListener("click", async () => {
             const id = +document.getElementById("modSolicitudId").value;
             if (!confirm("¿Eliminar esta solicitud?")) return;
-            let solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
-            solicitudes = solicitudes.filter(s => s.id !== id);
-            localStorage.setItem("solicitudes", JSON.stringify(solicitudes));
-            document.getElementById("modificarSolicitudSection").classList.add("hidden");
+
+            try {
+                const response = await eliminarSolicitud(id);
+                if (!response.ok) {
+                    if (response.status == 500) {
+                        alert("El servidor no pudo realizar la eliminación de la solicitud. Código: 500");
+                        return;
+                    }
+                    else {
+                        alert(`El servidor no pudo realizar la eliminación de la solicitud. Código: ${response.status}`);
+                        return;
+                    }
+                }
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
+            alert("Solicitud eliminada.");
+            await recargarSolicitudes();
             renderSolicitudes();
+            document.getElementById("modificarSolicitudSection").classList.add("hidden");
+            document.getElementById("modificarSolicitudForm").reset();
         });
+
+        // Cancelar edición de datos
+        document.getElementById("cancelarBtn").onclick = () => {
+            if (confirm("¿Deseás cancelar la edición? Se perderán los cambios no guardados.")) {
+                document.getElementById("modificarSolicitudSection").classList.add("hidden");
+                document.getElementById("modificarSolicitudForm").reset();
+            }
+        };
 
         renderSolicitudes();
     </script>

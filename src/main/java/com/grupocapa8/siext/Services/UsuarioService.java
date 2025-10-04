@@ -1,78 +1,87 @@
 package com.grupocapa8.siext.Services;
 
+import com.grupocapa8.siext.DAO.UsuarioDAOImpl;
 import com.grupocapa8.siext.DTO.UsuarioDTO;
+import java.util.List;
+import java.util.NoSuchElementException;
 import org.mindrot.jbcrypt.BCrypt;
 /**
  *
  * @author geroj
  */
-public class UsuarioService {
-   private UsuarioDAO usuarioDAO; //acceso a la BD
-   
-    public void lecturaDTOs(){
-        int idUsuario = 0;
-        while(usuarioDAO.BuscarUsuario(idUsuario)){
-            UsuarioDTO dto = usuarioDAO.obtenerUsuario(idUsuario);
-            recibirUsuarioDTO(dto);
-            idUsuario = idUsuario + 1;    
-        }
-        if(idUsuario == 0){
-            System.out.println("No Existe el usuario en la BD");
-        }   
+public class UsuarioService implements ServiceGenerico<UsuarioDTO> {
+   private final UsuarioDAOImpl usuarioDAO; //acceso a la BD
+
+    public UsuarioService() {
+        this.usuarioDAO = new UsuarioDAOImpl();
     }
-    public void BuscarDto(int idUsuario){
+    
+   @Override
+    public UsuarioDTO buscar(int idUsuario) throws NoSuchElementException {
         validarID(idUsuario);
-        if (!usuarioDAO.BuscarUsuario(idUsuario)){
-            throw new IllegalArgumentException("No existe el usuario");
+        UsuarioDTO usuario = usuarioDAO.buscar(idUsuario);
+        
+        if (usuario == null){
+            throw new NoSuchElementException("No existe el usuario");
         }
-        UsuarioDTO dto = usuarioDAO.obtenerUsuario(idUsuario);
-        recibirUsuarioDTO(dto); //enviando el dto a la capa de presentacion para que lo muestre
+        
+        return usuario; //enviando el dto a la capa de presentacion para que lo muestre
     }
-    public void crearUsuario(UsuarioDTO dto){
-        validarString(dto.getNombre(),1);
-        validarString(dto.getRol(),2);
+    
+    @Override
+    public List<UsuarioDTO> buscarTodos() {
+        return usuarioDAO.buscarTodos();
+    }
+    
+   @Override
+    public void crear(UsuarioDTO dto){
+        String nombre = dto.getNombre();
+        validarString(nombre,1);
+        String rol = dto.getRol();
+        validarString(rol,2);
         validarContraseña(dto.getContraseña());
         String contraseñaHash = BCrypt.hashpw(dto.getContraseña(), BCrypt.gensalt());
         // Convertir DTO a entidad y guardarlo en BD
+        dto.setNombre(nombre);
+        dto.setRol(rol);
         dto.setContraseña(contraseñaHash);
-        usuarioDAO.guardar(dto);
-    } 
+        
+        usuarioDAO.insertar(dto);
+    }
     
-    public void modificarUsuario(Integer idUsuario){
-        validarID(idUsuario);
-        if (!usuarioDAO.BuscarUsuario(idUsuario)){
-            throw new IllegalArgumentException("No existe el Usuario");
+   @Override
+    public void modificar(UsuarioDTO dto, int id) throws NoSuchElementException {
+        validarID(id);
+        if (usuarioDAO.buscar(id) == null){
+            throw new NoSuchElementException("No existe el Usuario");
         }
-        UsuarioDTO dto = usuarioDAO.obtenerUsuario(idUsuario);
-        UsuarioDTO dto2 = recibirUsuarioDTO(dto); //enviando el dto a la capa de presentacion para que lo muestre y me devuelva el dto modificado
-        validarString(dto2.getNombre(),1);
-        validarString(dto2.getRol(),2);
-        if (!dto2.getContraseña().equals(dto.getContraseña())) {
-            validarContraseña(dto2.getContraseña());
-            String contraseñaHash = BCrypt.hashpw(dto.getContraseña(), BCrypt.gensalt());
-            dto2.setContraseña(contraseñaHash);
-        }
+        String nombre = dto.getNombre();
+        validarString(nombre,1);
+        String rol = dto.getRol();
+        validarString(dto.getRol(),2);
+        validarContraseña(dto.getContraseña());
+        String contraseñaHash = BCrypt.hashpw(dto.getContraseña(), BCrypt.gensalt());
+        
+        dto.setNombre(nombre);
+        dto.setRol(rol);
+        dto.setContraseña(contraseñaHash);
+        dto.setID_Usuario(id);
         
         // Convertir DTO a entidad y guardarlo en BD
-        usuarioDAO.guardar(dto2);
-    } 
-    public void eliminarUsuario(Integer idUsuario, String rol){
+        usuarioDAO.actualizar(dto);
+    }
+    
+   @Override
+    public void eliminar(int idUsuario) throws NoSuchElementException {
         validarID(idUsuario);
-        validarString(rol,2);
-        if (!rol.equals("ADMIN")) {
-            throw new SecurityException("No tiene permisos para eliminar usuarios");
-        }
-        if (!usuarioDAO.BuscarBien(idUsuario)){ //hacer una validacion del id
-            throw new IllegalArgumentException("No existe el usuario");
+        if (usuarioDAO.buscar(idUsuario) == null){ //hacer una validacion del id
+            throw new NoSuchElementException("No existe el usuario");
         }
         
-        UsuarioDTO dto = usuarioDAO.obtenerUsuario(idUsuario);
-        boolean V = confirmacionEliminarUsuario(dto); //enviando el dto a la capa de presentacion para que lo muestre y me devuelva verdadero o falso para continuar con la eliminacion
-        if(V){
-            usuarioDAO.eliminarUsuario(idUsuario);
-        }   
+        usuarioDAO.eliminar(idUsuario);
     } 
-    public void validarID(Integer id){
+    
+    private void validarID(Integer id){
         if (id == null) {
             throw new IllegalArgumentException("El ID no puede ser nulo.");
         }
@@ -80,7 +89,8 @@ public class UsuarioService {
             throw new IllegalArgumentException("El ID debe ser un número entero positivo.");
         }
     }
-    public void validarString(String string,int a) {
+    
+    private void validarString(String string,int a) {
         if (string == null || string.length() < 3 || string.length() > 50) {
             switch (a){
                 case 1 -> throw new IllegalArgumentException("El nombre debe tener entre 3 y 50 caracteres");
@@ -88,7 +98,8 @@ public class UsuarioService {
             } 
         }
     }
-    public void validarContraseña(String contraseña){
+    
+    private void validarContraseña(String contraseña){
         // 1. Longitud mínima y máxima
         if (contraseña==null || contraseña.length() < 8 || contraseña.length() > 64) {
             throw new IllegalArgumentException("La contraseña debe tener entre 8 y 64 caracteres"); 

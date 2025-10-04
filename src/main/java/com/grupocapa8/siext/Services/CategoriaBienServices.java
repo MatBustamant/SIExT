@@ -1,72 +1,71 @@
 package com.grupocapa8.siext.Services;
 
+import com.grupocapa8.siext.DAO.CategoriaDAOImpl;
 import com.grupocapa8.siext.DTO.CategoriaBienDTO;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  *
  * @author geroj
  */
-public class CategoriaBienServices {
-    private CategoriaBienDAO categoriaBienDAO; //acceso a la BD
-    
-    public void lecturaDTOs(){
-        int idCategoriaBien = 0;
-        while(categoriaBienDAO.BuscarCategoriaBien(idCategoriaBien)){
-            CategoriaBienDTO dto = categoriaBienDAO.obtenerCategoriaBien(idCategoriaBien);
-            recibirCategoriaBienDTO(dto);
-            idCategoriaBien = idCategoriaBien + 1;    
-        }
-        if(idCategoriaBien == 0){
-            System.out.println("No Existen Categoria de Bienes almacenados en BD");
-        }
-        
-        
-         
-    }
-    public void BuscarDto(int idCategoriaBien){
-        validarID(idCategoriaBien);
-        if (!categoriaBienDAO.BuscarCategoriaBien(idCategoriaBien)){
-            throw new IllegalArgumentException("No existe la categoria del Bien");
-        }
-        CategoriaBienDTO dto = categoriaBienDAO.obtenerCategoriaBien(idCategoriaBien);
-        recibirCategoriaBienDTO(dto); //enviando el dto a la capa de presentacion para que lo muestre
-    }
-    public void crearCategoriaBien(CategoriaBienDTO dto){
-        validarString(dto.getNombre(),1);
+public class CategoriaBienServices implements ServiceGenerico<CategoriaBienDTO>{
+    private final CategoriaDAOImpl categoriaBienDAO; //acceso a la BD
 
-        categoriaBienDAO.guardar(dto);
+    public CategoriaBienServices() {
+        this.categoriaBienDAO = new CategoriaDAOImpl();
+    }
+    
+    @Override
+    public CategoriaBienDTO buscar(int idCategoriaBien) throws NoSuchElementException {
+        validarID(idCategoriaBien);
+        CategoriaBienDTO categoria = categoriaBienDAO.buscar(idCategoriaBien);
+        if (categoria == null){
+            throw new NoSuchElementException("No existe la categoria");
+        }
+        return categoria;
+    }
+    
+    @Override
+    public List<CategoriaBienDTO> buscarTodos() {
+        return categoriaBienDAO.buscarTodos();
+    }
+    
+    @Override
+    public void crear(CategoriaBienDTO dto){
+        String nombre = dto.getNombre().trim().toUpperCase();
+        validarString(nombre,1);
+        
+        dto.setNombre(nombre);
+
+        categoriaBienDAO.insertar(dto);
     } 
     
-    public void modificarCategoriaBien(int idCategoriaBien){
-        validarID(idCategoriaBien);
-        if (!categoriaBienDAO.BuscarCategoriaBien(idCategoriaBien)){
-            throw new IllegalArgumentException("No existe la categoria");
+    @Override
+    public void modificar(CategoriaBienDTO dto, int id) throws NoSuchElementException {
+        validarID(id);
+        if (categoriaBienDAO.buscar(id) == null){
+            throw new NoSuchElementException("No existe la categoria");
         }
-        CategoriaBienDTO dto = categoriaBienDAO.obtenerCategoriaBien(idCategoriaBien);
-        dto = recibirCategoriaBienDTO(dto); //enviando el dto a la capa de presentacion para que lo muestre y me devuelva el dto modificado
+        String nombre = dto.getNombre().trim().toUpperCase();
         validarString(dto.getNombre(),1);
+        
+        dto.setNombre(nombre);
+        dto.setID_Categoria(id);
        
-        categoriaBienDAO.guardar(dto);
+        categoriaBienDAO.actualizar(dto);
     } 
    
-    public void eliminarCategoriaBien(int idCategoriaBien, String rol){
+    @Override
+    public void eliminar(int idCategoriaBien) throws NoSuchElementException {
         validarID(idCategoriaBien);
-        validarString(rol,2);
-        if (!rol.equals("ADMIN")) {
-            throw new SecurityException("No tiene permisos para eliminar categorias");
+        if (categoriaBienDAO.buscar(idCategoriaBien) == null){
+            throw new NoSuchElementException("No existe la categoria");
         }
-        if (!categoriaBienDAO.BuscarCategoriaBien(idCategoriaBien)){
-            throw new IllegalArgumentException("No existe la categoria");
-        }
-        
-        CategoriaBienDTO dto = categoriaBienDAO.obtenerCategoriaBien(idCategoriaBien);
-        boolean V = confirmacionEliminarCategoriaBien(dto); //enviando el dto a la capa de presentacion para que lo muestre y me devuelva verdadero o falso para continuar con la eliminacion
-        if(V){
-            categoriaBienDAO.eliminarCategoriaBien(idCategoriaBien);
-        }   
+        categoriaBienDAO.eliminar(idCategoriaBien);
     } 
   
-    public void validarID(Integer id){
+    private void validarID(Integer id){
         if (id == null) {
             throw new IllegalArgumentException("El ID no puede ser nulo.");
         }
@@ -74,7 +73,7 @@ public class CategoriaBienServices {
             throw new IllegalArgumentException("El ID debe ser un número entero positivo.");
         }
     }
-    public void validarString(String string,int a) {
+    private void validarString(String string,int a) {
         if (string == null || string.length() < 3 || string.length() > 50) {
             switch (a){
                 case 1 -> throw new IllegalArgumentException("El nombre debe tener entre 3 y 50 caracteres");

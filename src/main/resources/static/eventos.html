@@ -30,11 +30,11 @@
         <!-- Formulario para agregar nuevo evento -->
         <section>
             <h2>Registrar evento sobre un bien</h2>
-            <form>
+            <form id="registroEventoForm">
                 <div class="form-grid">
                     <div>
                         <label>ID del bien</label>
-                        <input type="number" required>
+                        <input id="bienAsociado" type="number" required>
                     </div>
                     <div>
                         <label>Tipo de evento</label>
@@ -45,27 +45,6 @@
                             <option value="ENTREGA">Entrega</option>
                         </select>
                     </div>
-                </div>
-                <!-- 
-                <div class="form-grid">
-                    <div>
-                        <label>Fecha</label>
-                        <input type="date" required>
-                    </div>
-                    <div>
-                        <label>Hora</label>
-                        <input type="time" required>
-                    </div>
-                </div> -->
-
-                <div id="despiecePiezasSection" class="hidden">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                        <h4 style="margin: 0;">Piezas generadas</h4>
-                        <button type="button" class="btn" id="agregarPiezaBtn"><i class="bi bi-plus-circle"></i>Agregar
-                            pieza</button>
-                    </div>
-                    <div id="piezasContainer"></div>
                 </div>
 
                 <div class="btn-row">
@@ -106,19 +85,10 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>1023</td>
-                        <td>Averío</td>
-                        <td>2025-06-29 22:30:20 (localizado para Arg)</td>
-                        <td>
-                            <button class="btn"><i class="bi bi-pencil"></i></button>
-                        </td>
-                    </tr>
                 </tbody>
             </table>
 
-            <div class="informativo">Mostrando 1 evento(s).</div>
+            <div class="informativo">Mostrando 1 evento(s). A MODIFICAAAAAAAAAAAAAAAR</div>
         </section>
 
         <!-- Formulario para modificar evento seleccionado -->
@@ -138,23 +108,6 @@
                     <option value="ENTREGA">Entrega</option>
                 </select>
 
-                <!-- <label>Fecha</label>
-                <input type="date" id="modFechaEvento" required>
-
-                <label>Hora</label>
-                <input type="time" id="modHoraEvento" required> -->
-
-                <div id="modDespiecePiezasSection" class="hidden">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                        <h4 style="margin: 0;">Piezas generadas</h4>
-                        <button type="button" class="btn" id="modAgregarPiezaBtn"><i
-                                class="bi bi-plus-circle"></i>Agregar
-                            pieza</button>
-                    </div>
-                    <div id="modPiezasContainer"></div>
-                </div>
-
                 <div class="btn-row">
                     <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
                     <button type="button" class="btn" id="cancelarEdicionBtn"><i
@@ -169,213 +122,168 @@
 
     <footer>SIExT | 2025</footer>
 
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
     <script>
-        // Abrir formulario de edición con datos simulados (para prueba)
-        document.querySelectorAll(".bi-pencil").forEach(btn => {
-            btn.addEventListener("click", () => {
-                // Datos simulados: en producción, tomás los valores reales de la fila
-                document.getElementById("modEventoId").value = "1";
-                document.getElementById("modBienId").value = "1023";
-                document.getElementById("modTipoEvento").value = "AVERIO";
-                // document.getElementById("modFechaEvento").value = "2025-06-29";
-                // document.getElementById("modHoraEvento").value = "14:30";
+        recargarEventos();
+        recargarBienes();
+        function renderEventos() {
+            const eventos = JSON.parse(localStorage.getItem("eventos")) || [];
+            const tbody = document.querySelector("table tbody");
+            tbody.innerHTML = "";
 
-                // Mostrar sección de edición
-                document.getElementById("modificarEventoSection").classList.remove("hidden");
+            eventos.forEach(evento => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${evento.id_Evento}</td>
+                    <td>${evento.bienAsociado}</td>
+                    <td>${evento.tipoEvento}</td>
+                    <td>${new Date(evento.fechaEvento).toLocaleString()}</td>
+                    <td>
+                        <button class="btn" onClick="editarEvento(${evento.id_Evento})"><i class="bi bi-pencil"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
             });
-        });
+        }
+        renderEventos();
 
-        // Botón Cancelar
-        document.getElementById("cancelarEdicionBtn").addEventListener("click", () => {
-            document.getElementById("modificarEventoSection").classList.add("hidden");
-        });
-
-        // Guardar cambios (por ahora solo alerta)
-        document.getElementById("modificarEventoForm").addEventListener("submit", e => {
+        document.getElementById("registroEventoForm").addEventListener("submit", async (e) => {
             e.preventDefault();
-            alert("Evento actualizado (simulado)");
-            document.getElementById("modificarEventoSection").classList.add("hidden");
+
+            const tipoEvento = document.getElementById("tipoEvento").value.toUpperCase();
+            const bienAsociado = document.getElementById("bienAsociado").value;
+            if (!tipoEvento || !bienAsociado) {
+                alert("Datos incompletos.");
+                return;
+            }
+
+            const evento = {
+                tipoEvento,
+                bienAsociado
+            }
+
+            try {
+                const response = await crearEvento(evento);
+                if (!response.ok) {
+                    alert(`El servidor no pudo realizar el registro del evento. Código: ${response.status}`);
+                    return;
+                }
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
+            alert("Evento registrado.");
+            await recargarEventos();
+            await recargarBienes();
+
+            renderEventos();
+            e.target.reset();
         });
 
-        // Eliminar evento (por ahora solo alerta)
-        document.getElementById("eliminarEventoBtn").addEventListener("click", () => {
-            if (confirm("¿Eliminar este evento?")) {
-                alert("Evento eliminado (simulado)");
-                document.getElementById("modificarEventoSection").classList.add("hidden");
+        function editarEvento(id) {
+            const eventos = JSON.parse(localStorage.getItem("eventos")) || [];
+            const evento = eventos.find(e => e.id_Evento === id);
+            if (!evento) return;
+            document.getElementById("modEventoId").value = evento.id_Evento;
+            document.getElementById("modBienId").value = evento.bienAsociado;
+            document.getElementById("modTipoEvento").value = evento.tipoEvento;
+            document.getElementById("modificarEventoSection").classList.remove("hidden");
+        }
+
+        document.getElementById("modificarEventoForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const id = +document.getElementById("modEventoId").value;
+            let evento;
+            try {
+                const response = await leerEvento(id);
+                if (!response.ok) {
+                    document.getElementById("modificarEventoSection").classList.add("hidden");
+                    if (response.status == 404) {
+                        alert("Evento no encontrado.");
+                        return;
+                    }
+                    else if (response.status == 500) {
+                        alert("El servidor no pudo realizar la búsqueda del evento. Código: 500");
+                        return;
+                    }
+                    else {
+                        alert(`El servidor no pudo realizar la búsqueda del evento. Código: ${response.status}`);
+                        return;
+                    }
+                }
+                evento = await response.json();
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
             }
+
+            const eventoModificado = {
+                tipoEvento: document.getElementById("modTipoEvento").value.trim().toUpperCase(),
+                bienAsociado: document.getElementById("modBienId").value
+            }
+
+            try {
+                const response = await modificarEvento(eventoModificado, id);
+                if (!response.ok) {
+                    if (response.status == 500) {
+                        alert("El servidor no pudo realizar la modificación del evento. Código: 500");
+                        return;
+                    } else {
+                    alert(`El servidor no pudo realizar la modificación del evento. Código: ${response.status}`);
+                    return;
+                    }
+                }
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
+
+            alert("Evento actualizado.");
+            await recargarEventos();
+            await recargarBienes();
+
+            renderEventos();
+            document.getElementById("modificarEventoSection").classList.add("hidden");
+            e.target.reset();
+        });
+
+        // Cancelar edición de datos
+        document.getElementById("cancelarEdicionBtn").onclick = () => {
+            if (confirm("¿Deseás cancelar la edición? Se perderán los cambios no guardados.")) {
+                document.getElementById("modificarEventoSection").classList.add("hidden");
+                document.getElementById("modificarEventoSection").reset();
+            }
+        };
+
+        document.getElementById("eliminarEventoBtn").addEventListener("click", async () => {
+            const id = +document.getElementById("modEventoId").value;
+            if (!confirm("¿Eliminar este evento?")) return;
+
+            try {
+                const response = await eliminarEvento(id);
+                if (!response.ok) {
+                    if (response.status == 500) {
+                        alert("El servidor no pudo realizar la eliminación del evento. Código: 500");
+                        return;
+                    }
+                    else {
+                        alert(`El servidor no pudo realizar la eliminación del evento. Código: ${response.status}`);
+                        return;
+                    }
+                }
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
+            alert("Evento eliminado.");
+            await recargarEventos();
+            await recargarBienes();
+            renderEventos();
+            document.getElementById("modificarEventoSection").classList.add("hidden");
+            document.getElementById("modificarEventoForm").reset();
         });
     </script>
-
-    <!-- <script>
-        // // Mostrar sección de piezas si evento es despiece
-        // document.getElementById("tipoEvento").addEventListener("change", function () {
-        //     if (this.value === "Despiece") {
-        //         document.getElementById("despiecePiezasSection").classList.remove("hidden");
-        //     } else {
-        //         document.getElementById("despiecePiezasSection").classList.add("hidden");
-        //         document.getElementById("piezasContainer").innerHTML = "";
-        //     }
-        // });
-
-        // // Agregar pieza en registro
-        // document.getElementById("agregarPiezaBtn").addEventListener("click", () => {
-        //     const container = document.getElementById("piezasContainer");
-
-        //     // Crear un div contenedor para la fila
-        //     const filaDiv = document.createElement("div");
-        //     filaDiv.style.display = "flex";
-        //     filaDiv.style.gap = "1rem";
-        //     filaDiv.style.alignItems = "flex-end";
-        //     filaDiv.style.marginBottom = "1rem";
-
-        //     // Crear div para categoría (label + select)
-        //     const categoriaDiv = document.createElement("div");
-        //     categoriaDiv.style.flex = "1";
-
-        //     const labelCategoria = document.createElement("label");
-        //     labelCategoria.textContent = "Categoría";
-        //     labelCategoria.setAttribute("for", "categoriaProducto");
-        //     categoriaDiv.appendChild(labelCategoria);
-
-        //     const selectCategoria = document.createElement("select");
-        //     selectCategoria.id = "categoriaProducto";
-        //     selectCategoria.required = true;
-        //     selectCategoria.style.width = "100%";
-        //     selectCategoria.style.padding = "0.6rem";
-        //     selectCategoria.style.border = "1px solid #ccc";
-        //     selectCategoria.style.borderRadius = "5px";
-
-        //     // Opción vacía
-        //     const opcionDefault = document.createElement("option");
-        //     opcionDefault.value = "";
-        //     opcionDefault.textContent = "Seleccionar";
-        //     selectCategoria.appendChild(opcionDefault);
-
-        //     categoriaDiv.appendChild(selectCategoria);
-
-        //     // Crear div para nombre (label + input)
-        //     const nombreDiv = document.createElement("div");
-        //     nombreDiv.style.flex = "1";
-
-        //     const labelNombre = document.createElement("label");
-        //     labelNombre.textContent = "Nombre";
-        //     labelNombre.setAttribute("for", "nombreProducto");
-        //     nombreDiv.appendChild(labelNombre);
-
-        //     const inputNombre = document.createElement("input");
-        //     inputNombre.type = "text";
-        //     inputNombre.id = "nombreProducto";
-        //     inputNombre.required = true;
-        //     inputNombre.style.width = "100%";
-        //     inputNombre.style.padding = "0.6rem";
-        //     inputNombre.style.border = "1px solid #ccc";
-        //     inputNombre.style.borderRadius = "5px";
-
-        //     nombreDiv.appendChild(inputNombre);
-
-        //     // Crear botón eliminar
-        //     const btnEliminar = document.createElement("button");
-        //     btnEliminar.innerHTML = "<i class='bi bi-x-lg'></i>";
-        //     btnEliminar.className = "btn btn-danger";
-        //     btnEliminar.style.height = "36px";
-        //     btnEliminar.style.marginBottom = "1rem";
-        //     btnEliminar.type = "button";
-        //     btnEliminar.addEventListener("click", () => filaDiv.remove());
-
-        //     // Agregar los elementos a la fila
-        //     filaDiv.appendChild(categoriaDiv);
-        //     filaDiv.appendChild(nombreDiv);
-        //     filaDiv.appendChild(btnEliminar);
-
-        //     // Agregar la fila al contenedor
-        //     container.appendChild(filaDiv);
-        // });
-
-        // // Mostrar sección de piezas en modificar evento
-        // document.getElementById("modTipoEvento").addEventListener("change", function () {
-        //     if (this.value === "Despiece") {
-        //         document.getElementById("modDespiecePiezasSection").classList.remove("hidden");
-        //     } else {
-        //         document.getElementById("modDespiecePiezasSection").classList.add("hidden");
-        //         document.getElementById("modPiezasContainer").innerHTML = "";
-        //     }
-        // });
-
-        // // Agregar pieza en modificación
-        // document.getElementById("modAgregarPiezaBtn").addEventListener("click", () => {
-        //     const container = document.getElementById("modPiezasContainer");
-
-        //     // Crear un div contenedor para la fila
-        //     const filaDiv = document.createElement("div");
-        //     filaDiv.style.display = "flex";
-        //     filaDiv.style.gap = "1rem";
-        //     filaDiv.style.alignItems = "flex-end";
-        //     filaDiv.style.marginBottom = "1rem";
-
-        //     // Crear div para categoría (label + select)
-        //     const categoriaDiv = document.createElement("div");
-        //     categoriaDiv.style.flex = "1";
-
-        //     const labelCategoria = document.createElement("label");
-        //     labelCategoria.textContent = "Categoría";
-        //     labelCategoria.setAttribute("for", "modCategoriaProducto");
-        //     categoriaDiv.appendChild(labelCategoria);
-
-        //     const selectCategoria = document.createElement("select");
-        //     selectCategoria.id = "modCategoriaProducto";
-        //     selectCategoria.required = true;
-        //     selectCategoria.style.width = "100%";
-        //     selectCategoria.style.padding = "0.6rem";
-        //     selectCategoria.style.border = "1px solid #ccc";
-        //     selectCategoria.style.borderRadius = "5px";
-
-        //     // Opción vacía
-        //     const opcionDefault = document.createElement("option");
-        //     opcionDefault.value = "";
-        //     opcionDefault.textContent = "Seleccionar";
-        //     selectCategoria.appendChild(opcionDefault);
-
-        //     categoriaDiv.appendChild(selectCategoria);
-
-        //     // Crear div para nombre (label + input)
-        //     const nombreDiv = document.createElement("div");
-        //     nombreDiv.style.flex = "1";
-
-        //     const labelNombre = document.createElement("label");
-        //     labelNombre.textContent = "Nombre";
-        //     labelNombre.setAttribute("for", "modNombreProducto");
-        //     nombreDiv.appendChild(labelNombre);
-
-        //     const inputNombre = document.createElement("input");
-        //     inputNombre.type = "text";
-        //     inputNombre.id = "modNombreProducto";
-        //     inputNombre.required = true;
-        //     inputNombre.style.width = "100%";
-        //     inputNombre.style.padding = "0.6rem";
-        //     inputNombre.style.border = "1px solid #ccc";
-        //     inputNombre.style.borderRadius = "5px";
-
-        //     nombreDiv.appendChild(inputNombre);
-
-        //     // Crear botón eliminar
-        //     const btnEliminar = document.createElement("button");
-        //     btnEliminar.innerHTML = "<i class='bi bi-x-lg'></i>";
-        //     btnEliminar.className = "btn btn-danger";
-        //     btnEliminar.style.height = "36px";
-        //     btnEliminar.style.marginBottom = "1rem";
-        //     btnEliminar.type = "button";
-        //     btnEliminar.addEventListener("click", () => filaDiv.remove());
-
-        //     // Agregar los elementos a la fila
-        //     filaDiv.appendChild(categoriaDiv);
-        //     filaDiv.appendChild(nombreDiv);
-        //     filaDiv.appendChild(btnEliminar);
-
-        //     // Agregar la fila al contenedor
-        //     container.appendChild(filaDiv);
-        // });
-
-    </script> -->
 
 </body>
 

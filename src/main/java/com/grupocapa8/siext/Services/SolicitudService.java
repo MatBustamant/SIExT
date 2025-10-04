@@ -1,86 +1,98 @@
 package com.grupocapa8.siext.Services;
 
+import com.grupocapa8.siext.DAO.SolicitudDAOImpl;
+import com.grupocapa8.siext.DAO.UbicacionDAOImpl;
 import com.grupocapa8.siext.DTO.SolicitudDTO;
-//import java.time.LocalDate;
+import com.grupocapa8.siext.DTO.UbicacionDTO;
+import java.util.List;
+import java.util.NoSuchElementException;
 
-public class SolicitudService {
-    private SolicitudDAO solicitudDAO; //acceso a la BD
-    
-    
-    public void lecturaDTOs(){
-        int numSolicitud = 0;
-        while(solicitudDAO.BuscarSolicitud(numSolicitud)){
-            SolicitudDTO dto = solicitudDAO.obtenerSolicitud(numSolicitud);
-            recibirSolicitudDTO(dto);
-            numSolicitud = numSolicitud + 1;    
-        }
-        if(numSolicitud == 0){
-            System.out.println("No Existe la solicitud en la BD");
-        }
-        
-        
-         
+public class SolicitudService implements ServiceGenerico<SolicitudDTO> {
+    private final SolicitudDAOImpl solicitudDAO; //acceso a la BD
+    private final UbicacionDAOImpl ubiDAO;
+
+    public SolicitudService() {
+        this.solicitudDAO = new SolicitudDAOImpl();
+        this.ubiDAO = new UbicacionDAOImpl();
     }
-    public void BuscarDto(int numSolicitud){
+    
+    @Override
+    public SolicitudDTO buscar(int numSolicitud) throws NoSuchElementException {
         validarNumero(numSolicitud);
-        if (!solicitudDAO.BuscarSolicitud(numSolicitud)){
-            throw new IllegalArgumentException("No existe la solicitud");
+        SolicitudDTO solicitud = solicitudDAO.buscar(numSolicitud);
+        if (solicitud == null){
+            throw new NoSuchElementException("No existe la solicitud");
         }
-        SolicitudDTO dto = solicitudDAO.obtenerSolicitud(numSolicitud);
-        recibirSolicitudDTO(dto); //enviando el dto a la capa de presentacion para que lo muestre
+        return solicitud;
     }
     
-    public void crearSolicitud(SolicitudDTO dto){
-        validarNumero(dto.getNumSolicitud());
-        // validarFecha(dto.getFechaInicioSolicitud()); ver que hacer
-        validarString(dto.getEstado(),3);
-        validarString(dto.getUbicacionBienes(),1);
+    @Override
+    public List<SolicitudDTO> buscarTodos() {
+        return solicitudDAO.buscarTodos();
+    }
+    
+    @Override
+    public void crear(SolicitudDTO dto){
+        String estado = dto.getEstado().toUpperCase();
+        validarString(estado,3);
+        String ubicacion = dto.getUbicacionBienes().toUpperCase();
+        validarString(ubicacion,1);
+        
+        dto.setEstado(estado);
+        dto.setUbicacionBienes(ubicacion);
+        
+        if (ubiDAO.buscar(ubicacion) == null) {
+            UbicacionDTO nuevaUbicacion = new UbicacionDTO(0, ubicacion);
+            ubiDAO.insertar(nuevaUbicacion);
+        }
         // Convertir DTO a entidad y guardarlo en BD
-        solicitudDAO.guardar(dto);
+        solicitudDAO.insertar(dto);
     } 
     
-    public void modificarSolicitud(Integer numSolicitud){
-        validarNumero(numSolicitud);
-        if (!solicitudDAO.BuscarSolicitud(numSolicitud)){
-            throw new IllegalArgumentException("No existe la solicitud");
-        }
-        SolicitudDTO dto = solicitudDAO.obtenerSolicitud(numSolicitud);
-        dto = recibirSolicitudDTO(dto); //enviando el dto a la capa de presentacion para que lo muestre y me devuelva el dto modificado
-        validarNumero(dto.getNumSolicitud());
-        // validarFecha(dto.getFechaInicioSolicitud()); ver que hacer
-        validarString(dto.getEstado(),3);
-        validarString(dto.getUbicacionBienes(),1);
-        
-        solicitudDAO.guardar(dto);
-    } 
-    public void eliminarSolicitud(Integer numSolicitud, String rol){
-        validarNumero(numSolicitud);
-        validarString(rol,2);
-        if (!rol.equals("ADMIN")) {
-            throw new SecurityException("No tiene permisos para eliminar solicitudes");
-        }
-        if (!solicitudDAO.BuscarBien(numSolicitud)){ //hacer una validacion del id
-            throw new IllegalArgumentException("No existe la solicitud");
+    @Override
+    public void modificar(SolicitudDTO dto, int id) throws NoSuchElementException {
+        validarNumero(id);
+        if (solicitudDAO.buscar(id) == null){
+            throw new NoSuchElementException("No existe la solicitud");
         }
         
-        SolicitudDTO dto = solicitudDAO.obtenerUsuario(numSolicitud);
-        boolean V = confirmacionEliminarSolicitud(dto); //enviando el dto a la capa de presentacion para que lo muestre y me devuelva verdadero o falso para continuar con la eliminacion
-        if(V){
-            solicitudDAO.eliminarSolicitud(numSolicitud);
-        }   
-    } 
-    public void validarNumero(Integer num){
+        String estado = dto.getEstado().toUpperCase();
+        validarString(estado,3);
+        String ubicacion = dto.getUbicacionBienes().toUpperCase();
+        validarString(ubicacion,1);
+        
+        dto.setEstado(estado);
+        dto.setUbicacionBienes(ubicacion);
+        dto.setNumSolicitud(id);
+        
+        if (ubiDAO.buscar(ubicacion) == null) {
+            UbicacionDTO nuevaUbicacion = new UbicacionDTO(0, ubicacion);
+            ubiDAO.insertar(nuevaUbicacion);
+        }
+        // Convertir DTO a entidad y guardarlo en BD
+        solicitudDAO.actualizar(dto);
+    }
+    
+    @Override
+    public void eliminar(int numSolicitud) throws NoSuchElementException {
+        validarNumero(numSolicitud);
+        if (solicitudDAO.buscar(numSolicitud) == null){ //hacer una validacion del id
+            throw new NoSuchElementException("No existe la solicitud");
+        }
+        
+        solicitudDAO.eliminar(numSolicitud);
+    }
+    
+    private void validarNumero(Integer num){
         if (num == null) {
             throw new IllegalArgumentException("El numero de solicitud no puede ser nulo.");
         }
         if (num <= 0) {
             throw new IllegalArgumentException("El numero de solicitud debe ser un número entero positivo.");
         }
-        if(solicitudDAO.obtenerNumSolicitud(num)){
-            throw new IllegalArgumentException("El numero de solicitud ya existe, ingrese nuevamente.");
-        }
     }
-    public void validarString(String string,int a) {
+    
+    private void validarString(String string,int a) {
         if (string == null || string.length() < 3 || string.length() > 50) {
             switch (a){
                 case 1 -> throw new IllegalArgumentException("La ubicacion debe tener entre 3 y 50 caracteres");

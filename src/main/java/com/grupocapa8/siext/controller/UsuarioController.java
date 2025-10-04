@@ -4,6 +4,8 @@
  */
 package com.grupocapa8.siext.controller;
 
+import com.grupocapa8.siext.DTO.UsuarioDTO;
+import com.grupocapa8.siext.Services.UsuarioService;
 import jakarta.ws.rs.Path;
 
 /**
@@ -11,10 +13,10 @@ import jakarta.ws.rs.Path;
  * @author Matias
  */
 @Path("usuario")
-public class UsuarioController extends AbstractController<Object, Integer>{
+public class UsuarioController extends AbstractController<UsuarioDTO>{
 
     public UsuarioController() {
-        this.servicio = new Object(); //UsuarioService
+        this.servicio = new UsuarioService(); //UsuarioService
     }
     
 }

@@ -4,6 +4,8 @@
  */
 package com.grupocapa8.siext.controller;
 
+import com.grupocapa8.siext.DTO.BienDTO;
+import com.grupocapa8.siext.Services.BienService;
 import jakarta.ws.rs.Path;
 
 /**
@@ -11,10 +13,10 @@ import jakarta.ws.rs.Path;
  * @author Matias
  */
 @Path("bien")
-public class BienController extends AbstractController<Object, Integer>{
+public class BienController extends AbstractController<BienDTO>{
 
     public BienController() {
-        this.servicio = new Object(); //BienService
+        this.servicio = new BienService(); //BienService
     }
     
 }

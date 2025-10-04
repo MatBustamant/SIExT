@@ -1,85 +1,142 @@
 package com.grupocapa8.siext.Services;
 
+import com.grupocapa8.siext.DAO.BienDAOImpl;
+import com.grupocapa8.siext.DAO.CategoriaDAOImpl;
+import com.grupocapa8.siext.DAO.UbicacionDAOImpl;
 import com.grupocapa8.siext.DTO.BienDTO;
+import com.grupocapa8.siext.DTO.CategoriaBienDTO;
+import com.grupocapa8.siext.DTO.UbicacionDTO;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  *
  * @author geroj
  */
-public class BienService {
-    private BienDAO bienDAO; //acceso a la BD
-    
-    
-    public void lecturaDTOs(){
-        int idBien = 0;
-        while(bienDAO.BuscarBien(idBien)){
-            BienDTO dto = bienDAO.obtenerBien(idBien);
-            recibirBienDTO(dto);
-            idBien = idBien + 1;    
-        }
-        if(idBien == 0){
-            System.out.println("No Existen Bienes almacenados en BD");
-        }
-        
-        
-         //enviando el dto a la capa de presentacion para que lo muestre y me devuelva el dto modificado
+public class BienService implements ServiceGenerico<BienDTO> {
+    private final BienDAOImpl bienDAO; //acceso a la BD
+    private final CategoriaDAOImpl catDAO;
+    private final UbicacionDAOImpl ubiDAO;
+
+    public BienService() {
+        this.bienDAO = new BienDAOImpl();
+        this.catDAO = new CategoriaDAOImpl();
+        this.ubiDAO = new UbicacionDAOImpl();
     }
-    public void BuscarDto(int idBien){
+    
+    @Override
+    public BienDTO buscar(int idBien) throws NoSuchElementException {
         validarID(idBien);
-        if (!bienDAO.BuscarBien(idBien)){
-            throw new IllegalArgumentException("No existe el Bien");
+        BienDTO bien = bienDAO.buscar(idBien);
+        if (bien == null){
+            throw new NoSuchElementException("No existe el Bien");
         }
-        BienDTO dto = bienDAO.obtenerBien(idBien);
-        recibirBienDTO(dto); //enviando el dto a la capa de presentacion para que lo muestre y me devuelva el dto modificado
+        return bien;
     }
     
-    public void crearBien(BienDTO dto){
-        validarString(dto.getNombre(),1);
-        validarString(dto.getNombreCatBienes(),1);
-        validarUbicacionBien(dto.getUbicacionBien());
-        validarString(dto.getEstadoBien(),3);
+    @Override
+    public List<BienDTO> buscarTodos() {
+        return bienDAO.buscarTodos();
+    }
+    
+    @Override
+    public void crear(BienDTO dto){
+        // Validamos solo que debemos recibir
+        String nombre = dto.getNombre().toUpperCase();
+        validarString(nombre,1);
+        String categoria = dto.getNombreCatBienes().toUpperCase();
+        validarString(categoria,1);
+        String ubicacion = dto.getUbicacionBien().toUpperCase();
+        validarUbicacionBien(ubicacion);
         
-        bienDAO.guardar(dto);
+        // Una vez validado, dejamos en el dto los datos formateados y agregamos el resto
+        dto.setNombre(nombre);
+        dto.setNombreCatBienes(categoria);
+        dto.setUbicacionBien(ubicacion);
+        dto.setEstadoBien("EN CONDICIONES");
+        
+        // Si no existe la categoría, la creamos
+        if (catDAO.buscar(categoria) == null) {
+            CategoriaBienDTO nuevaCategoria = new CategoriaBienDTO(0, categoria);
+            catDAO.insertar(nuevaCategoria);
+        }
+        
+        // Si no existe la ubicación, la creamos
+        if (ubiDAO.buscar(ubicacion) == null) {
+            UbicacionDTO nuevaUbicacion = new UbicacionDTO(0, ubicacion);
+            ubiDAO.insertar(nuevaUbicacion);
+        }
+        
+        // Creamos la cantidad de bienes que nos pide el front
+        for (int i = 0; i < dto.getCantBienes(); i++) {
+            bienDAO.insertar(dto);
+        }
     } 
     
-    public void modificarBien(int idBien){
-        validarID(idBien);
-        if (!bienDAO.BuscarBien(idBien)){
-            throw new IllegalArgumentException("No existe el Bien");
+    @Override
+    public void modificar(BienDTO dto, int id) throws NoSuchElementException {
+        validarID(id);
+        if (bienDAO.buscar(id) == null){
+            throw new NoSuchElementException("No existe el Bien");
         }
-        BienDTO dto = bienDAO.obtenerBien(idBien);
-        dto = recibirBienDTO(dto); //enviando el dto a la capa de presentacion para que lo muestre y me devuelva el dto modificado
-        validarString(dto.getNombre(),1);
-        validarString(dto.getNombreCatBienes(),1);
-        validarUbicacionBien(dto.getUbicacionBien());
-        validarString(dto.getEstadoBien(),3);
+        String nombre = dto.getNombre().toUpperCase();
+        validarString(nombre,1);
+        String categoria = dto.getNombreCatBienes();
+        validarString(categoria,1);
+        String ubicacion = dto.getUbicacionBien();
+        validarUbicacionBien(ubicacion);
+        
+        dto.setNombre(nombre);
+        dto.setNombreCatBienes(categoria);
+        dto.setUbicacionBien(ubicacion);
+        dto.setID_Bien(id);
+        
+        // Si no existe la categoría, la creamos
+        if (catDAO.buscar(categoria) == null) {
+            CategoriaBienDTO nuevaCategoria = new CategoriaBienDTO(0, categoria);
+            catDAO.insertar(nuevaCategoria);
+        }
+        
+        // Si no existe la ubicación, la creamos
+        if (ubiDAO.buscar(ubicacion) == null) {
+            UbicacionDTO nuevaUbicacion = new UbicacionDTO(0, ubicacion);
+            ubiDAO.insertar(nuevaUbicacion);
+        }
        
-        bienDAO.guardar(dto);
-    } 
+        bienDAO.actualizar(dto);
+    }
+    
+    void averiar(int id) throws NoSuchElementException {
+        validarID(id);
+        if (bienDAO.buscar(id) == null){
+            throw new NoSuchElementException("No existe el Bien");
+        }
+        bienDAO.cambiarEstado("AVERIADO", id);
+    }
+    
+    void reparar(int id) throws NoSuchElementException {
+        validarID(id);
+        if (bienDAO.buscar(id) == null){
+            throw new NoSuchElementException("No existe el Bien");
+        }
+        bienDAO.cambiarEstado("EN CONDICIONES", id);
+    }
    
-    public void eliminarBien(int idBien, String rol){
+    @Override
+    public void eliminar(int idBien) throws NoSuchElementException {
         validarID(idBien);
-        validarString(rol,4);
-        if (!rol.equals("ADMIN")) {
-            throw new SecurityException("No tiene permisos para eliminar bienes");
+        if (bienDAO.buscar(idBien) == null){
+            throw new NoSuchElementException("No existe el Bien");
         }
-        if (!bienDAO.BuscarBien(idBien)){
-            throw new IllegalArgumentException("No existe el Bien");
-        }
-        
-        BienDTO dto = bienDAO.obtenerBien(idBien);
-        boolean V = confirmacionEliminarBien(dto); //enviando el dto a la capa de presentacion para que lo muestre y me devuelva verdadero o falso para continuar con la eliminacion
-        if(V){
-            bienDAO.eliminarBien(idBien);
-        }   
+        bienDAO.eliminar(idBien);
     } 
     
-    public void validarUbicacionBien(String ubi){
+    private void validarUbicacionBien(String ubi) {
         if (ubi== null || ubi.length() < 3 || ubi.length() > 80) {
             throw new IllegalArgumentException("La ubicacion debe tener entre 3 y 80 caracteres");
         }
     }
-    public void validarID(Integer id){
+    private void validarID(Integer id) throws IllegalArgumentException{
         if (id == null) {
             throw new IllegalArgumentException("El ID no puede ser nulo.");
         }
@@ -87,7 +144,7 @@ public class BienService {
             throw new IllegalArgumentException("El ID debe ser un número entero positivo.");
         }
     }
-    public void validarString(String string,int a) {
+    private void validarString(String string,int a) {
         if (string == null || string.length() < 3 || string.length() > 50) {
             switch (a){
                 case 1 -> throw new IllegalArgumentException("El nombre debe tener entre 3 y 50 caracteres");

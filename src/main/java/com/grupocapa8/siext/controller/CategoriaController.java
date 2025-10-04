@@ -4,6 +4,8 @@
  */
 package com.grupocapa8.siext.controller;
 
+import com.grupocapa8.siext.DTO.CategoriaBienDTO;
+import com.grupocapa8.siext.Services.CategoriaBienServices;
 import jakarta.ws.rs.Path;
 
 /**
@@ -11,10 +13,10 @@ import jakarta.ws.rs.Path;
  * @author Matias
  */
 @Path("categoria")
-public class CategoriaController extends AbstractController<Object, Integer>{
+public class CategoriaController extends AbstractController<CategoriaBienDTO>{
 
     public CategoriaController() {
-        this.servicio = new Object(); //CategoriaBienService y CategoriaInsumoService. O capaz un solo service a dos daos? ya veremos.
+        this.servicio = new CategoriaBienServices(); //CategoriaBienService y CategoriaInsumoService. O capaz un solo service a dos daos? ya veremos.
     }
     
 }
