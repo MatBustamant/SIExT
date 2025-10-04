@@ -28,10 +28,17 @@ async function recargarEventos() {
     localStorage.setItem('eventos', JSON.stringify(eventos));
 }
 
+async function recargarUbicaciones() {
+    const response = await leerUbicaciones();
+    const ubicaciones = await response.json();
+    localStorage.setItem('ubicaciones', JSON.stringify(ubicaciones));
+}
+
 function recargarTodo() {
     recargarBienes();
     recargarSolicitudes();
     recargarCategorias();
     recargarUsuarios();
     recargarEventos();
+    recargarUbicaciones();
 }

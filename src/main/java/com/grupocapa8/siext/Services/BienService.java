@@ -2,8 +2,10 @@ package com.grupocapa8.siext.Services;
 
 import com.grupocapa8.siext.DAO.BienDAOImpl;
 import com.grupocapa8.siext.DAO.CategoriaDAOImpl;
+import com.grupocapa8.siext.DAO.UbicacionDAOImpl;
 import com.grupocapa8.siext.DTO.BienDTO;
 import com.grupocapa8.siext.DTO.CategoriaBienDTO;
+import com.grupocapa8.siext.DTO.UbicacionDTO;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -14,10 +16,12 @@ import java.util.NoSuchElementException;
 public class BienService implements ServiceGenerico<BienDTO> {
     private final BienDAOImpl bienDAO; //acceso a la BD
     private final CategoriaDAOImpl catDAO;
+    private final UbicacionDAOImpl ubiDAO;
 
     public BienService() {
         this.bienDAO = new BienDAOImpl();
         this.catDAO = new CategoriaDAOImpl();
+        this.ubiDAO = new UbicacionDAOImpl();
     }
     
     @Override
@@ -42,19 +46,25 @@ public class BienService implements ServiceGenerico<BienDTO> {
         validarString(nombre,1);
         String categoria = dto.getNombreCatBienes().toUpperCase();
         validarString(categoria,1);
-        String ubcacion = dto.getUbicacionBien().toUpperCase();
-        validarUbicacionBien(dto.getUbicacionBien());
+        String ubicacion = dto.getUbicacionBien().toUpperCase();
+        validarUbicacionBien(ubicacion);
         
         // Una vez validado, dejamos en el dto los datos formateados y agregamos el resto
         dto.setNombre(nombre);
         dto.setNombreCatBienes(categoria);
-        dto.setUbicacionBien(ubcacion);
+        dto.setUbicacionBien(ubicacion);
         dto.setEstadoBien("EN CONDICIONES");
         
         // Si no existe la categoría, la creamos
         if (catDAO.buscar(categoria) == null) {
             CategoriaBienDTO nuevaCategoria = new CategoriaBienDTO(0, categoria);
             catDAO.insertar(nuevaCategoria);
+        }
+        
+        // Si no existe la ubicación, la creamos
+        if (ubiDAO.buscar(ubicacion) == null) {
+            UbicacionDTO nuevaUbicacion = new UbicacionDTO(0, ubicacion);
+            ubiDAO.insertar(nuevaUbicacion);
         }
         
         // Creamos la cantidad de bienes que nos pide el front
@@ -85,6 +95,12 @@ public class BienService implements ServiceGenerico<BienDTO> {
         if (catDAO.buscar(categoria) == null) {
             CategoriaBienDTO nuevaCategoria = new CategoriaBienDTO(0, categoria);
             catDAO.insertar(nuevaCategoria);
+        }
+        
+        // Si no existe la ubicación, la creamos
+        if (ubiDAO.buscar(ubicacion) == null) {
+            UbicacionDTO nuevaUbicacion = new UbicacionDTO(0, ubicacion);
+            ubiDAO.insertar(nuevaUbicacion);
         }
        
         bienDAO.actualizar(dto);

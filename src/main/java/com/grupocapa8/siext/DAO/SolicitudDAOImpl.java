@@ -19,6 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
+    
+    private final UbicacionDAOImpl ubicacionDAO;
+
+    public SolicitudDAOImpl() {
+        this.ubicacionDAO = new UbicacionDAOImpl();
+    }
 
     @Override
     public SolicitudDTO buscar(int id) {
@@ -39,7 +45,9 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
                     DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toInstant(ZoneOffset.UTC);
                     soli.setFechaInicioSolicitud(fecha);
                     
-                    soli.setUbicacionBienes(rs.getString("Destino"));
+                    int ubicacionID = rs.getInt("Destino");
+                    soli.setUbicacionBienes(ubicacionDAO.buscar(ubicacionID).getNombre());
+                    
                     soli.setEstado(rs.getString("Estado"));
                     soli.setDescripcion(rs.getString("Descripcion"));
                 }
@@ -69,7 +77,9 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
                 DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toInstant(ZoneOffset.UTC);
                 soli.setFechaInicioSolicitud(fecha);
                 
-                soli.setUbicacionBienes(rs.getString("Destino"));
+                int ubicacionID = rs.getInt("Destino");
+                soli.setUbicacionBienes(ubicacionDAO.buscar(ubicacionID).getNombre());
+
                 soli.setEstado(rs.getString("Estado"));
                 soli.setDescripcion(rs.getString("Descripcion"));
                 
@@ -85,12 +95,14 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
     @Override
     public int insertar(SolicitudDTO Solicitud) {
         String sql = "INSERT INTO Solicitud (Estado, Destino, Descripcion) VALUES (?, ?, ?)";
+        int idUbicacion = ubicacionDAO.buscar(Solicitud.getUbicacionBienes()).getID_Ubicacion();
+        
         int resultado = 0;
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setString(1, Solicitud.getEstado());
-            ps.setString(2, Solicitud.getUbicacionBienes());
+            ps.setInt(2, idUbicacion);
             ps.setString(3, Solicitud.getDescripcion());
             
             resultado = ps.executeUpdate();
@@ -103,13 +115,15 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
     @Override
     public int actualizar(SolicitudDTO Solicitud) {
         String sql = "UPDATE Solicitud SET Estado = ?, Destino = ?, Descripcion = ? WHERE Num_Solicitud = ?";
+        int idUbicacion = ubicacionDAO.buscar(Solicitud.getUbicacionBienes()).getID_Ubicacion();
+        
         int resultado = 0;
         
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setString(1, Solicitud.getEstado());
-            ps.setString(2, Solicitud.getUbicacionBienes());
+            ps.setInt(2, idUbicacion);
             ps.setString(3, Solicitud.getDescripcion());
             ps.setInt(4, Solicitud.getNumSolicitud());
             

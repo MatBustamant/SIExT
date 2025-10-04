@@ -125,3 +125,24 @@ async function modificarEvento(evento, id) {
 async function eliminarEvento(id) {
     return fetch(`${API_BASE}/evento/eliminar/${id}`, DELETE);
 }
+
+// funciones con el crud de ubicaciones
+async function leerUbicaciones() {
+    return fetch(`${API_BASE}/ubicacion/leer`);
+}
+
+async function leerUbicacion(id) {
+    return fetch(`${API_BASE}/ubicacion/leer/${id}`);
+}
+
+async function crearUbicacion(ubicacion) {
+    return fetch(`${API_BASE}/ubicacion/crear`, POST(ubicacion));
+}
+
+async function modificarUbicacion(ubicacion, id) {
+    return fetch(`${API_BASE}/ubicacion/modificar/${id}`, PUT(ubicacion));
+}
+
+async function eliminarUbicacion(id) {
+    return fetch(`${API_BASE}/ubicacion/eliminar/${id}`, DELETE);
+}

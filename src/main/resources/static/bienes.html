@@ -75,7 +75,8 @@
                     </div>
                     <div>
                         <label>Ubicación</label>
-                        <input type="text" id="ubicacionProducto" required>
+                        <input list="ubicacionesSugeridas" type="text" id="ubicacionProducto" required>
+                        <datalist id="ubicacionesSugeridas"></datalist>
                     </div>
                     <div>
                         <label>Cantidad</label>
@@ -124,7 +125,8 @@
                     </div>
                     <div>
                         <label>Ubicación</label>
-                        <input type="text" id="modUbicacion" required>
+                        <input list="modUbicacionesSugeridas" type="text" id="modUbicacion" required>
+                        <datalist id="modUbicacionesSugeridas"></datalist>
                     </div>
                     <div class="btn-row">
                         <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
@@ -188,8 +190,27 @@
             sel.disabled = false;
         }
 
+        function cargarUbicaciones(idSelect) {
+            const sel = document.getElementById(idSelect);
+            sel.innerHTML = "";
+            const cats = JSON.parse(localStorage.getItem("ubicaciones")) || [];
+            if (cats.length === 0) {
+                sel.disabled = true;
+                sel.innerHTML = "<option>Sin ubicaciones</option>";
+                return;
+            }
+            cats.forEach(c => {
+                const o = document.createElement("option");
+                o.textContent = c.nombre;
+                sel.appendChild(o);
+            });
+            sel.disabled = false;
+        }
+
         cargarCategorias("categoriasSugeridas");
+        cargarUbicaciones("ubicacionesSugeridas");
         cargarCategorias("modCategoriasSugeridas");
+        cargarUbicaciones("modUbicacionesSugeridas");
 
         document.getElementById("productoForm").onsubmit = async (e) => {
             e.preventDefault();
@@ -226,11 +247,14 @@
             else {alert("Bien registrado.");}
             await recargarBienes();
             await recargarCategorias();
+            await recargarUbicaciones();
             await recargarEventos();
 
             // Reiniciamos el form y lo preparamos para nuevos inserts
             cargarCategorias("categoriasSugeridas");
+            cargarUbicaciones("ubicacionesSugeridas");
             cargarCategorias("modCategoriasSugeridas");
+            cargarUbicaciones("modUbicacionesSugeridas");
             e.target.reset();
         };
     </script>
@@ -344,10 +368,13 @@
                 alert("Bien actualizado.");
                 await recargarBienes();
                 await recargarCategorias();
+                await recargarUbicaciones();
                 await recargarEventos();
 
                 cargarCategorias("categoriasSugeridas");
+                cargarUbicaciones("ubicacionesSugeridas");
                 cargarCategorias("modCategoriasSugeridas");
+                cargarUbicaciones("modUbicacionesSugeridas");
                 mostrarInfoYAcciones(bienIdActual);
                 document.getElementById("formModificarDatos").classList.add("hidden");
                 modificarContenedor.classList.add("hidden");
