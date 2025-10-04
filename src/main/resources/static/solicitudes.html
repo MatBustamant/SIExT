@@ -135,7 +135,7 @@
                 const fila = document.createElement("tr");
                 fila.innerHTML = `
                     <td>${sol.numSolicitud}</td>
-                    <td>${sol.fechaInicioSolicitud}</td>
+                    <td>${new Date(sol.fechaInicioSolicitud).toLocaleString()}</td>
                     <td>${sol.ubicacionBienes}</td>
                     <td>${sol.estado}</td>
                     <td>
@@ -299,6 +299,14 @@
             document.getElementById("modificarSolicitudSection").classList.add("hidden");
             e.target.reset();
         });
+
+        // Cancelar edición de datos
+        document.getElementById("cancelarBtn").onclick = () => {
+            if (confirm("¿Deseás cancelar la edición? Se perderán los cambios no guardados.")) {
+                document.getElementById("modificarSolicitudSection").classList.add("hidden");
+                document.getElementById("modificarSolicitudForm").reset();
+            }
+        };
 
         renderSolicitudes();
     </script>
