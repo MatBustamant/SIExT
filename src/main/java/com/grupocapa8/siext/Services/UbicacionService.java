@@ -33,7 +33,10 @@ public class UbicacionService implements ServiceGenerico<UbicacionDTO>{
     
     @Override
     public void crear(UbicacionDTO dto){
-        validarString(dto.getNombre(),1);
+        String nombre = dto.getNombre().trim().toUpperCase();
+        validarString(nombre,1);
+        
+        dto.setNombre(nombre);
 
         ubicacionDAO.insertar(dto);
     } 
@@ -44,7 +47,11 @@ public class UbicacionService implements ServiceGenerico<UbicacionDTO>{
         if (ubicacionDAO.buscar(id) == null){
             throw new NoSuchElementException("No existe la ubicación");
         }
-        validarString(dto.getNombre(),1);
+        String nombre = dto.getNombre().trim().toUpperCase();
+        validarString(nombre,1);
+        
+        dto.setNombre(nombre);
+        dto.setID_Ubicacion(id);
        
         ubicacionDAO.actualizar(dto);
     } 
