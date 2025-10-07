@@ -51,6 +51,28 @@
         <!-- Gestión de solicitudes existentes -->
         <section>
             <h2>Solicitudes registradas</h2>
+            <!-- Filtros -->
+            <div class="form-grid">
+                <div>
+                    <input type="number" id="filterNroSolicitud" placeholder="Filtrar por nro de solicitud...">
+                </div>
+                <div>
+                    <select id="filterUbicacion"></select>
+                </div>
+                <div>
+                    <select id="filterEstado">
+                        <option value="">Todos los estados</option>
+                        <option value="POR REVISAR">Pendiente de aprobación</option>
+                        <option value="APROBADA">Aprobada</option>
+                        <option value="DESAPROBADA">No aprobada</option>
+                        <option value="SATISFECHA">Completada</option>
+                    </select>
+                </div>
+                <div>
+                    <input type="date" id="filterFecha">
+                </div>
+            </div>
+
             <table id="tablaSolicitudes">
                 <thead>
                     <tr>
@@ -63,6 +85,8 @@
                 </thead>
                 <tbody></tbody>
             </table>
+
+            <div class="informativo" id="counterSolicitudes"></div>
         </section>
 
         <!-- Formulario para modificar solicitud seleccionada -->
@@ -130,26 +154,60 @@
         recargarUbicaciones();
         function renderSolicitudes() {
             const solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
+
+            const filterNroSolicitud = document.getElementById("filterNroSolicitud");
+            const filterUbicacion = document.getElementById("filterUbicacion");
+            const filterEstado = document.getElementById("filterEstado");
+            const filterFecha = document.getElementById("filterFecha");
+
             const tbody = document.querySelector("#tablaSolicitudes tbody");
             tbody.innerHTML = "";
+
+            let count = 0;
+
             solicitudes.forEach(sol => {
-                const fila = document.createElement("tr");
-                fila.innerHTML = `
-                    <td>${sol.numSolicitud}</td>
-                    <td>${new Date(sol.fechaInicioSolicitud).toLocaleString()}</td>
-                    <td>${sol.ubicacionBienes}</td>
-                    <td>${sol.estado}</td>
-                    <td>
-                        <button class="btn" onclick="editarSolicitud(${sol.numSolicitud})"><i class="bi bi-pencil"></i></button>
-                    </td>`;
-                tbody.appendChild(fila);
+                const matchNumSolicitud = numero => String(sol.numSolicitud).includes(numero);
+                const matchUbicacion = (ubi, filtro) => !filtro || ubi === filtro;
+                const matchEstado = (est, filtro) => !filtro || est === filtro;
+                const matchFecha = (fecha, filtro) => !filtro || new Date(fecha).toLocaleDateString("en-CA") === filtro;
+
+                if (matchNumSolicitud(filterNroSolicitud.value)
+                    && matchUbicacion(sol.ubicacionBienes, filterUbicacion.value)
+                    && matchEstado(sol.estado, filterEstado.value)
+                    && matchFecha(sol.fechaInicioSolicitud, filterFecha.value)
+                ) {
+                    const fila = document.createElement("tr");
+                    fila.innerHTML = `
+                        <td>${sol.numSolicitud}</td>
+                        <td>${new Date(sol.fechaInicioSolicitud).toLocaleString()}</td>
+                        <td>${sol.ubicacionBienes}</td>
+                        <td>${sol.estado}</td>
+                        <td>
+                            <button class="btn" onclick="editarSolicitud(${sol.numSolicitud})"><i class="bi bi-pencil"></i></button>
+                        </td>`;
+                    tbody.appendChild(fila);
+                    count++;
+                }
             });
+
+            document.getElementById("counterSolicitudes").textContent = `Mostrando ${count} solicitud(es).`;
         }
+
+        document.getElementById("filterNroSolicitud").addEventListener("input", renderSolicitudes);
+        document.getElementById("filterUbicacion").addEventListener("change", renderSolicitudes);
+        document.getElementById("filterEstado").addEventListener("change", renderSolicitudes);
+        document.getElementById("filterFecha").addEventListener("change", renderSolicitudes);
 
         function cargarUbicaciones(idSelect) {
             const sel = document.getElementById(idSelect);
             sel.innerHTML = "";
             const cats = JSON.parse(localStorage.getItem("ubicaciones")) || [];
+            if(idSelect == "filterUbicacion") {
+                const opt = document.createElement("option");
+                opt.value = "";
+                opt.textContent = "Todas las ubicaciones";
+                sel.appendChild(opt);
+            }
             if (cats.length === 0) {
                 sel.disabled = true;
                 sel.innerHTML = "<option>Sin ubicaciones</option>";
@@ -165,6 +223,7 @@
 
         cargarUbicaciones("ubicacionesSugeridas");
         cargarUbicaciones("modUbicacionesSugeridas");
+        cargarUbicaciones("filterUbicacion");
 
         document.getElementById("solicitudForm").addEventListener("submit", async (e) => {
             e.preventDefault();
@@ -206,6 +265,7 @@
 
             cargarUbicaciones("ubicacionesSugeridas");
             cargarUbicaciones("modUbicacionesSugeridas");
+            cargarUbicaciones("filterUbicacion");
             renderSolicitudes();
             e.target.reset();
         });
@@ -286,6 +346,7 @@
 
             cargarUbicaciones("ubicacionesSugeridas");
             cargarUbicaciones("modUbicacionesSugeridas");
+            cargarUbicaciones("filterUbicacion");
             renderSolicitudes();
             document.getElementById("modificarSolicitudSection").classList.add("hidden");
             e.target.reset();

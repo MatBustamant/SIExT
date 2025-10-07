@@ -59,10 +59,10 @@
             <!-- Filtros -->
             <div class="form-grid">
                 <div>
-                    <input type="number" placeholder="Filtrar por ID de bien">
+                    <input id="filterBienInput" type="number" placeholder="Filtrar por ID de bien">
                 </div>
                 <div>
-                    <select>
+                    <select id="filterTipoEvento">
                         <option value="">Todos los eventos</option>
                         <option value="AVERIO">Averío</option>
                         <option value="REPARACION">Reparación</option>
@@ -70,7 +70,7 @@
                     </select>
                 </div>
                 <div>
-                    <input type="date">
+                    <input type="date" id="filterFecha">
                 </div>
             </div>
 
@@ -88,7 +88,7 @@
                 </tbody>
             </table>
 
-            <div class="informativo">Mostrando 1 evento(s). A MODIFICAAAAAAAAAAAAAAAR</div>
+            <div class="informativo" id="counterEventos"></div>
         </section>
 
         <!-- Formulario para modificar evento seleccionado -->
@@ -129,23 +129,47 @@
         recargarBienes();
         function renderEventos() {
             const eventos = JSON.parse(localStorage.getItem("eventos")) || [];
+
+            const filterBienInput = document.getElementById("filterBienInput");
+            const filterTipoEvento = document.getElementById("filterTipoEvento");
+            const filterFecha = document.getElementById("filterFecha");
+
             const tbody = document.querySelector("table tbody");
             tbody.innerHTML = "";
 
+            let count = 0;
+
             eventos.forEach(evento => {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td>${evento.id_Evento}</td>
-                    <td>${evento.bienAsociado}</td>
-                    <td>${evento.tipoEvento}</td>
-                    <td>${new Date(evento.fechaEvento).toLocaleString()}</td>
-                    <td>
-                        <button class="btn" onClick="editarEvento(${evento.id_Evento})"><i class="bi bi-pencil"></i></button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
+                const matchBienInput = numero => String(evento.bienAsociado).includes(numero);
+                const matchTipoEvento = (tipo, filtro) => !filtro || tipo === filtro;
+                const matchFecha = (fechaEvento, filtro) => !filtro || new Date(fechaEvento).toLocaleDateString("en-CA") === filtro;
+
+                if (matchBienInput(filterBienInput.value) &&
+                    matchTipoEvento(evento.tipoEvento, filterTipoEvento.value) &&
+                    matchFecha(evento.fechaEvento, filterFecha.value)
+                ) {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${evento.id_Evento}</td>
+                        <td>${evento.bienAsociado}</td>
+                        <td>${evento.tipoEvento}</td>
+                        <td>${new Date(evento.fechaEvento).toLocaleString()}</td>
+                        <td>
+                            <button class="btn" onClick="editarEvento(${evento.id_Evento})"><i class="bi bi-pencil"></i></button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                    count++;
+                }
             });
+
+            document.getElementById("counterEventos").textContent = `Mostrando ${count} evento(s).`;
         }
+
+        document.getElementById("filterBienInput").addEventListener("input", renderEventos);
+        document.getElementById("filterTipoEvento").addEventListener("change", renderEventos);
+        document.getElementById("filterFecha").addEventListener("change", renderEventos);
+
         renderEventos();
 
         document.getElementById("registroEventoForm").addEventListener("submit", async (e) => {
