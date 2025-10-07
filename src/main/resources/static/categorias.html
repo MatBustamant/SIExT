@@ -161,8 +161,15 @@
             try {
                 const response = await crearCategoria(categoria);
                 if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
+                    else {
                     alert(`El servidor no pudo realizar el registro de la categoría. Código: ${response.status}`);
                     return;
+                    }
                 }
             } catch (error) {
                 alert("No se pudo conectar con el servidor.");
@@ -197,6 +204,11 @@
                 const response = await leerCategoria(id);
                 if (!response.ok) {
                     document.getElementById("modificarCategoriaSection").classList.add("hidden");
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
                     if (response.status == 404) {
                         alert("Categoría no encontrada.");
                         return;
@@ -225,6 +237,11 @@
             try {
                 const response = await modificarCategoria(categoriaModificada, id);
                 if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
                     if (response.status == 500) {
                         alert("El servidor no pudo realizar la modificación de la categoría. Código: 500");
                         return;
@@ -263,6 +280,11 @@
             try {
                 const response = await eliminarCategoria(id);
                 if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
                     if (response.status == 500) {
                         alert("El servidor no pudo realizar la eliminación de la categoría. Código: 500");
                         return;

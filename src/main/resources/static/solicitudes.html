@@ -186,8 +186,15 @@
             try {
                 const response = await crearSolicitud(solicitud);
                 if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
+                    else {
                     alert(`El servidor no pudo realizar el registro de la solicitud. Código: ${response.status}`);
                     return;
+                    }
                 }
             } catch (error) {
                 alert("No se pudo conectar con el servidor.");
@@ -222,6 +229,11 @@
                 const response = await leerSolicitud(id);
                 if (!response.ok) {
                     document.getElementById("modificarSolicitudSection").classList.add("hidden");
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
                     if (response.status == 404) {
                         alert("Solicitud no encontrada.");
                         return;
@@ -250,6 +262,11 @@
             try {
                 const response = await modificarSolicitud(solicitudModificada, id);
                 if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
                     if (response.status == 500) {
                         alert("El servidor no pudo realizar la modificación de la solicitud. Código: 500");
                         return;
@@ -281,6 +298,11 @@
             try {
                 const response = await eliminarSolicitud(id);
                 if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
                     if (response.status == 500) {
                         alert("El servidor no pudo realizar la eliminación de la solicitud. Código: 500");
                         return;

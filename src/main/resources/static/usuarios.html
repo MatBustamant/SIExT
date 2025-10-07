@@ -141,8 +141,15 @@
             try {
                 const response = await crearUsuario(usuario);
                 if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
+                    else {
                     alert(`El servidor no pudo realizar el registro del usuario. Código: ${response.status}`);
                     return;
+                    }
                 }
             } catch (error) {
                 alert("No se pudo conectar con el servidor.");
@@ -176,6 +183,11 @@
                 const response = await leerUsuario(id);
                 if (!response.ok) {
                     document.getElementById("modificarUsuarioSection").classList.add("hidden");
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
                     if (response.status == 404) {
                         alert("Usuario no encontrado.");
                         return;
@@ -204,6 +216,11 @@
             try {
                 const response = await modificarUsuario(usuarioModificado, id);
                 if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
                     if (response.status == 500) {
                         alert("El servidor no pudo realizar la modificación del usuario. Código: 500");
                         return;
@@ -240,6 +257,11 @@
             try {
                 const response = await eliminarUsuario(id);
                 if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
                     if (response.status == 500) {
                         alert("El servidor no pudo realizar la eliminación del usuario. Código: 500");
                         return;

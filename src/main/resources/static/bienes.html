@@ -242,8 +242,14 @@
             try {
                 const response = await crearBien(bien);
                 if (!response.ok) {
-                    alert(`El servidor no pudo realizar el registro del bien. Código: ${response.status}`);
-                    return;
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    } else {
+                        alert(`El servidor no pudo realizar el registro del bien. Código: ${response.status}`);
+                        return;
+                    }
                 }
             } catch (error) {
                 alert("No se pudo conectar con el servidor.");
@@ -278,6 +284,11 @@
                 bienIdActual = id;
                 if (!response.ok) {
                     modificarContenedor.classList.add("hidden");
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
                     if (response.status == 404) {
                         alert("Bien no encontrado.");
                         return;
@@ -318,6 +329,11 @@
                 try {
                     const response = await eliminarBien(bienIdActual);
                     if (!response.ok) {
+                        const errorData = await response.json();
+                        if (response.status == 422) {
+                            alert(errorData.error);
+                            return;
+                        }
                         if (response.status == 500) {
                             alert("El servidor no pudo realizar la eliminación del bien. Código: 500");
                             return;
@@ -359,6 +375,11 @@
                 try {
                     const response = await modificarBien(bienModificado, bienIdActual);
                     if (!response.ok) {
+                        const errorData = await response.json();
+                        if (response.status == 422) {
+                            alert(errorData.error);
+                            return;
+                        }
                         if (response.status == 500) {
                             alert("El servidor no pudo realizar la modificación del bien. Código: 500");
                             return;

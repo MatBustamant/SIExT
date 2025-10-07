@@ -29,8 +29,15 @@ public abstract class AbstractController<E> {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("crear")
-    public void crear(E entidad) {
-        servicio.crear(entidad);
+    public Response crear(E entidad) {
+        try {
+            servicio.crear(entidad);
+            return Response.ok().build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(422, "Unprocessable Entity").entity("{\"error\":\"" + e.getMessage() + "\"}").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"" + e.getMessage() + "\"}").build();
+        }
     }
     
     @GET
@@ -68,6 +75,8 @@ public abstract class AbstractController<E> {
             return Response.ok().build();
         } catch (NoSuchElementException e) {
             return Response.status(Response.Status.NOT_FOUND).entity("{}").build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(422, "Unprocessable Entity").entity("{\"error\":\"" + e.getMessage() + "\"}").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"" + e.getMessage() + "\"}").build();
         }
@@ -81,6 +90,8 @@ public abstract class AbstractController<E> {
             return Response.ok().build();
         } catch (NoSuchElementException e) {
             return Response.status(Response.Status.NOT_FOUND).entity("{}").build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(422, "Unprocessable Entity").entity("{\"error\":\"" + e.getMessage() + "\"}").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"" + e.getMessage() + "\"}").build();
         }

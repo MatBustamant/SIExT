@@ -166,8 +166,15 @@
             try {
                 const response = await crearEvento(evento);
                 if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
+                    else {
                     alert(`El servidor no pudo realizar el registro del evento. Código: ${response.status}`);
                     return;
+                    }
                 }
             } catch (error) {
                 alert("No se pudo conectar con el servidor.");
@@ -199,6 +206,11 @@
                 const response = await leerEvento(id);
                 if (!response.ok) {
                     document.getElementById("modificarEventoSection").classList.add("hidden");
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
                     if (response.status == 404) {
                         alert("Evento no encontrado.");
                         return;
@@ -226,6 +238,11 @@
             try {
                 const response = await modificarEvento(eventoModificado, id);
                 if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
                     if (response.status == 500) {
                         alert("El servidor no pudo realizar la modificación del evento. Código: 500");
                         return;
@@ -263,6 +280,11 @@
             try {
                 const response = await eliminarEvento(id);
                 if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
                     if (response.status == 500) {
                         alert("El servidor no pudo realizar la eliminación del evento. Código: 500");
                         return;
