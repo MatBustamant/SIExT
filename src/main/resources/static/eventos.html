@@ -191,13 +191,10 @@
                 const response = await crearEvento(evento);
                 if (!response.ok) {
                     const errorData = await response.json();
-<<<<<<< HEAD
                     if (response.status == 404) {
                         alert("Bien no encontrado.");
                         return;
                     }
-=======
->>>>>>> 5809091 (manejo de error de datos inválidos, con manejo de excepciones y status code 422 + alertas en front)
                     if (response.status == 422) {
                         alert(errorData.error);
                         return;
