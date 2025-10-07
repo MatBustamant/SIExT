@@ -33,6 +33,8 @@ public abstract class AbstractController<E> {
         try {
             servicio.crear(entidad);
             return Response.ok().build();
+        } catch (NoSuchElementException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity("{}").build();
         } catch (IllegalArgumentException e) {
             return Response.status(422, "Unprocessable Entity").entity("{\"error\":\"" + e.getMessage() + "\"}").build();
         } catch (Exception e) {

@@ -167,6 +167,10 @@
                 const response = await crearEvento(evento);
                 if (!response.ok) {
                     const errorData = await response.json();
+                    if (response.status == 404) {
+                        alert("Bien no encontrado.");
+                        return;
+                    }
                     if (response.status == 422) {
                         alert(errorData.error);
                         return;
@@ -239,6 +243,10 @@
                 const response = await modificarEvento(eventoModificado, id);
                 if (!response.ok) {
                     const errorData = await response.json();
+                    if (response.status == 404) {
+                        alert("Bien no encontrado.");
+                        return;
+                    }
                     if (response.status == 422) {
                         alert(errorData.error);
                         return;
