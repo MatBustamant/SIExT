@@ -59,10 +59,10 @@
             <!-- Filtros -->
             <div class="form-grid">
                 <div>
-                    <input type="number" placeholder="Filtrar por ID de bien">
+                    <input id="filterBienInput" type="number" placeholder="Filtrar por ID de bien">
                 </div>
                 <div>
-                    <select>
+                    <select id="filterTipoEvento">
                         <option value="">Todos los eventos</option>
                         <option value="AVERIO">Averío</option>
                         <option value="REPARACION">Reparación</option>
@@ -70,7 +70,7 @@
                     </select>
                 </div>
                 <div>
-                    <input type="date">
+                    <input type="date" id="filterFecha">
                 </div>
             </div>
 
@@ -88,7 +88,7 @@
                 </tbody>
             </table>
 
-            <div class="informativo">Mostrando 1 evento(s). A MODIFICAAAAAAAAAAAAAAAR</div>
+            <div class="informativo" id="counterEventos"></div>
         </section>
 
         <!-- Formulario para modificar evento seleccionado -->
@@ -129,23 +129,47 @@
         recargarBienes();
         function renderEventos() {
             const eventos = JSON.parse(localStorage.getItem("eventos")) || [];
+
+            const filterBienInput = document.getElementById("filterBienInput");
+            const filterTipoEvento = document.getElementById("filterTipoEvento");
+            const filterFecha = document.getElementById("filterFecha");
+
             const tbody = document.querySelector("table tbody");
             tbody.innerHTML = "";
 
+            let count = 0;
+
             eventos.forEach(evento => {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td>${evento.id_Evento}</td>
-                    <td>${evento.bienAsociado}</td>
-                    <td>${evento.tipoEvento}</td>
-                    <td>${new Date(evento.fechaEvento).toLocaleString()}</td>
-                    <td>
-                        <button class="btn" onClick="editarEvento(${evento.id_Evento})"><i class="bi bi-pencil"></i></button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
+                const matchBienInput = numero => String(evento.bienAsociado).includes(numero);
+                const matchTipoEvento = (tipo, filtro) => !filtro || tipo === filtro;
+                const matchFecha = (fechaEvento, filtro) => !filtro || new Date(fechaEvento).toLocaleDateString("en-CA") === filtro;
+
+                if (matchBienInput(filterBienInput.value) &&
+                    matchTipoEvento(evento.tipoEvento, filterTipoEvento.value) &&
+                    matchFecha(evento.fechaEvento, filterFecha.value)
+                ) {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${evento.id_Evento}</td>
+                        <td>${evento.bienAsociado}</td>
+                        <td>${evento.tipoEvento}</td>
+                        <td>${new Date(evento.fechaEvento).toLocaleString()}</td>
+                        <td>
+                            <button class="btn" onClick="editarEvento(${evento.id_Evento})"><i class="bi bi-pencil"></i></button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                    count++;
+                }
             });
+
+            document.getElementById("counterEventos").textContent = `Mostrando ${count} evento(s).`;
         }
+
+        document.getElementById("filterBienInput").addEventListener("input", renderEventos);
+        document.getElementById("filterTipoEvento").addEventListener("change", renderEventos);
+        document.getElementById("filterFecha").addEventListener("change", renderEventos);
+
         renderEventos();
 
         document.getElementById("registroEventoForm").addEventListener("submit", async (e) => {
@@ -166,8 +190,19 @@
             try {
                 const response = await crearEvento(evento);
                 if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 404) {
+                        alert("Bien no encontrado.");
+                        return;
+                    }
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
+                    else {
                     alert(`El servidor no pudo realizar el registro del evento. Código: ${response.status}`);
                     return;
+                    }
                 }
             } catch (error) {
                 alert("No se pudo conectar con el servidor.");
@@ -199,6 +234,11 @@
                 const response = await leerEvento(id);
                 if (!response.ok) {
                     document.getElementById("modificarEventoSection").classList.add("hidden");
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
                     if (response.status == 404) {
                         alert("Evento no encontrado.");
                         return;
@@ -226,6 +266,15 @@
             try {
                 const response = await modificarEvento(eventoModificado, id);
                 if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 404) {
+                        alert("Bien no encontrado.");
+                        return;
+                    }
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
                     if (response.status == 500) {
                         alert("El servidor no pudo realizar la modificación del evento. Código: 500");
                         return;
@@ -263,6 +312,11 @@
             try {
                 const response = await eliminarEvento(id);
                 if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
                     if (response.status == 500) {
                         alert("El servidor no pudo realizar la eliminación del evento. Código: 500");
                         return;

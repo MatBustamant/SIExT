@@ -41,7 +41,6 @@
                     <option value="">Seleccionar</option>
                     <option value="ADMINISTRATIVO">Administrativo</option>
                     <option value="SUPERVISOR">Supervisor</option>
-                    <option value="DEPOSITO">Depósito</option>
                 </select>
 
                 <button type="submit" class="btn"><i class="bi bi-plus-circle"></i>Registrar</button>
@@ -51,6 +50,20 @@
         <!-- Gestión de usuarios registrados -->
         <section>
             <h2>Usuarios registrados</h2>
+            <!-- Filtros -->
+            <div class="form-grid">
+                <div>
+                    <input type="text" id="filterUsuario" placeholder="Filtrar por nombre o ID...">
+                </div>
+                <div>
+                    <select id="filterRol">
+                        <option value="">Todos los roles</option>
+                        <option value="ADMINISTRATIVO">Administrativo</option>
+                        <option value="SUPERVISOR">Supervisor</option>
+                    </select>
+                </div>
+            </div>
+
             <table>
                 <thead>
                     <tr>
@@ -63,6 +76,8 @@
                 <tbody id="tablaUsuarios">
                 </tbody>
             </table>
+
+            <div class="informativo" id="counterUsuarios"></div>
         </section>
 
         <!-- Formulario para modificar usuario seleccionado -->
@@ -82,7 +97,6 @@
                     <option value="">Seleccionar</option>
                     <option value="ADMINISTRATIVO">Administrativo</option>
                     <option value="SUPERVISOR">Supervisor</option>
-                    <option value="DEPOSITO">Depósito</option>
                 </select>
 
                 <div class="btn-row">
@@ -105,22 +119,38 @@
         recargarUsuarios();
         function renderUsuarios() {
             const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+
+            const filtroUsuario = document.getElementById("filterUsuario").value.toUpperCase();
+            const filtroRol = document.getElementById("filterRol").value.toUpperCase();
+
             const tabla = document.getElementById("tablaUsuarios");
             tabla.innerHTML = "";
+            let count = 0;
 
             usuarios.forEach(usuario => {
-                const fila = document.createElement("tr");
-                fila.innerHTML = `
-          <td>${usuario.id_Usuario}</td>
-          <td>${usuario.nombre}</td>
-          <td>${usuario.rol}</td>
-          <td>
-            <button class="btn" onclick='editarUsuario(${usuario.id_Usuario})'><i class="bi bi-pencil"></i></button>
-          </td>
-        `;
-                tabla.appendChild(fila);
+                const matchUsuario = txt => usuario.nombre.toUpperCase().includes(txt) || String(usuario.id_Usuario).includes(txt);
+                const matchRol = (rol, filtro) => !filtro || rol === filtro;
+
+                if (matchUsuario(filtroUsuario) && matchRol(usuario.rol, filtroRol)
+                ) {
+                    const fila = document.createElement("tr");
+                    fila.innerHTML = `
+                    <td>${usuario.id_Usuario}</td>
+                    <td>${usuario.nombre}</td>
+                    <td>${usuario.rol}</td>
+                    <td>
+                        <button class="btn" onclick='editarUsuario(${usuario.id_Usuario})'><i class="bi bi-pencil"></i></button>
+                    </td>
+                    `;
+                    tabla.appendChild(fila);
+                    count++;
+                }
             });
+
+            document.getElementById("counterUsuarios").textContent = `Mostrando ${count} usuario(s).`;
         }
+        document.getElementById("filterUsuario").addEventListener("input", renderUsuarios);
+        document.getElementById("filterRol").addEventListener("change", renderUsuarios);
         renderUsuarios();
 
         document.getElementById("formNuevoUsuario").addEventListener("submit", async (e) => {
@@ -143,8 +173,15 @@
             try {
                 const response = await crearUsuario(usuario);
                 if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
+                    else {
                     alert(`El servidor no pudo realizar el registro del usuario. Código: ${response.status}`);
                     return;
+                    }
                 }
             } catch (error) {
                 alert("No se pudo conectar con el servidor.");
@@ -178,6 +215,11 @@
                 const response = await leerUsuario(id);
                 if (!response.ok) {
                     document.getElementById("modificarUsuarioSection").classList.add("hidden");
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
                     if (response.status == 404) {
                         alert("Usuario no encontrado.");
                         return;
@@ -206,6 +248,11 @@
             try {
                 const response = await modificarUsuario(usuarioModificado, id);
                 if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
                     if (response.status == 500) {
                         alert("El servidor no pudo realizar la modificación del usuario. Código: 500");
                         return;
@@ -242,6 +289,11 @@
             try {
                 const response = await eliminarUsuario(id);
                 if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
                     if (response.status == 500) {
                         alert("El servidor no pudo realizar la eliminación del usuario. Código: 500");
                         return;

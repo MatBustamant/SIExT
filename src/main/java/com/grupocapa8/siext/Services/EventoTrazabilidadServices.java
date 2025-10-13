@@ -36,12 +36,15 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
     @Override
     public void crear(EventoTrazabilidadDTO dto){
         int idBien = dto.getBienAsociado();
+        if (bienService.buscar(idBien) == null){
+            throw new NoSuchElementException("No existe el Bien");
+        }
         validarID(idBien);
         String tipo = dto.getTipoEvento().toUpperCase();
         validarString(tipo,1);
         
         dto.setTipoEvento(tipo);
-        if(tipo.equals("AVERIO")) {
+        if(tipo.equals("AVERIO")) { // Cambiar a switch cuando trabajemos con enums mejor
             bienService.averiar(idBien);
         } else if (tipo.equals("REPARACION")) {
             bienService.reparar(idBien);
@@ -57,6 +60,9 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
             throw new NoSuchElementException("No existe el Evento de trazabilidad");
         }
         int idBien = dto.getBienAsociado();
+        if (bienService.buscar(idBien) == null){
+            throw new NoSuchElementException("No existe el Bien");
+        }
         validarID(idBien);
         String tipo = dto.getTipoEvento().toUpperCase();
         validarString(tipo,1);
@@ -65,7 +71,7 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
         dto.setID_Evento(id);
         
         if(eventoTrazDAO.buscarMasReciente(idBien).getID_Evento() == id) {
-            if(tipo.equals("AVERIO")) {
+            if(tipo.equals("AVERIO")) { // Cambiar a switch cuando trabajemos con enums mejor
                 bienService.averiar(idBien);
             } else if (tipo.equals("REPARACION")) {
                 bienService.reparar(idBien);
