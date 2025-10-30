@@ -4,6 +4,7 @@
  */
 package com.grupocapa8.siext.DAO;
 
+import Enums.EstadoSolicitud;
 import com.grupocapa8.siext.ConexionBD.BasedeDatos;
 import static com.grupocapa8.siext.ConexionBD.BasedeDatos.getConnection;
 import com.grupocapa8.siext.DTO.SolicitudDTO;
@@ -48,7 +49,7 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
                     int ubicacionID = rs.getInt("Destino");
                     soli.setUbicacionBienes(ubicacionDAO.buscar(ubicacionID).getNombre());
                     
-                    soli.setEstado(rs.getString("Estado"));
+                    soli.setEstado(EstadoSolicitud.valueOf(rs.getString("Estado")));
                     soli.setDescripcion(rs.getString("Descripcion"));
                 }
             }
@@ -80,7 +81,7 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
                 int ubicacionID = rs.getInt("Destino");
                 soli.setUbicacionBienes(ubicacionDAO.buscar(ubicacionID).getNombre());
 
-                soli.setEstado(rs.getString("Estado"));
+                soli.setEstado(EstadoSolicitud.valueOf(rs.getString("Estado")));
                 soli.setDescripcion(rs.getString("Descripcion"));
                 
                 solicitudes.add(soli);
@@ -101,7 +102,7 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
-            ps.setString(1, Solicitud.getEstado());
+            ps.setString(1, Solicitud.getEstado().getNombre());
             ps.setInt(2, idUbicacion);
             ps.setString(3, Solicitud.getDescripcion());
             
@@ -122,7 +123,7 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
-            ps.setString(1, Solicitud.getEstado());
+            ps.setString(1, Solicitud.getEstado().getNombre());
             ps.setInt(2, idUbicacion);
             ps.setString(3, Solicitud.getDescripcion());
             ps.setInt(4, Solicitud.getNumSolicitud());

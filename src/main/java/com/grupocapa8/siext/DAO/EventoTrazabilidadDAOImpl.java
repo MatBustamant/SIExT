@@ -4,6 +4,7 @@
  */
 package com.grupocapa8.siext.DAO;
 
+import Enums.TipoEvento;
 import com.grupocapa8.siext.ConexionBD.BasedeDatos;
 import static com.grupocapa8.siext.ConexionBD.BasedeDatos.getConnection;
 import com.grupocapa8.siext.DTO.EventoTrazabilidadDTO;
@@ -40,7 +41,7 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
                     evento = new EventoTrazabilidadDTO();
                     evento.setID_Evento(rs.getInt("ID_Evento"));
                     evento.setBienAsociado(rs.getInt("ID_Bien"));
-                    evento.setTipoEvento(rs.getString("TipoEvento"));
+                    evento.setTipoEvento(TipoEvento.valueOf(rs.getString("TipoEvento")));
                     
                     String fechaString = rs.getString("Fecha");
                     Instant fecha = LocalDateTime.parse(fechaString, 
@@ -69,7 +70,7 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
                 EventoTrazabilidadDTO evento = new EventoTrazabilidadDTO();
                 evento.setID_Evento(rs.getInt("ID_Evento"));
                 evento.setBienAsociado(rs.getInt("ID_Bien"));
-                evento.setTipoEvento(rs.getString("TipoEvento"));
+                evento.setTipoEvento(TipoEvento.valueOf(rs.getString("TipoEvento")));
                 
                 String fechaString = rs.getString("Fecha");
                 Instant fecha = LocalDateTime.parse(fechaString,
@@ -98,7 +99,7 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
                     evento = new EventoTrazabilidadDTO();
                     evento.setID_Evento(rs.getInt("ID_Evento"));
                     evento.setBienAsociado(rs.getInt("ID_Bien"));
-                    evento.setTipoEvento(rs.getString("TipoEvento"));
+                    evento.setTipoEvento(TipoEvento.valueOf(rs.getString("TipoEvento")));
                     
                     String fechaString = rs.getString("Fecha");
                     Instant fecha = LocalDateTime.parse(fechaString, 
@@ -120,7 +121,7 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, Evento.getBienAsociado());
-            ps.setString(2, Evento.getTipoEvento());
+            ps.setString(2, Evento.getTipoEvento().getNombre());
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
@@ -154,7 +155,7 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, Evento.getBienAsociado());
-            ps.setString(2, Evento.getTipoEvento());
+            ps.setString(2, Evento.getTipoEvento().getNombre());
             ps.setInt(3, Evento.getID_Evento());
             
             resultado = ps.executeUpdate();

@@ -1,5 +1,6 @@
 package com.grupocapa8.siext.DTO;
 
+import Enums.EstadoSolicitud;
 import java.time.Instant;
 
 /**
@@ -10,13 +11,13 @@ public class SolicitudDTO {
     private Integer numSolicitud;
     private Instant FechaInicioSolicitud;
     private String UbicacionBienes;
-    private String Estado;
+    private EstadoSolicitud Estado;
     private String Descripcion;
     
     public SolicitudDTO(){
         
     }
-    public SolicitudDTO(Integer numSolicitud, Instant FechaInicioSolicitud, String UbicacionBienes, String Estado) {
+    public SolicitudDTO(Integer numSolicitud, Instant FechaInicioSolicitud, String UbicacionBienes, EstadoSolicitud Estado) {
         this.numSolicitud = numSolicitud;
         this.FechaInicioSolicitud = FechaInicioSolicitud;
         this.UbicacionBienes = UbicacionBienes;
@@ -55,11 +56,11 @@ public class SolicitudDTO {
         this.UbicacionBienes = UbicacionBienes;
     }
 
-    public String getEstado() {
+    public EstadoSolicitud getEstado() {
         return Estado;
     }
 
-    public void setEstado(String Estado) {
+    public void setEstado(EstadoSolicitud Estado) {
         this.Estado = Estado;
     }   
 }

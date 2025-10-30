@@ -1,5 +1,7 @@
 package com.grupocapa8.siext.DTO;
 
+import Enums.EstadoBien;
+
 /**
  *
  * @author geroj
@@ -8,11 +10,11 @@ public class BienDTO {
     private int ID_Bien;
     private String Nombre;
     private String UbicacionBien;
-    private String EstadoBien; //Cambiaria a EnUso o EnDesuso
+    private EstadoBien EstadoBien; //Cambiaria a EnUso o EnDesuso
     private String NombreCatBienes;
     private int cantBienes;
 
-    public BienDTO(int ID_Bien, String Nombre, String UbicacionBien, String EstadoBien, String NombreCatBienes, int cantBienes) {
+    public BienDTO(int ID_Bien, String Nombre, String UbicacionBien, EstadoBien EstadoBien, String NombreCatBienes, int cantBienes) {
         this.ID_Bien = ID_Bien;
         this.Nombre = Nombre;
         this.UbicacionBien = UbicacionBien;
@@ -48,11 +50,11 @@ public class BienDTO {
         this.UbicacionBien = UbicacionBien;
     }
 
-    public String getEstadoBien() {
+    public EstadoBien getEstadoBien() {
         return EstadoBien;
     }
 
-    public void setEstadoBien(String EstadoBien) {
+    public void setEstadoBien(EstadoBien EstadoBien) {
         this.EstadoBien = EstadoBien;
     }
 

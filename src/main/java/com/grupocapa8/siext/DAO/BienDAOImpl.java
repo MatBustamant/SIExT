@@ -4,6 +4,7 @@
  */
 package com.grupocapa8.siext.DAO;
 
+import Enums.EstadoBien;
 import com.grupocapa8.siext.ConexionBD.BasedeDatos;
 import com.grupocapa8.siext.DTO.BienDTO;
 import java.sql.Connection;
@@ -45,7 +46,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
                     bien = new BienDTO();
                     bien.setID_Bien(rs.getInt("ID_Bien"));
                     bien.setNombre(rs.getString("Nombre"));
-                    bien.setEstadoBien(rs.getString("Estado"));
+                    bien.setEstadoBien(EstadoBien.valueOf(rs.getString("Estado")));
                     
                     int ubicacionID = rs.getInt("ID_Ubicacion");
                     bien.setUbicacionBien(ubicacionDAO.buscar(ubicacionID).getNombre());
@@ -84,7 +85,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
                     //para ponerlo en la lista y sea compatible con BienDTO
                     int ubicacionID = rs.getInt("ID_Ubicacion");
                     bien.setUbicacionBien(ubicacionDAO.buscar(ubicacionID).getNombre());
-                    bien.setEstadoBien(rs.getString("Estado"));
+                    bien.setEstadoBien(EstadoBien.valueOf(rs.getString("Estado")));
 
                     bienes.add(bien);
                 }
@@ -107,7 +108,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
 
             ps.setString(1, bien.getNombre());
             ps.setInt(2, idCategoria); //el id de categoria que mande a buscar antes
-            ps.setString(3, bien.getEstadoBien());
+            ps.setString(3, bien.getEstadoBien().getNombre());
             ps.setInt(4, idUbicacion);
             
             resultado = ps.executeUpdate();
