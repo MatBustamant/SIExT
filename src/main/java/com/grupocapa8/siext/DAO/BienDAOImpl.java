@@ -152,13 +152,13 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
         return resultado;
     }
     
-    public void cambiarEstado(String estado, int id) {
+    public void cambiarEstado(EstadoBien estado, int id) {
         String sql = "UPDATE Bien SET Estado = ? WHERE ID_Bien = ?";
         
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
-            ps.setString(1, estado);
+            ps.setString(1, estado.getNombre());
             ps.setInt(2, id);
             
             ps.executeUpdate();

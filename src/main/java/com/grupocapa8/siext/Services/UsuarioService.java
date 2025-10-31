@@ -1,7 +1,9 @@
 package com.grupocapa8.siext.Services;
 
+import Enums.RolUsuario;
 import com.grupocapa8.siext.DAO.UsuarioDAOImpl;
 import com.grupocapa8.siext.DTO.UsuarioDTO;
+import com.grupocapa8.siext.Util.Validador;
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.mindrot.jbcrypt.BCrypt;
@@ -11,6 +13,11 @@ import org.mindrot.jbcrypt.BCrypt;
  */
 public class UsuarioService implements ServiceGenerico<UsuarioDTO> {
    private final UsuarioDAOImpl usuarioDAO; //acceso a la BD
+   
+    private final static String CAMPO_ID_TEXT = "Identificador";
+    private final static String CAMPO_NOMBRE_TEXT = "Nombre";
+    private static final int CAMPO_NOMBRE_MIN = 3;
+    private static final int CAMPO_NOMBRE_MAX = 50;
 
     public UsuarioService() {
         this.usuarioDAO = new UsuarioDAOImpl();
@@ -18,7 +25,7 @@ public class UsuarioService implements ServiceGenerico<UsuarioDTO> {
     
    @Override
     public UsuarioDTO buscar(int idUsuario) throws NoSuchElementException {
-        validarID(idUsuario);
+        Validador.validarId(idUsuario, CAMPO_ID_TEXT);
         UsuarioDTO usuario = usuarioDAO.buscar(idUsuario);
         
         if (usuario == null){
@@ -35,11 +42,12 @@ public class UsuarioService implements ServiceGenerico<UsuarioDTO> {
     
    @Override
     public void crear(UsuarioDTO dto){
+        // Validamos solo que debemos recibir
         String nombre = dto.getNombre();
-        validarString(nombre,1);
-        String rol = dto.getRol();
-        validarString(rol,2);
-        validarContraseña(dto.getContraseña());
+        Validador.validarString(nombre,CAMPO_NOMBRE_TEXT, CAMPO_NOMBRE_MIN, CAMPO_NOMBRE_MAX);
+        RolUsuario rol = dto.getRol();
+//        validarString(rol,2);
+        Validador.validarContraseña(dto.getContraseña());
         String contraseñaHash = BCrypt.hashpw(dto.getContraseña(), BCrypt.gensalt());
         // Convertir DTO a entidad y guardarlo en BD
         dto.setNombre(nombre);
@@ -51,15 +59,15 @@ public class UsuarioService implements ServiceGenerico<UsuarioDTO> {
     
    @Override
     public void modificar(UsuarioDTO dto, int id) throws NoSuchElementException {
-        validarID(id);
+        Validador.validarId(id, CAMPO_ID_TEXT);
         if (usuarioDAO.buscar(id) == null){
             throw new NoSuchElementException("No existe el Usuario");
         }
         String nombre = dto.getNombre();
-        validarString(nombre,1);
-        String rol = dto.getRol();
-        validarString(dto.getRol(),2);
-        validarContraseña(dto.getContraseña());
+        Validador.validarString(nombre,CAMPO_NOMBRE_TEXT, CAMPO_NOMBRE_MIN, CAMPO_NOMBRE_MAX);
+        RolUsuario rol = dto.getRol();
+//        validarString(dto.getRol(),2);
+        Validador.validarContraseña(dto.getContraseña());
         String contraseñaHash = BCrypt.hashpw(dto.getContraseña(), BCrypt.gensalt());
         
         dto.setNombre(nombre);
@@ -73,55 +81,12 @@ public class UsuarioService implements ServiceGenerico<UsuarioDTO> {
     
    @Override
     public void eliminar(int idUsuario) throws NoSuchElementException {
-        validarID(idUsuario);
+        Validador.validarId(idUsuario, CAMPO_ID_TEXT);
         if (usuarioDAO.buscar(idUsuario) == null){ //hacer una validacion del id
             throw new NoSuchElementException("No existe el usuario");
         }
         
         usuarioDAO.eliminar(idUsuario);
-    } 
-    
-    private void validarID(Integer id){
-        if (id == null) {
-            throw new IllegalArgumentException("El ID no puede ser nulo.");
-        }
-        if (id <= 0) {
-            throw new IllegalArgumentException("El ID debe ser un número entero positivo.");
-        }
     }
     
-    private void validarString(String string,int a) {
-        if (string == null || string.length() < 3 || string.length() > 50) {
-            switch (a){
-                case 1 -> throw new IllegalArgumentException("El nombre debe tener entre 3 y 50 caracteres");
-                case 2 -> throw new IllegalArgumentException("El Rol debe tener entre 3 y 50 caracteres");
-            } 
-        }
-    }
-    
-    private void validarContraseña(String contraseña){
-        // 1. Longitud mínima y máxima
-        if (contraseña==null || contraseña.length() < 8 || contraseña.length() > 64) {
-            throw new IllegalArgumentException("La contraseña debe tener entre 8 y 64 caracteres"); 
-        }
-        // 2. Al menos una mayúscula
-        if (!contraseña.matches(".*[A-Z].*")) {
-            throw new IllegalArgumentException("La contraseña debe contener al menos una letra mayúscula");
-        }
-
-        // 3. Al menos una minúscula
-        if (!contraseña.matches(".*[a-z].*")) {
-            throw new IllegalArgumentException("La contraseña debe contener al menos una letra minúscula");
-        }
-
-        // 4. Al menos un número
-        if (!contraseña.matches(".*[0-9].*")) {
-            throw new IllegalArgumentException("La contraseña debe contener al menos un número");
-        }
-
-        // 5. Al menos un signo o símbolo
-        if (!contraseña.matches(".*[!@#$%^&*(),.?\":{}|<>].*")) {
-            throw new IllegalArgumentException("La contraseña debe contener al menos un carácter especial");
-        }  
-    }  
 }

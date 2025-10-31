@@ -1,11 +1,13 @@
 package com.grupocapa8.siext.Services;
 
+import Enums.EstadoBien;
 import com.grupocapa8.siext.DAO.BienDAOImpl;
 import com.grupocapa8.siext.DAO.CategoriaDAOImpl;
 import com.grupocapa8.siext.DAO.UbicacionDAOImpl;
 import com.grupocapa8.siext.DTO.BienDTO;
 import com.grupocapa8.siext.DTO.CategoriaBienDTO;
 import com.grupocapa8.siext.DTO.UbicacionDTO;
+import com.grupocapa8.siext.Util.Validador;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -17,6 +19,17 @@ public class BienService implements ServiceGenerico<BienDTO> {
     private final BienDAOImpl bienDAO; //acceso a la BD
     private final CategoriaDAOImpl catDAO;
     private final UbicacionDAOImpl ubiDAO;
+    
+    private final static String CAMPO_ID_TEXT = "Identificador";
+    private final static String CAMPO_NOMBRE_TEXT = "Nombre";
+    private static final int CAMPO_NOMBRE_MIN = 3;
+    private static final int CAMPO_NOMBRE_MAX = 50;
+    private final static String CAMPO_UBICACION_TEXT = "Ubicación";
+    private static final int CAMPO_UBICACION_MIN = 3;
+    private static final int CAMPO_UBICACION_MAX = 80;
+    private final static String CAMPO_CATEGORIA_TEXT = "Categoría";
+    private static final int CAMPO_CATEGORIA_MIN = 3;
+    private static final int CAMPO_CATEGORIA_MAX = 50;
 
     public BienService() {
         this.bienDAO = new BienDAOImpl();
@@ -26,10 +39,10 @@ public class BienService implements ServiceGenerico<BienDTO> {
     
     @Override
     public BienDTO buscar(int idBien) throws NoSuchElementException {
-        validarID(idBien);
+        Validador.validarId(idBien, CAMPO_ID_TEXT);
         BienDTO bien = bienDAO.buscar(idBien);
         if (bien == null){
-            throw new NoSuchElementException("No existe el Bien");
+            throw new NoSuchElementException("No existe el bien.");
         }
         return bien;
     }
@@ -43,17 +56,17 @@ public class BienService implements ServiceGenerico<BienDTO> {
     public void crear(BienDTO dto){
         // Validamos solo que debemos recibir
         String nombre = dto.getNombre().toUpperCase();
-        validarString(nombre,1);
+        Validador.validarString(nombre,CAMPO_NOMBRE_TEXT,CAMPO_NOMBRE_MIN,CAMPO_NOMBRE_MAX);
         String categoria = dto.getNombreCatBienes().toUpperCase();
-        validarString(categoria,1);
+        Validador.validarString(categoria,CAMPO_CATEGORIA_TEXT,CAMPO_CATEGORIA_MIN,CAMPO_CATEGORIA_MAX);
         String ubicacion = dto.getUbicacionBien().toUpperCase();
-        validarUbicacionBien(ubicacion);
+        Validador.validarString(ubicacion, CAMPO_UBICACION_TEXT,CAMPO_UBICACION_MIN,CAMPO_UBICACION_MAX);
         
         // Una vez validado, dejamos en el dto los datos formateados y agregamos el resto
         dto.setNombre(nombre);
         dto.setNombreCatBienes(categoria);
         dto.setUbicacionBien(ubicacion);
-        dto.setEstadoBien("EN CONDICIONES");
+        dto.setEstadoBien(EstadoBien.EN_CONDICIONES);
         
         // Si no existe la categoría, la creamos
         if (catDAO.buscar(categoria) == null) {
@@ -75,16 +88,16 @@ public class BienService implements ServiceGenerico<BienDTO> {
     
     @Override
     public void modificar(BienDTO dto, int id) throws NoSuchElementException {
-        validarID(id);
+        Validador.validarId(id, CAMPO_ID_TEXT);
         if (bienDAO.buscar(id) == null){
-            throw new NoSuchElementException("No existe el Bien");
+            throw new NoSuchElementException("No existe el bien.");
         }
         String nombre = dto.getNombre().toUpperCase();
-        validarString(nombre,1);
+        Validador.validarString(nombre,CAMPO_NOMBRE_TEXT,CAMPO_NOMBRE_MIN,CAMPO_NOMBRE_MAX);
         String categoria = dto.getNombreCatBienes();
-        validarString(categoria,1);
+        Validador.validarString(categoria,CAMPO_CATEGORIA_TEXT,CAMPO_CATEGORIA_MIN,CAMPO_CATEGORIA_MAX);
         String ubicacion = dto.getUbicacionBien();
-        validarUbicacionBien(ubicacion);
+        Validador.validarString(ubicacion, CAMPO_UBICACION_TEXT,CAMPO_UBICACION_MIN,CAMPO_UBICACION_MAX);
         
         dto.setNombre(nombre);
         dto.setNombreCatBienes(categoria);
@@ -107,51 +120,28 @@ public class BienService implements ServiceGenerico<BienDTO> {
     }
     
     void averiar(int id) throws NoSuchElementException {
-        validarID(id);
+        Validador.validarId(id, CAMPO_ID_TEXT);
         if (bienDAO.buscar(id) == null){
-            throw new NoSuchElementException("No existe el Bien");
+            throw new NoSuchElementException("No existe el bien.");
         }
-        bienDAO.cambiarEstado("AVERIADO", id);
+        bienDAO.cambiarEstado(EstadoBien.AVERIADO, id);
     }
     
     void reparar(int id) throws NoSuchElementException {
-        validarID(id);
+        Validador.validarId(id, CAMPO_ID_TEXT);
         if (bienDAO.buscar(id) == null){
-            throw new NoSuchElementException("No existe el Bien");
+            throw new NoSuchElementException("No existe el bien.");
         }
-        bienDAO.cambiarEstado("EN CONDICIONES", id);
+        bienDAO.cambiarEstado(EstadoBien.EN_CONDICIONES, id);
     }
    
     @Override
     public void eliminar(int idBien) throws NoSuchElementException {
-        validarID(idBien);
+        Validador.validarId(idBien, CAMPO_ID_TEXT);
         if (bienDAO.buscar(idBien) == null){
-            throw new NoSuchElementException("No existe el Bien");
+            throw new NoSuchElementException("No existe el bien.");
         }
         bienDAO.eliminar(idBien);
-    } 
-    
-    private void validarUbicacionBien(String ubi) {
-        if (ubi== null || ubi.length() < 3 || ubi.length() > 80) {
-            throw new IllegalArgumentException("La ubicacion debe tener entre 3 y 80 caracteres");
-        }
-    }
-    private void validarID(Integer id) throws IllegalArgumentException{
-        if (id == null) {
-            throw new IllegalArgumentException("El ID no puede ser nulo.");
-        }
-        if (id <= 0) {
-            throw new IllegalArgumentException("El ID debe ser un número entero positivo.");
-        }
-    }
-    private void validarString(String string,int a) {
-        if (string == null || string.length() < 3 || string.length() > 50) {
-            switch (a){
-                case 1 -> throw new IllegalArgumentException("El nombre debe tener entre 3 y 50 caracteres");
-                case 2 -> throw new IllegalArgumentException("El estado del bien no debe estar vacio");
-                case 3 -> throw new IllegalArgumentException("El Rol debe tener entre 3 y 50 caracteres");
-            } 
-        }
     }
 
 }
