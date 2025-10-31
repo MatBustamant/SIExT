@@ -168,7 +168,7 @@
 
     <script>
         // Obtener productos e ingresos del localStorage
-        const productos = JSON.parse(localStorage.getItem("bienes")) || [];
+        const bienes = JSON.parse(localStorage.getItem("bienes")) || [];
         const eventos = JSON.parse(localStorage.getItem("eventos")) || [];
 
         // Ordenar ingresos por fecha descendente
@@ -183,7 +183,7 @@
 
         while (i < ingresosOrdenados.length && ultimosIngresos.length < 5) {
             const ingresoActual = ingresosOrdenados[i];
-            const productoActual = productos.find(p => p.id === ingresoActual.productoId);
+            const productoActual = bienes.find(p => p.id === ingresoActual.productoId);
 
             let cantidad = 1;
             let j = i + 1;
@@ -191,7 +191,7 @@
             // Contar ingresos consecutivos con mismo nombre y categoría
             while (j < ingresosOrdenados.length) {
                 const siguiente = ingresosOrdenados[j];
-                const productoSiguiente = productos.find(p => p.id === siguiente.productoId);
+                const productoSiguiente = bienes.find(p => p.id === siguiente.productoId);
 
                 if (
                     productoSiguiente.nombre === productoActual.nombre &&
@@ -224,7 +224,7 @@
         const solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
 
         // Calcular bienes averiados
-        const bienesAveriados = productos.filter(p => p.estadoBien === "AVERIADO").length;
+        const bienesAveriados = bienes.filter(p => p.estadoBien === "AVERIADO").length;
 
         // Calcular solicitudes pendientes de entrega
         const solicitudesPendientes = solicitudes.filter(s => s.estado === "APROBADA").length;

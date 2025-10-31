@@ -4,6 +4,7 @@
  */
 package com.grupocapa8.siext.DAO;
 
+import com.grupocapa8.siext.Enums.RolUsuario;
 import com.grupocapa8.siext.ConexionBD.BasedeDatos;
 import com.grupocapa8.siext.DTO.UsuarioDTO;
 import java.sql.Connection;
@@ -31,7 +32,7 @@ public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
                     usuario.setID_Usuario(rs.getInt("ID_Usuario"));
                     usuario.setNombre(rs.getString("Nombre_Usuario"));
                     usuario.setContraseña(rs.getString("Contraseña"));
-                    usuario.setRol(rs.getString("Rol"));
+                    usuario.setRol(RolUsuario.valueOf(rs.getString("Rol")));
                 }
             }
             
@@ -57,7 +58,7 @@ public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
                 usuario.setID_Usuario(rs.getInt("ID_Usuario"));
                 usuario.setNombre(rs.getString("Nombre_Usuario"));
                 usuario.setContraseña(rs.getString("Contraseña"));
-                usuario.setRol(rs.getString("Rol"));
+                usuario.setRol(RolUsuario.valueOf(rs.getString("Rol")));
 
                 usuarios.add(usuario);
             }
@@ -77,7 +78,7 @@ public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
             
                 ps.setString(1, Usuario.getNombre());
                 ps.setString(2, Usuario.getContraseña());
-                ps.setString(3, Usuario.getRol());
+                ps.setString(3, Usuario.getRol().name());
 
                 resultado = ps.executeUpdate();
             
@@ -97,7 +98,7 @@ public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
             
             ps.setString(1, Usuario.getNombre());
             ps.setString(2, Usuario.getContraseña());
-            ps.setString(3, Usuario.getRol());
+            ps.setString(3, Usuario.getRol().name());
             ps.setInt(4, Usuario.getID_Usuario());
 
             resultado = ps.executeUpdate();

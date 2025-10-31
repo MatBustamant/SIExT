@@ -1,5 +1,6 @@
 package com.grupocapa8.siext.DTO;
 
+import com.grupocapa8.siext.Enums.TipoEvento;
 import java.time.Instant;
 
 /**
@@ -10,13 +11,13 @@ public class EventoTrazabilidadDTO {
     private int ID_Evento;
     private Instant FechaEvento;
     private int BienAsociado;
-    private String TipoEvento;
+    private TipoEvento TipoEvento;
 
     
     public EventoTrazabilidadDTO(){
     }
     
-    public EventoTrazabilidadDTO(Instant FechaEvento, Integer BienAsociado, String TipoEvento) {
+    public EventoTrazabilidadDTO(Instant FechaEvento, Integer BienAsociado, TipoEvento TipoEvento) {
         this.FechaEvento = FechaEvento;
         this.BienAsociado = BienAsociado;
         this.TipoEvento = TipoEvento;
@@ -46,11 +47,11 @@ public class EventoTrazabilidadDTO {
         this.BienAsociado = BienAsociado;
     }
 
-    public String getTipoEvento() {
+    public TipoEvento getTipoEvento() {
         return TipoEvento;
     }
 
-    public void setTipoEvento(String TipoEvento) {
+    public void setTipoEvento(TipoEvento TipoEvento) {
         this.TipoEvento = TipoEvento;
     }
 

@@ -1,5 +1,7 @@
 package com.grupocapa8.siext.DTO;
 
+import com.grupocapa8.siext.Enums.RolUsuario;
+
 /**
  *
  * @author geroj
@@ -8,9 +10,9 @@ public class UsuarioDTO {
     private int ID_Usuario;
     private String Nombre;
     private String Contraseña;
-    private String Rol;
+    private RolUsuario Rol;
 
-    public UsuarioDTO(int ID_Usuario, String Nombre, String Contraseña, String Rol) {
+    public UsuarioDTO(int ID_Usuario, String Nombre, String Contraseña, RolUsuario Rol) {
         this.ID_Usuario = ID_Usuario;
         this.Nombre = Nombre;
         this.Contraseña = Contraseña;
@@ -44,11 +46,11 @@ public class UsuarioDTO {
         this.Contraseña = Contraseña;
     }
 
-    public String getRol() {
+    public RolUsuario getRol() {
         return Rol;
     }
 
-    public void setRol(String Rol) {
+    public void setRol(RolUsuario Rol) {
         this.Rol = Rol;
     }
     

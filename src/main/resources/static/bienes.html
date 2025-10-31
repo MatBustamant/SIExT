@@ -146,9 +146,9 @@
 
         // if (!localStorage.getItem("productos")) {
         //     const productosPredef = [
-        //         { id: 1, nombre: "SILLA ERGONÓMICA", categoria: "SILLAS", estado: "EN CONDICIONES", ubicacion: "LUGAR-A" },
-        //         { id: 2, nombre: "SILLA ERGONÓMICA", categoria: "SILLAS", estado: "EN CONDICIONES", ubicacion: "LUGAR-A" },
-        //         { id: 3, nombre: "SILLA ERGONÓMICA", categoria: "SILLAS", estado: "EN CONDICIONES", ubicacion: "LUGAR-A" },
+        //         { id: 1, nombre: "SILLA ERGONÓMICA", categoria: "SILLAS", estado: "EN_CONDICIONES", ubicacion: "LUGAR-A" },
+        //         { id: 2, nombre: "SILLA ERGONÓMICA", categoria: "SILLAS", estado: "EN_CONDICIONES", ubicacion: "LUGAR-A" },
+        //         { id: 3, nombre: "SILLA ERGONÓMICA", categoria: "SILLAS", estado: "EN_CONDICIONES", ubicacion: "LUGAR-A" },
         //     ];
         //     localStorage.setItem("productos", JSON.stringify(productosPredef));
         // }
@@ -313,7 +313,7 @@
                 const datosHTML = `
                 <p><strong>Nombre:</strong> ${bien.nombre}</p>
                 <p><strong>Categoría:</strong> ${bien.nombreCatBienes}</p>
-                <p><strong>Estado:</strong> ${bien.estadoBien}</p>
+                <p><strong>Estado:</strong> ${(bien.estadoBien).replace("_"," ")}</p>
                 <p><strong>Ubicación:</strong> ${bien.ubicacionBien}</p>
                 `;
                 const titulo = `Bien con identificador "${bienIdActual}" encontrado`;
