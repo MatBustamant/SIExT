@@ -70,7 +70,7 @@
                 <div>
                     <select id="filterBienEstado">
                         <option value="">Todos los estados</option>
-                        <option value="EN CONDICIONES">EN CONDICIONES</option>
+                        <option value="EN_CONDICIONES">EN CONDICIONES</option>
                         <option value="AVERIADO">AVERIADO</option>
                     </select>
                 </div>
@@ -153,7 +153,7 @@
                     <td>${prod.id_Bien}</td>
                     <td>${prod.nombre}</td>
                     <td>${prod.nombreCatBienes}</td>
-                <td><span class="badge ${prod.estadoBien === "EN CONDICIONES" ? 'disponible' : 'averiado'}">${prod.estadoBien}</span></td>
+                <td><span class="badge ${prod.estadoBien === "EN_CONDICIONES" ? 'disponible' : 'averiado'}">${prod.estadoBien}</span></td>
                 <td>${prod.ubicacionBien}</td>`;
                         bienesTable.appendChild(row);
                         countBienes++;

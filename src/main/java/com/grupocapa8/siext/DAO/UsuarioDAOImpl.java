@@ -78,7 +78,7 @@ public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
             
                 ps.setString(1, Usuario.getNombre());
                 ps.setString(2, Usuario.getContraseña());
-                ps.setString(3, Usuario.getRol().getNombre());
+                ps.setString(3, Usuario.getRol().name());
 
                 resultado = ps.executeUpdate();
             
@@ -98,7 +98,7 @@ public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
             
             ps.setString(1, Usuario.getNombre());
             ps.setString(2, Usuario.getContraseña());
-            ps.setString(3, Usuario.getRol().getNombre());
+            ps.setString(3, Usuario.getRol().name());
             ps.setInt(4, Usuario.getID_Usuario());
 
             resultado = ps.executeUpdate();

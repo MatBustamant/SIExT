@@ -108,7 +108,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
 
             ps.setString(1, bien.getNombre());
             ps.setInt(2, idCategoria); //el id de categoria que mande a buscar antes
-            ps.setString(3, bien.getEstadoBien().getNombre());
+            ps.setString(3, bien.getEstadoBien().name());
             ps.setInt(4, idUbicacion);
             
             resultado = ps.executeUpdate();
@@ -158,7 +158,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
-            ps.setString(1, estado.getNombre());
+            ps.setString(1, estado.name());
             ps.setInt(2, id);
             
             ps.executeUpdate();

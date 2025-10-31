@@ -102,7 +102,7 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
-            ps.setString(1, Solicitud.getEstado().getNombre());
+            ps.setString(1, Solicitud.getEstado().name());
             ps.setInt(2, idUbicacion);
             ps.setString(3, Solicitud.getDescripcion());
             
@@ -123,7 +123,7 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
-            ps.setString(1, Solicitud.getEstado().getNombre());
+            ps.setString(1, Solicitud.getEstado().name());
             ps.setInt(2, idUbicacion);
             ps.setString(3, Solicitud.getDescripcion());
             ps.setInt(4, Solicitud.getNumSolicitud());

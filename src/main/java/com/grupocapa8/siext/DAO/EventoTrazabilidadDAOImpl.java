@@ -121,7 +121,7 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, Evento.getBienAsociado());
-            ps.setString(2, Evento.getTipoEvento().getNombre());
+            ps.setString(2, Evento.getTipoEvento().name());
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
@@ -155,7 +155,7 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, Evento.getBienAsociado());
-            ps.setString(2, Evento.getTipoEvento().getNombre());
+            ps.setString(2, Evento.getTipoEvento().name());
             ps.setInt(3, Evento.getID_Evento());
             
             resultado = ps.executeUpdate();
