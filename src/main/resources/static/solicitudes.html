@@ -181,7 +181,7 @@
                         <td>${sol.numSolicitud}</td>
                         <td>${new Date(sol.fechaInicioSolicitud).toLocaleString()}</td>
                         <td>${sol.ubicacionBienes}</td>
-                        <td>${sol.estado}</td>
+                        <td>${(sol.estado).replace("_"," ")}</td>
                         <td>
                             <button class="btn" onclick="editarSolicitud(${sol.numSolicitud})"><i class="bi bi-pencil"></i></button>
                         </td>`;

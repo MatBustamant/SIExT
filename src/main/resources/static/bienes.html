@@ -313,7 +313,7 @@
                 const datosHTML = `
                 <p><strong>Nombre:</strong> ${bien.nombre}</p>
                 <p><strong>Categoría:</strong> ${bien.nombreCatBienes}</p>
-                <p><strong>Estado:</strong> ${bien.estadoBien}</p>
+                <p><strong>Estado:</strong> ${(bien.estadoBien).replace("_"," ")}</p>
                 <p><strong>Ubicación:</strong> ${bien.ubicacionBien}</p>
                 `;
                 const titulo = `Bien con identificador "${bienIdActual}" encontrado`;
