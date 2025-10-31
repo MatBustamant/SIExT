@@ -1,6 +1,6 @@
 package com.grupocapa8.siext.Services;
 
-import Enums.RolUsuario;
+import com.grupocapa8.siext.Enums.RolUsuario;
 import com.grupocapa8.siext.DAO.UsuarioDAOImpl;
 import com.grupocapa8.siext.DTO.UsuarioDTO;
 import com.grupocapa8.siext.Util.Validador;

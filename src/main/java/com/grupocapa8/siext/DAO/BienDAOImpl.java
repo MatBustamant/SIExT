@@ -4,7 +4,7 @@
  */
 package com.grupocapa8.siext.DAO;
 
-import Enums.EstadoBien;
+import com.grupocapa8.siext.Enums.EstadoBien;
 import com.grupocapa8.siext.ConexionBD.BasedeDatos;
 import com.grupocapa8.siext.DTO.BienDTO;
 import java.sql.Connection;

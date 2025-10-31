@@ -1,6 +1,6 @@
 package com.grupocapa8.siext.Services;
 
-import Enums.TipoEvento;
+import com.grupocapa8.siext.Enums.TipoEvento;
 import com.grupocapa8.siext.DAO.EventoTrazabilidadDAOImpl;
 import com.grupocapa8.siext.DTO.EventoTrazabilidadDTO;
 import com.grupocapa8.siext.Util.Validador;

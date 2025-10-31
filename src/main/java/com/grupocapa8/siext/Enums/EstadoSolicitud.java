@@ -2,16 +2,18 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Enum.java to edit this template
  */
-package Enums;
+package com.grupocapa8.siext.Enums;
 
 /**
  *
  * @author Matias
  */
-public enum RolUsuario {
-    ADMINISTRATIVO,
-    SUPERVISOR;
-
+public enum EstadoSolicitud {
+    POR_REVISAR,
+    APROBADA,
+    DESAPROBADA,
+    SATISFECHA;
+    
     @Override
     public String toString() {
         return name();

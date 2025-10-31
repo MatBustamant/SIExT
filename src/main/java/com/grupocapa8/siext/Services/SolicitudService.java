@@ -1,6 +1,6 @@
 package com.grupocapa8.siext.Services;
 
-import Enums.EstadoSolicitud;
+import com.grupocapa8.siext.Enums.EstadoSolicitud;
 import com.grupocapa8.siext.DAO.SolicitudDAOImpl;
 import com.grupocapa8.siext.DAO.UbicacionDAOImpl;
 import com.grupocapa8.siext.DTO.SolicitudDTO;

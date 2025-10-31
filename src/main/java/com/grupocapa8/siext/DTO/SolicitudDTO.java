@@ -1,6 +1,6 @@
 package com.grupocapa8.siext.DTO;
 
-import Enums.EstadoSolicitud;
+import com.grupocapa8.siext.Enums.EstadoSolicitud;
 import java.time.Instant;
 
 /**

@@ -4,7 +4,7 @@
  */
 package com.grupocapa8.siext.DAO;
 
-import Enums.RolUsuario;
+import com.grupocapa8.siext.Enums.RolUsuario;
 import com.grupocapa8.siext.ConexionBD.BasedeDatos;
 import com.grupocapa8.siext.DTO.UsuarioDTO;
 import java.sql.Connection;

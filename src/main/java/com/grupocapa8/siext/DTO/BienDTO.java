@@ -1,6 +1,6 @@
 package com.grupocapa8.siext.DTO;
 
-import Enums.EstadoBien;
+import com.grupocapa8.siext.Enums.EstadoBien;
 
 /**
  *

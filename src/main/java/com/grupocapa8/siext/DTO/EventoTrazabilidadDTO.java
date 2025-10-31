@@ -1,6 +1,6 @@
 package com.grupocapa8.siext.DTO;
 
-import Enums.TipoEvento;
+import com.grupocapa8.siext.Enums.TipoEvento;
 import java.time.Instant;
 
 /**

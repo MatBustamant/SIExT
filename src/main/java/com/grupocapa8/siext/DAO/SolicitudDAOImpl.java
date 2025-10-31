@@ -4,7 +4,7 @@
  */
 package com.grupocapa8.siext.DAO;
 
-import Enums.EstadoSolicitud;
+import com.grupocapa8.siext.Enums.EstadoSolicitud;
 import com.grupocapa8.siext.ConexionBD.BasedeDatos;
 import static com.grupocapa8.siext.ConexionBD.BasedeDatos.getConnection;
 import com.grupocapa8.siext.DTO.SolicitudDTO;

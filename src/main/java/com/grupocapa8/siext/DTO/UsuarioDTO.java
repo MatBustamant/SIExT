@@ -1,6 +1,6 @@
 package com.grupocapa8.siext.DTO;
 
-import Enums.RolUsuario;
+import com.grupocapa8.siext.Enums.RolUsuario;
 
 /**
  *

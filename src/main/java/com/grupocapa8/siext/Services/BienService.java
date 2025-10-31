@@ -1,6 +1,6 @@
 package com.grupocapa8.siext.Services;
 
-import Enums.EstadoBien;
+import com.grupocapa8.siext.Enums.EstadoBien;
 import com.grupocapa8.siext.DAO.BienDAOImpl;
 import com.grupocapa8.siext.DAO.CategoriaDAOImpl;
 import com.grupocapa8.siext.DAO.UbicacionDAOImpl;
