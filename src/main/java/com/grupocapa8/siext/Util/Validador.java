@@ -39,9 +39,13 @@ public class Validador {
     }
     
     public static void validarContraseña(String contraseña){
+        // 0. Campo no nulo
+        if (contraseña==null) {
+            throw new IllegalArgumentException("El campo contraseña no puede ser nulo.");
+        }
         // 1. Longitud mínima y máxima
-        if (contraseña==null || contraseña.length() < 8 || contraseña.length() > 64) {
-            throw new IllegalArgumentException("La contraseña debe tener entre 8 y 64 caracteres."); 
+        if (contraseña.length() < 8 || contraseña.length() > 64) {
+            throw new IllegalArgumentException("La contraseña debe tener entre 8 y 64 caracteres.");
         }
         // 2. Al menos una mayúscula
         if (!contraseña.matches(".*[A-Z].*")) {
