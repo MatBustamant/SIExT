@@ -9,21 +9,11 @@ package Enums;
  * @author Matias
  */
 public enum RolUsuario {
-    ADMINISTRATIVO("ADMINISTRATIVO"),
-    SUPERVISOR("SUPERVISOR");
-    
-    private final String nombre;
-
-    private RolUsuario(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
+    ADMINISTRATIVO,
+    SUPERVISOR;
 
     @Override
     public String toString() {
-        return nombre;
+        return name();
     }
 }

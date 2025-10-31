@@ -9,21 +9,11 @@ package Enums;
  * @author Matias
  */
 public enum EstadoBien {
-    EN_CONDICIONES("EN CONDICIONES"),
-    AVERIADO("AVERIADO");
-
-    private final String nombre;
-
-    private EstadoBien(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
+    EN_CONDICIONES,
+    AVERIADO;
 
     @Override
     public String toString() {
-        return nombre;
+        return name();
     }
 }

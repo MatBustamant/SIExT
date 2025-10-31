@@ -9,22 +9,12 @@ package Enums;
  * @author Matias
  */
 public enum TipoEvento {
-    AVERIO("AVERIO"),
-    REPARACION("REPARACION"),
-    ENTREGA("ENTREGA");
-
-    private final String nombre;
-
-    private TipoEvento(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
+    AVERIO,
+    REPARACION,
+    ENTREGA;
+    
     @Override
     public String toString() {
-        return nombre;
+        return name();
     }
 }
