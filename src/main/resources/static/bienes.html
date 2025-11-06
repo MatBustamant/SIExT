@@ -45,7 +45,19 @@
 </head>
 
 <body>
-    <header>SIExT | Gestionar bienes</header>
+    <header>
+        <span>SIExT | Gestionar bienes</span>
+        <div id="userInfo" class="user-info">
+            <span id="username"></span>
+            <i class="bi bi-person-circle"></i>
+            <div id="userMenu" class="user-menu hidden">
+                <p id="userRole"><i id="rolIcon" class="bi bi-person-circle"></i></p>
+                <button id="logoutBtn" class="btn btn-danger">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                </button>
+            </div>
+        </div>
+    </header>
 
     <div class="default-block-container">
         <nav>
@@ -55,7 +67,8 @@
                 <li><a href="categorias.html" class="btn"><i class="bi bi-tags"></i>Editar Categorías</a></li>
                 <li><a href="ubicaciones.html" class="btn"><i class="bi bi-geo-alt"></i>Editar Ubicaciones</a></li>
                 <li><a href="inventario.html" class="btn"><i class="bi bi-card-list"></i></i>Listar Inventario</a></li>
-                <li><a href="eventos.html" class="btn"><i class="bi bi-exclamation-circle"></i>Registrar Eventos</a></li>
+                <li><a href="eventos.html" class="btn"><i class="bi bi-exclamation-circle"></i>Registrar Eventos</a>
+                </li>
             </ul>
         </nav>
     </div>
@@ -142,27 +155,10 @@
 
     <footer>SIExT | 2025</footer>
 
+    <script src="js/auth.js"></script>
     <script>
-
-        // if (!localStorage.getItem("productos")) {
-        //     const productosPredef = [
-        //         { id: 1, nombre: "SILLA ERGONÓMICA", categoria: "SILLAS", estado: "EN_CONDICIONES", ubicacion: "LUGAR-A" },
-        //         { id: 2, nombre: "SILLA ERGONÓMICA", categoria: "SILLAS", estado: "EN_CONDICIONES", ubicacion: "LUGAR-A" },
-        //         { id: 3, nombre: "SILLA ERGONÓMICA", categoria: "SILLAS", estado: "EN_CONDICIONES", ubicacion: "LUGAR-A" },
-        //     ];
-        //     localStorage.setItem("productos", JSON.stringify(productosPredef));
-        // }
-
-        // if (!localStorage.getItem("ingresos")) {
-        //     const ingresosPredef = [
-        //         { id: 1, productoId: 1, fecha: "2025-01-01T22:10:12.781Z" },
-        //         { id: 2, productoId: 2, fecha: "2025-01-03T22:10:12.781Z" },
-        //         { id: 3, productoId: 3, fecha: "2025-01-04T22:10:12.781Z" }
-        //     ];
-        //     localStorage.setItem("ingresos", JSON.stringify(ingresosPredef));
-        // }
+        verificarAuth();
     </script>
-
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
 
@@ -256,8 +252,8 @@
                 return;
             }
 
-            if (cantBienes > 1) {alert(`${cantBienes} bienes registrados.`);}
-            else {alert("Bien registrado.");}
+            if (cantBienes > 1) { alert(`${cantBienes} bienes registrados.`); }
+            else { alert("Bien registrado."); }
             await recargarBienes();
             await recargarCategorias();
             await recargarUbicaciones();
@@ -310,15 +306,15 @@
 
             modificarContenedor.classList.remove("hidden");
             // Mostrar todos los datos actuales
-                const datosHTML = `
+            const datosHTML = `
                 <p><strong>Nombre:</strong> ${bien.nombre}</p>
                 <p><strong>Categoría:</strong> ${bien.nombreCatBienes}</p>
-                <p><strong>Estado:</strong> ${(bien.estadoBien).replace("_"," ")}</p>
+                <p><strong>Estado:</strong> ${(bien.estadoBien).replace("_", " ")}</p>
                 <p><strong>Ubicación:</strong> ${bien.ubicacionBien}</p>
                 `;
-                const titulo = `Bien con identificador "${bienIdActual}" encontrado`;
-                document.getElementById("tituloProductoEncontrado").textContent = titulo;
-                document.getElementById("datosProductoEncontrado").innerHTML = datosHTML;
+            const titulo = `Bien con identificador "${bienIdActual}" encontrado`;
+            document.getElementById("tituloProductoEncontrado").textContent = titulo;
+            document.getElementById("datosProductoEncontrado").innerHTML = datosHTML;
 
             // Ocultar formularios
             document.getElementById("formModificarDatos").classList.add("hidden");
@@ -384,8 +380,8 @@
                             alert("El servidor no pudo realizar la modificación del bien. Código: 500");
                             return;
                         } else {
-                        alert(`El servidor no pudo realizar la modificación del bien. Código: ${response.status}`);
-                        return;
+                            alert(`El servidor no pudo realizar la modificación del bien. Código: ${response.status}`);
+                            return;
                         }
                     }
                 } catch (error) {

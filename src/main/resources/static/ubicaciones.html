@@ -12,7 +12,19 @@
 </head>
 
 <body>
-    <header>SIExT | Editar ubicaciones</header>
+    <header>
+        <span>SIExT | Editar ubicaciones</span>
+        <div id="userInfo" class="user-info">
+            <span id="username"></span>
+            <i class="bi bi-person-circle"></i>
+            <div id="userMenu" class="user-menu hidden">
+                <p id="userRole"><i id="rolIcon" class="bi bi-person-circle"></i></p>
+                <button id="logoutBtn" class="btn btn-danger">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                </button>
+            </div>
+        </div>
+    </header>
 
     <div class="default-block-container">
         <nav>
@@ -21,7 +33,8 @@
                 <li><a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver a Panel</a></li>
                 <li><a href="inventario.html" class="btn"><i class="bi bi-card-list"></i></i>Ver Inventario</a></li>
                 <li><a href="bienes.html" class="btn"><i class="bi bi-box-seam"></i>Gestionar Bienes</a></li>
-                <li><a href="solicitudes.html" class="btn"><i class="bi bi-card-checklist"></i>Gestionar Solicitudes</a></li>
+                <li><a href="solicitudes.html" class="btn"><i class="bi bi-card-checklist"></i>Gestionar Solicitudes</a>
+                </li>
             </ul>
         </nav>
     </div>
@@ -83,6 +96,10 @@
 
     <footer>SIExT | 2025</footer>
 
+    <script src="js/auth.js"></script>
+    <script>
+        verificarAuth();
+    </script>
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script>
@@ -168,8 +185,8 @@
                         return;
                     }
                     else {
-                    alert(`El servidor no pudo realizar el registro de la ubicación. Código: ${response.status}`);
-                    return;
+                        alert(`El servidor no pudo realizar el registro de la ubicación. Código: ${response.status}`);
+                        return;
                     }
                 }
             } catch (error) {
@@ -247,8 +264,8 @@
                         alert("El servidor no pudo realizar la modificación de la ubicación. Código: 500");
                         return;
                     } else {
-                    alert(`El servidor no pudo realizar la modificación de la ubicación. Código: ${response.status}`);
-                    return;
+                        alert(`El servidor no pudo realizar la modificación de la ubicación. Código: ${response.status}`);
+                        return;
                     }
                 }
             } catch (error) {

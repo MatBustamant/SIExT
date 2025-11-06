@@ -13,7 +13,19 @@
 
 <body>
 
-    <header>SIExT | Registrar eventos</header>
+    <header>
+        <span>SIExT | Registrar eventos</span>
+        <div id="userInfo" class="user-info">
+            <span id="username"></span>
+            <i class="bi bi-person-circle"></i>
+            <div id="userMenu" class="user-menu hidden">
+                <p id="userRole"><i id="rolIcon" class="bi bi-person-circle"></i></p>
+                <button id="logoutBtn" class="btn btn-danger">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                </button>
+            </div>
+        </div>
+    </header>
 
     <div class="default-block-container">
         <nav>
@@ -122,6 +134,10 @@
 
     <footer>SIExT | 2025</footer>
 
+    <script src="js/auth.js"></script>
+    <script>
+        verificarAuth();
+    </script>
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script>
@@ -200,8 +216,8 @@
                         return;
                     }
                     else {
-                    alert(`El servidor no pudo realizar el registro del evento. Código: ${response.status}`);
-                    return;
+                        alert(`El servidor no pudo realizar el registro del evento. Código: ${response.status}`);
+                        return;
                     }
                 }
             } catch (error) {
@@ -279,8 +295,8 @@
                         alert("El servidor no pudo realizar la modificación del evento. Código: 500");
                         return;
                     } else {
-                    alert(`El servidor no pudo realizar la modificación del evento. Código: ${response.status}`);
-                    return;
+                        alert(`El servidor no pudo realizar la modificación del evento. Código: ${response.status}`);
+                        return;
                     }
                 }
             } catch (error) {

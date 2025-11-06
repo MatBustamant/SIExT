@@ -12,7 +12,19 @@
 </head>
 
 <body>
-    <header>SIExT | Gestionar solicitudes</header>
+    <header>
+        <span>SIExT | Gestionar solicitudes</span>
+        <div id="userInfo" class="user-info">
+            <span id="username"></span>
+            <i class="bi bi-person-circle"></i>
+            <div id="userMenu" class="user-menu hidden">
+                <p id="userRole"><i id="rolIcon" class="bi bi-person-circle"></i></p>
+                <button id="logoutBtn" class="btn btn-danger">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                </button>
+            </div>
+        </div>
+    </header>
 
     <div class="default-block-container">
         <nav>
@@ -119,33 +131,9 @@
 
     <footer>SIExT | 2025</footer>
 
+    <script src="js/auth.js"></script>
     <script>
-        // if (!localStorage.getItem("solicitudes")) {
-        //     const solicitudesIniciales = [
-        //         {
-        //             id: 1,
-        //             fecha: "2025-06-15",
-        //             ubicacion: "GAME",
-        //             estado: "Pendiente de aprobación",
-        //             descripcion: "5 resmas A4, 2 toners HP 85A"
-        //         },
-        //         {
-        //             id: 2,
-        //             fecha: "2025-06-16",
-        //             ubicacion: "Parque Industrial",
-        //             estado: "Aprobada",
-        //             descripcion: "20 metros cable 2,5mm, 5 tubos LED 18W"
-        //         },
-        //         {
-        //             id: 3,
-        //             fecha: "2025-06-17",
-        //             ubicacion: "Bedelía",
-        //             estado: "Aprobada",
-        //             descripcion: "1 Mouse"
-        //         }
-        //     ];
-        //     localStorage.setItem("solicitudes", JSON.stringify(solicitudesIniciales));
-        // }
+        verificarAuth();
     </script>
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
@@ -181,7 +169,7 @@
                         <td>${sol.numSolicitud}</td>
                         <td>${new Date(sol.fechaInicioSolicitud).toLocaleString()}</td>
                         <td>${sol.ubicacionBienes}</td>
-                        <td>${(sol.estado).replace("_"," ")}</td>
+                        <td>${(sol.estado).replace("_", " ")}</td>
                         <td>
                             <button class="btn" onclick="editarSolicitud(${sol.numSolicitud})"><i class="bi bi-pencil"></i></button>
                         </td>`;
@@ -202,7 +190,7 @@
             const sel = document.getElementById(idSelect);
             sel.innerHTML = "";
             const cats = JSON.parse(localStorage.getItem("ubicaciones")) || [];
-            if(idSelect == "filterUbicacion") {
+            if (idSelect == "filterUbicacion") {
                 const opt = document.createElement("option");
                 opt.value = "";
                 opt.textContent = "Todas las ubicaciones";
@@ -251,8 +239,8 @@
                         return;
                     }
                     else {
-                    alert(`El servidor no pudo realizar el registro de la solicitud. Código: ${response.status}`);
-                    return;
+                        alert(`El servidor no pudo realizar el registro de la solicitud. Código: ${response.status}`);
+                        return;
                     }
                 }
             } catch (error) {
@@ -331,8 +319,8 @@
                         alert("El servidor no pudo realizar la modificación de la solicitud. Código: 500");
                         return;
                     } else {
-                    alert(`El servidor no pudo realizar la modificación de la solicitud. Código: ${response.status}`);
-                    return;
+                        alert(`El servidor no pudo realizar la modificación de la solicitud. Código: ${response.status}`);
+                        return;
                     }
                 }
             } catch (error) {
