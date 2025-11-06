@@ -41,6 +41,31 @@ public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
         }
         return usuario;
     }
+    
+    public UsuarioDTO buscar(String nombreUsuario) {
+        UsuarioDTO usuario = null;
+        String sql = "SELECT ID_Usuario, Nombre_Usuario, Contraseña, Rol FROM Usuario WHERE Nombre_Usuario = ? AND Eliminado = ?";
+        
+        try(Connection con = BasedeDatos.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setString(1, nombreUsuario);
+            ps.setInt(2,0);
+            try(ResultSet rs = ps.executeQuery()) {
+                if(rs.next()){
+                    usuario = new UsuarioDTO();
+                    usuario.setID_Usuario(rs.getInt("ID_Usuario"));
+                    usuario.setNombre(rs.getString("Nombre_Usuario"));
+                    usuario.setContraseña(rs.getString("Contraseña"));
+                    usuario.setRol(RolUsuario.valueOf(rs.getString("Rol")));
+                }
+            }
+            
+        } catch (SQLException ex) {
+            System.getLogger(UsuarioDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+        return usuario;
+    }
 
     @Override
     public List<UsuarioDTO> buscarTodos() {
