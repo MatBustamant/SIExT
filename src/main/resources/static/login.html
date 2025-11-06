@@ -86,10 +86,17 @@
     </div>
 
     <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
     <script>
-        if (localStorage.getItem('auth')) {
+        // Si ya está autenticado, redirigir al panel principal
+        if (obtenerAuth()) {
             window.location.href = 'panel.html';
+        } else {
+            // Sino, mostramos el contenido
+            document.body.style.display = 'flex';
         }
+    </script>
+    <script>
         document.getElementById('loginForm').onsubmit = async (e) => {
             e.preventDefault();
             const nombreUsuario = document.getElementById('user').value.trim().toUpperCase();

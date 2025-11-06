@@ -18,6 +18,9 @@ function verificarAuth(rolRequerido = null, loginPanel = true) {
         return;
     }
 
+    // Si las validaciones pasaron, mostrar el contenido
+    document.body.style.display = 'flex';
+
     if (loginPanel && auth) {
         // Mostrar datos del usuario en el header
         const usernameEl = document.getElementById('username');
