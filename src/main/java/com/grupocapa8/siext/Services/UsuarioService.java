@@ -89,4 +89,22 @@ public class UsuarioService implements ServiceGenerico<UsuarioDTO> {
         usuarioDAO.eliminar(idUsuario);
     }
     
+    public UsuarioDTO login(String nombreUsuario, String contraseña) throws NoSuchElementException, IllegalArgumentException, SecurityException {
+        // Validamos que las credenciales estén correctemente formateadas
+        Validador.validarString(nombreUsuario, CAMPO_NOMBRE_TEXT, CAMPO_NOMBRE_MIN, CAMPO_NOMBRE_MAX);
+        Validador.validarContraseña(contraseña);
+        // Buscamos si existe el usuario
+        UsuarioDTO usuario = usuarioDAO.buscar(nombreUsuario);
+        if (usuario == null) {
+            throw new NoSuchElementException("No existe el usuario");
+        }
+        // Si existe, chequeamos que las contraseñas coincidan
+        if (!BCrypt.checkpw(contraseña, usuario.getContraseña())) {
+            throw new SecurityException("Contraseña incorrecta");
+        }
+        // Quitamos la contraseña del DTO y lo devolvemos
+        usuario.setContraseña(null);
+        return usuario;
+    }
+    
 }
