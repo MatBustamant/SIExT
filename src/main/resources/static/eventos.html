@@ -174,7 +174,7 @@
                         <td>${evento.id_Evento}</td>
                         <td>${formatearNroBien(evento.bienAsociado)}</td>
                         <td>${evento.tipoEvento}</td>
-                        <td>${new Date(evento.fechaEvento).toLocaleString()}</td>
+                        <td>${new Date(evento.fechaEvento).toLocaleString().replace(",", "")}</td>
                         <td>
                             <button class="btn" onClick="editarEvento(${evento.id_Evento})"><i class="bi bi-pencil"></i></button>
                         </td>

@@ -58,10 +58,10 @@
     const ingresosFiltrados = Object.values(
       eventos
         .filter(i => i.tipoEvento === "ENTREGA")
-        .filter(i => i.fechaEvento >= desde && i.fechaEvento <= hasta)
+        .filter(i => new Date(i.fechaEvento).toLocaleDateString("en-CA") >= desde && new Date(i.fechaEvento).toLocaleDateString("en-CA") <= hasta)
         .reduce((acc, i) => {
           const p = bienes.find(prod => prod.id_Bien === i.bienAsociado);
-          const fecha = i.fechaEvento.split("T")[0] + " " + i.fechaEvento.split("T")[1].replace("Z", "");
+          const fecha = `${new Date(i.fechaEvento).toLocaleString().replace(",", "")}`;
           const nombre = p ? p.nombre : "Producto eliminado";
           const categoria = p ? p.nombreCatBienes : "-";
 
