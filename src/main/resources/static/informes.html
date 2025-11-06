@@ -88,9 +88,10 @@
   <script>
       verificarAuth("SUPERVISOR");
   </script>
+  <script src="js/fechas.js"></script>
   <script>
     // Fecha actual local en formato YYYY-MM-DD
-    const hoy = new Date().toLocaleDateString("en-CA");
+    const hoy = obtenerFechaHoy();
 
     // Establecer máximo (hoy) para todos los inputs tipo date
     document.querySelectorAll('input[type="date"]').forEach(input => input.setAttribute("max", hoy));
@@ -116,20 +117,8 @@
       const desde = desdeIngresos.value;
       const hasta = hastaIngresos.value;
 
-      if (!desde || !hasta) {
-        alert("Seleccioná ambas fechas.");
-        return;
-      }
-
-      if (desde > hasta) {
-        alert("La fecha inicial no puede ser posterior a la fecha final.");
-        return;
-      }
-
-      if (desde > hoy || hasta > hoy) {
-        alert("Las fechas no pueden ser futuras.");
-        return;
-      }
+      const error = validarRangoFechas(desde, hasta, hoy);
+      if (error) return alert(error);
 
       window.location.href = `informe_ingresos.html?desde=${desde}&hasta=${hasta}`;
     };
@@ -157,20 +146,8 @@
       const desde = desdeSolicitudes.value;
       const hasta = hastaSolicitudes.value;
 
-      if (!desde || !hasta) {
-        alert("Seleccioná ambas fechas.");
-        return;
-      }
-
-      if (desde > hasta) {
-        alert("La fecha inicial no puede ser posterior a la fecha final.");
-        return;
-      }
-
-      if (desde > hoy || hasta > hoy) {
-        alert("Las fechas no pueden ser futuras.");
-        return;
-      }
+      const error = validarRangoFechas(desde, hasta, hoy);
+      if (error) return alert(error);
 
       window.location.href = `informe_solicitudes_dpto.html?desde=${desde}&hasta=${hasta}`;
     };

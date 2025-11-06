@@ -40,8 +40,9 @@
     <script>
         verificarAuth("SUPERVISOR", false);
     </script>
+    <script src="js/fechas.js"></script>
   <script>
-    document.getElementById("fechaActual").textContent = new Date().toLocaleString();
+    document.getElementById("fechaActual").textContent = obtenerFechaHoraActual();
 
     const params = new URLSearchParams(window.location.search);
     const desde = params.get("desde");
@@ -58,10 +59,13 @@
     const ingresosFiltrados = Object.values(
       eventos
         .filter(i => i.tipoEvento === "ENTREGA")
-        .filter(i => new Date(i.fechaEvento).toLocaleDateString("en-CA") >= desde && new Date(i.fechaEvento).toLocaleDateString("en-CA") <= hasta)
+        .filter(i => {
+          const fechaEventoLocal = formatearFechaLocal(i.fechaEvento);
+          return fechaEventoLocal >= desde && fechaEventoLocal <= hasta;
+        })
         .reduce((acc, i) => {
           const p = bienes.find(prod => prod.id_Bien === i.bienAsociado);
-          const fecha = `${new Date(i.fechaEvento).toLocaleString().replace(",", "")}`;
+          const fecha = formatearFechaHora(i.fechaEvento);
           const nombre = p ? p.nombre : "Producto eliminado";
           const categoria = p ? p.nombreCatBienes : "-";
 

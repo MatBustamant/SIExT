@@ -145,6 +145,7 @@
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script src="js/formateo.js"></script>
+    <script src="js/fechas.js"></script>
     <script>
         recargarEventos();
         recargarBienes();
@@ -163,7 +164,7 @@
             eventos.forEach(evento => {
                 const matchBienInput = numero => String(formatearNroBien(evento.bienAsociado)).includes(numero);
                 const matchTipoEvento = (tipo, filtro) => !filtro || tipo === filtro;
-                const matchFecha = (fechaEvento, filtro) => !filtro || new Date(fechaEvento).toLocaleDateString("en-CA") === filtro;
+                const matchFecha = (fechaEvento, filtro) => !filtro || formatearFechaLocal(fechaEvento) === filtro;
 
                 if (matchBienInput(filterBienInput.value) &&
                     matchTipoEvento(evento.tipoEvento, filterTipoEvento.value) &&
@@ -174,7 +175,7 @@
                         <td>${evento.id_Evento}</td>
                         <td>${formatearNroBien(evento.bienAsociado)}</td>
                         <td>${evento.tipoEvento}</td>
-                        <td>${new Date(evento.fechaEvento).toLocaleString().replace(",", "")}</td>
+                        <td>${formatearFechaHora(evento.fechaEvento)}</td>
                         <td>
                             <button class="btn" onClick="editarEvento(${evento.id_Evento})"><i class="bi bi-pencil"></i></button>
                         </td>
