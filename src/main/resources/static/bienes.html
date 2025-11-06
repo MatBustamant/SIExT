@@ -7,39 +7,29 @@
     <title>Gestionar bienes - SIExT</title>
     <link href="icons/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/tablas.css">
     <link rel="icon" href="images\icon.png">
     <style>
-        :root {
-            --modificar-bg: #e9f0ff;
-            --modificar-border: #8ab4f8;
+        .badge {
+            display: inline-block;
+            padding: 0.25em 0.5em;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 0.8rem;
+            text-align: center;
         }
 
-        .modificar-container {
-            margin-top: 1rem;
-            padding: 1.5rem;
-            background-color: var(--modificar-bg);
-            border: 2px solid var(--modificar-border);
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(27, 84, 255, 0.15);
+        .badge.disponible {
+            background-color: var(--verde);
         }
 
-        #datosProductoEncontrado {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.5rem 1rem;
+        .badge.averiado {
+            background-color: var(--rojo);
         }
 
-        #datosProductoEncontrado p {
-            margin: 0;
-        }
-
-        .modificar-container h3 {
-            margin-bottom: 1rem;
-        }
-
-        .actions {
-            display: flex;
-            flex-wrap: wrap;
+        .badge.reservado {
+            background-color: var(--amarillo);
+            color: var(--negro);
         }
     </style>
 </head>
@@ -108,60 +98,77 @@
             </form>
         </section>
 
-        <!-- Formulario buscar y modificar producto existente -->
+        <!-- Gestión de bienes -->
         <section>
-            <h2>Modificar bien existente</h2>
-            <form id="busquedaForm">
-                <label>Nro. de inventario</label>
-                <div class="input-prefix">
-                    <span>FCE-</span>
-                    <input type="number" id="buscarId" required>
+            <h2>Bienes registrados</h2>
+            <!-- Filtros -->
+            <div class="form-grid">
+                <div>
+                    <input type="text" id="filterBienInput" placeholder="Filtrar por nombre o nro. de inventario...">
                 </div>
-                <button type="submit" class="btn"><i class="bi bi-search"></i>Buscar</button>
-            </form>
+                <div>
+                    <input list="categoriasSugeridas" type="text" id="filterBienCategoria" placeholder="Filtrar por ubicación..."></input>
+                </div>
+                <div>
+                    <select id="filterBienEstado">
+                        <option value="">Todos los estados</option>
+                        <option value="EN_CONDICIONES">EN CONDICIONES</option>
+                        <option value="AVERIADO">AVERIADO</option>
+                    </select>
+                </div>
+                <div>
+                    <input list="ubicacionesSugeridas" type="text" id="filterBienUbicacion" placeholder="Filtrar por ubicación..."></select>
+                </div>
+            </div>
 
-            <div class="modificar-container hidden" id="modificarContenedor">
-                <h3 id="tituloProductoEncontrado">Bien encontrado</h3>
+            <table id="bienesTable">
+                <thead>
+                    <tr>
+                        <th>Nro. de inv.</th>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Estado</th>
+                        <th>Ubicación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
 
-                <!-- Datos actuales del producto -->
-                <div id="datosProductoEncontrado" style="margin-bottom: 1rem; line-height: 1.5;"></div>
+                <tbody></tbody>
+            </table>
 
-                <!-- Botones de acción -->
+            <div class="informativo" id="counterBienes"></div>
+        </section>
+
+        <!-- Formulario para modificar bien seleccionado -->
+        <section id="modificarBienSection" class="hidden">
+            <h2>Actualizar bien</h2>
+            <form id="modificarBienForm">
+                <input type="hidden" id="modBienId">
+                <div>
+                    <label>Categoría</label>
+                    <input list="categoriasSugeridas" type="text" id="modCategoria" required>
+                </div>
+                <div>
+                    <label>Nombre</label>
+                    <input type="text" id="modNombre" required>
+                </div>
+                <div>
+                    <label>Ubicación</label>
+                    <input list="ubicacionesSugeridas" type="text" id="modUbicacion" required>
+                </div>
+                <div>
+                    <label>Detalle</label>
+                    <input type="text" id="modDetalleProducto" placeholder="Detalles extras opcionales...">
+                </div>
                 <div class="btn-row">
-                    <button type="button" class="btn" id="btnEditarDatos"><i class="bi bi-pencil-square"></i>Modificar
-                        Datos</button>
-                    <button type="button" class="btn btn-danger" id="eliminarProducto"><i
+                    <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
+                    <button type="button" class="btn" id="cancelarBtn"><i class="bi bi-x-circle"></i>Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="eliminarBienBtn"><i
                             class="bi bi-trash"></i>Eliminar</button>
                 </div>
-
-                <!-- Formulario Modificar Datos Generales -->
-                <form id="formModificarDatos" class="hidden" style="margin-top: 1rem;">
-                    <div>
-                        <label>Categoría</label>
-                        <input list="modCategoriasSugeridas" type="text" id="modCategoria" required>
-                        <datalist id="modCategoriasSugeridas"></datalist>
-                    </div>
-                    <div>
-                        <label>Nombre</label>
-                        <input type="text" id="modNombre" required>
-                    </div>
-                    <div>
-                        <label>Ubicación</label>
-                        <input list="modUbicacionesSugeridas" type="text" id="modUbicacion" required>
-                        <datalist id="modUbicacionesSugeridas"></datalist>
-                    </div>
-                    <div>
-                        <label>Detalle</label>
-                        <input type="text" id="modDetalleProducto" placeholder="Detalles extras opcionales...">
-                    </div>
-                    <div class="btn-row">
-                        <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
-                        <button type="button" class="btn" id="cancelarEdicionBtn"><i
-                                class="bi bi-x-circle"></i>Cancelar</button>
-                    </div>
-                </form>
-            </div>
+            </form>
         </section>
+
     </main>
 
     <footer>SIExT | 2025</footer>
@@ -172,21 +179,69 @@
     </script>
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
-
+    <script src="js/formateo.js"></script>
     <script>
         const categoriaProducto = document.getElementById("categoriaProducto");
         const ubicacionProducto = document.getElementById("ubicacionProducto");
+        const modBienId = document.getElementById("modBienId");
         const modNombre = document.getElementById("modNombre");
         const modCategoria = document.getElementById("modCategoria");
         const modUbicacion = document.getElementById("modUbicacion");
         const modDetalleProducto = document.getElementById("modDetalleProducto");
-        const modificarForm = document.getElementById("modificarForm");
-        const modificarContenedor = document.getElementById("modificarContenedor");
+        const modificarForm = document.getElementById("modificarBienForm");
+
+        function renderInventario() {
+            const bienes = JSON.parse(localStorage.getItem("bienes")) || [];
+            const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
+
+            const bienFiltroTexto = document.getElementById("filterBienInput").value.toUpperCase();
+            const bienFiltroCategoria = document.getElementById("filterBienCategoria").value.toUpperCase().trim();
+            const bienFiltroEstado = document.getElementById("filterBienEstado").value;
+            const bienFiltroUbicacion = document.getElementById("filterBienUbicacion").value.toUpperCase().trim();
+
+            const bienesTable = document.getElementById("bienesTable").querySelector("tbody");
+            bienesTable.innerHTML = "";
+
+            let countBienes = 0;
+
+            bienes.forEach(prod => {
+                const matchTexto = txt => prod.nombre.toUpperCase().includes(txt) || String(formatearNroBien(prod.id_Bien)).includes(txt);
+                const matchCategoria = (cat, filtro) => !filtro || cat.toUpperCase().includes(filtro);
+                const matchEstado = (estado, filtro) => !filtro || estado === filtro;
+                const matchUbicacion = (ubicacion, filtro) => !filtro || ubicacion.toUpperCase().includes(filtro);
+
+                if (matchTexto(bienFiltroTexto) && matchCategoria(prod.nombreCatBienes, bienFiltroCategoria)
+                    && matchEstado(prod.estadoBien, bienFiltroEstado)
+                    && matchUbicacion(prod.ubicacionBien, bienFiltroUbicacion)
+                ) {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                    <td>${formatearNroBien(prod.id_Bien)}</td>
+                    <td>${prod.nombre}</td>
+                    <td>${prod.nombreCatBienes}</td>
+                    <td><span class="badge ${prod.estadoBien === "EN_CONDICIONES" ? 'disponible' : 'averiado'}">${(prod.estadoBien).replace("_", " ")}</span></td>
+                    <td>${prod.ubicacionBien}</td>
+                    <td>
+                        <button class='btn' onclick='editarBien(${prod.id_Bien})'><i class='bi bi-pencil'></i></button>
+                    </td>`;
+                    bienesTable.appendChild(row);
+                    countBienes++;
+                }
+            });
+
+            document.getElementById("counterBienes").textContent = `Mostrando ${countBienes} bien(es).`;
+        }
 
         function cargarCategorias(idSelect) {
             const sel = document.getElementById(idSelect);
             sel.innerHTML = "";
             const cats = JSON.parse(localStorage.getItem("categorias")) || [];
+            if (idSelect == "filterBienCategoria") {
+                const opt = document.createElement("option");
+                opt.value = "";
+                opt.textContent = "Todas las categorías";
+                sel.appendChild(opt);
+            }
             if (cats.length === 0) {
                 sel.disabled = true;
                 sel.innerHTML = "<option>Sin categorías</option>";
@@ -204,6 +259,12 @@
             const sel = document.getElementById(idSelect);
             sel.innerHTML = "";
             const cats = JSON.parse(localStorage.getItem("ubicaciones")) || [];
+            if (idSelect == "filterBienUbicacion") {
+                const opt = document.createElement("option");
+                opt.value = "";
+                opt.textContent = "Todas las ubicaciones";
+                sel.appendChild(opt);
+            }
             if (cats.length === 0) {
                 sel.disabled = true;
                 sel.innerHTML = "<option>Sin ubicaciones</option>";
@@ -224,8 +285,13 @@
 
         cargarCategorias("categoriasSugeridas");
         cargarUbicaciones("ubicacionesSugeridas");
-        cargarCategorias("modCategoriasSugeridas");
-        cargarUbicaciones("modUbicacionesSugeridas");
+
+        renderInventario();
+
+        document.getElementById("filterBienInput").oninput = renderInventario;
+        document.getElementById("filterBienCategoria").oninput = renderInventario;
+        document.getElementById("filterBienEstado").onchange = renderInventario;
+        document.getElementById("filterBienUbicacion").oninput = renderInventario
 
         document.getElementById("productoForm").onsubmit = async (e) => {
             e.preventDefault();
@@ -277,24 +343,32 @@
             // Reiniciamos el form y lo preparamos para nuevos inserts
             cargarCategorias("categoriasSugeridas");
             cargarUbicaciones("ubicacionesSugeridas");
-            cargarCategorias("modCategoriasSugeridas");
-            cargarUbicaciones("modUbicacionesSugeridas");
+            renderInventario();
             e.target.reset();
         };
-    </script>
-    <script src="js/formateo.js"></script>
-    <script>
-        let bienIdActual = null;
-        // Al buscar producto:
-        document.getElementById("busquedaForm").onsubmit = async (e) => {
+
+        function editarBien(id) {
+            const bienes = JSON.parse(localStorage.getItem("bienes")) || [];
+            const bien = bienes.find(b => b.id_Bien === id);
+            if (!bien) return;
+
+            modBienId.value = bien.id_Bien;
+            modNombre.value = bien.nombre;
+            modCategoria.value = bien.nombreCatBienes;
+            modUbicacion.value = bien.ubicacionBien;
+            modDetalleProducto.value = bien.detalle ? bien.detalle : "";
+
+            document.getElementById("modificarBienSection").classList.remove("hidden");
+        }
+
+        document.getElementById("modificarBienForm").addEventListener("submit", async (e) => {
             e.preventDefault();
-            const id = +document.getElementById("buscarId").value;
+            const id = modBienId.value;
             let bien;
             try {
                 const response = await leerBien(id);
-                bienIdActual = id;
                 if (!response.ok) {
-                    modificarContenedor.classList.add("hidden");
+                    document.getElementById("modificarBienSection").classList.add("hidden");
                     const errorData = await response.json();
                     if (response.status == 422) {
                         alert(errorData.error);
@@ -319,138 +393,97 @@
                 return;
             }
 
-            nroInventarioActual = formatearNroBien(bienIdActual);
+            const modDetalleTempInput = modDetalleProducto.value.trim().toUpperCase();
+            const modDetalleTemp = modDetalleTempInput === "" ? null : modDetalleTempInput;
 
-            modificarContenedor.classList.remove("hidden");
-            // Mostrar todos los datos actuales
-            const datosHTML = `
-                <p><strong>Nombre:</strong> ${bien.nombre}</p>
-                <p><strong>Categoría:</strong> ${bien.nombreCatBienes}</p>
-                <p><strong>Estado:</strong> ${(bien.estadoBien).replace("_", " ")}</p>
-                <p><strong>Ubicación:</strong> ${bien.ubicacionBien}</p>
-                <p><strong>Detalle:</strong> ${bien.detalle ? bien.detalle : "Sin detalles"}</p>
-                `;
-            const titulo = `Bien con nro. de inventario "${nroInventarioActual}" encontrado`;
-            document.getElementById("tituloProductoEncontrado").textContent = titulo;
-            document.getElementById("datosProductoEncontrado").innerHTML = datosHTML;
+            const bienModificado = {
+                nombre: modNombre.value.toUpperCase().trim(),
+                nombreCatBienes: modCategoria.value.toUpperCase(),
+                ubicacionBien: modUbicacion.value.toUpperCase(),
+                ...(modDetalleTemp ? { detalle: modDetalleTemp } : {})
+            };
 
-            // Ocultar formularios
-            document.getElementById("formModificarDatos").classList.add("hidden");
-
-            // Botón eliminar producto
-            document.getElementById("eliminarProducto").onclick = async () => {
-                if (!confirm("¿Eliminar bien?")) return;
-                try {
-                    const response = await eliminarBien(bienIdActual);
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        if (response.status == 422) {
-                            alert(errorData.error);
-                            return;
-                        }
-                        if (response.status == 500) {
-                            alert("El servidor no pudo realizar la eliminación del bien. Código: 500");
-                            return;
-                        }
-                        else {
-                            alert(`El servidor no pudo realizar la eliminación del bien. Código: ${response.status}`);
-                            return;
-                        }
+            try {
+                const response = await modificarBien(bienModificado, id);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 404) {
+                        alert("Bien no encontrado.");
+                        return;
                     }
-                } catch (error) {
-                    alert("No se pudo conectar con el servidor.");
-                    return;
-                }
-                alert("Bien eliminado.");
-                modificarContenedor.classList.add("hidden");
-                await recargarBienes();
-            };
-
-            // Mostrar form de edición de datos
-            document.getElementById("btnEditarDatos").onclick = () => {
-                document.getElementById("formModificarDatos").classList.remove("hidden");
-                document.getElementById("tituloProductoEncontrado").textContent = "Modificar Datos del Bien";
-                modNombre.value = bien.nombre;
-                modCategoria.value = bien.nombreCatBienes;
-                modUbicacion.value = bien.ubicacionBien;
-                modDetalleProducto.value = bien.detalle ? bien.detalle : "";
-                ocultarInfoYAcciones();
-            };
-
-            // Guardar cambios de datos generales
-            document.getElementById("formModificarDatos").onsubmit = async (ev) => {
-                ev.preventDefault();
-
-                const modDetalleTempInput = modDetalleProducto.value.trim().toUpperCase();
-                const modDetalleTemp = modDetalleTempInput === "" ? null : modDetalleTempInput;
-
-                const bienModificado = {
-                    nombre: modNombre.value.toUpperCase().trim(),
-                    nombreCatBienes: modCategoria.value.toUpperCase(),
-                    ubicacionBien: modUbicacion.value.toUpperCase(),
-                    ...(modDetalleTemp ? { detalle: modDetalleTemp } : {})
-                };
-
-                try {
-                    const response = await modificarBien(bienModificado, bienIdActual);
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        if (response.status == 422) {
-                            alert(errorData.error);
-                            return;
-                        }
-                        if (response.status == 500) {
-                            alert("El servidor no pudo realizar la modificación del bien. Código: 500");
-                            return;
-                        } else {
-                            alert(`El servidor no pudo realizar la modificación del bien. Código: ${response.status}`);
-                            return;
-                        }
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
                     }
-                } catch (error) {
-                    alert("No se pudo conectar con el servidor.");
-                    return;
+                    if (response.status == 500) {
+                        alert("El servidor no pudo realizar la modificación del bien. Código: 500");
+                        return;
+                    } else {
+                        alert(`El servidor no pudo realizar la modificación del bien. Código: ${response.status}`);
+                        return;
+                    }
                 }
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
 
-                alert("Bien actualizado.");
-                await recargarBienes();
-                await recargarCategorias();
-                await recargarUbicaciones();
-                await recargarEventos();
+            alert("Bien actualizado.");
+            await recargarBienes();
+            await recargarCategorias();
+            await recargarUbicaciones();
+            await recargarEventos();
 
-                cargarCategorias("categoriasSugeridas");
-                cargarUbicaciones("ubicacionesSugeridas");
-                cargarCategorias("modCategoriasSugeridas");
-                cargarUbicaciones("modUbicacionesSugeridas");
-                mostrarInfoYAcciones(nroInventarioActual);
-                document.getElementById("formModificarDatos").classList.add("hidden");
-                modificarContenedor.classList.add("hidden");
-                ev.target.reset();
-            };
+            cargarCategorias("categoriasSugeridas");
+            cargarUbicaciones("ubicacionesSugeridas");
+            renderInventario();
+            document.getElementById("modificarBienSection").classList.add("hidden");
+            e.target.reset();
+        });
 
-            // Cancelar edición de datos
-            document.getElementById("cancelarEdicionBtn").onclick = () => {
-                if (confirm("¿Deseás cancelar la edición? Se perderán los cambios no guardados.")) {
-                    document.getElementById("formModificarDatos").classList.add("hidden");
-                    mostrarInfoYAcciones(nroInventarioActual);
+        document.getElementById("eliminarBienBtn").addEventListener("click", async () => {
+            const id = modBienId.value;
+            if (!confirm("¿Eliminar este bien?")) return;
+
+            try {
+                const response = await eliminarBien(id);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
+                    if (response.status == 500) {
+                        alert("El servidor no pudo realizar la eliminación del bien. Código: 500");
+                        return;
+                    }
+                    else {
+                        alert(`El servidor no pudo realizar la eliminación del bien. Código: ${response.status}`);
+                        return;
+                    }
                 }
-            };
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
+            alert("Bien eliminado.");
+            await recargarBienes();
+            renderInventario();
+            document.getElementById("modificarBienSection").classList.add("hidden");
+            document.getElementById("modificarBienForm").reset();
+        });
+
+        // Cancelar edición de datos
+        document.getElementById("cancelarBtn").onclick = () => {
+            if (confirm("¿Deseás cancelar la edición? Se perderán los cambios no guardados.")) {
+                document.getElementById("modificarBienSection").classList.add("hidden");
+                document.getElementById("modificarBienForm").reset();
+            }
         };
 
+        renderInventario();
     </script>
 
-    <script>
-        function ocultarInfoYAcciones() {
-            document.getElementById("datosProductoEncontrado").classList.add("hidden");
-            document.querySelector(".btn-row").classList.add("hidden");
-        }
-
-        function mostrarInfoYAcciones(id) {
-            document.getElementById("datosProductoEncontrado").classList.remove("hidden");
-            document.querySelector(".btn-row").classList.remove("hidden");
-            document.getElementById("tituloProductoEncontrado").textContent = `Bien con nro. de inventario "${id}" encontrado`;
-        }
-    </script>
 </body>
 
 </html>
