@@ -52,7 +52,6 @@
   <main class="default-block-container">
     <section>
       <ul class="btn-row" style="flex-direction: column;">
-        <!-- <li><a href="#" class="btn"><i class="bi bi-card-list"></i>Listado completo de inventario</a></li> -->
         <li>
           <button class="btn" id="btnIngresos" type="button"><i class="bi bi-box-arrow-in-down-left"></i></i>Total de
             ingresos
@@ -67,9 +66,6 @@
             <button type="submit" class="btn"><i class="bi bi-search"></i>Ver Informe</button>
           </form>
         </li>
-        <!-- <li><a href="informe_minimo.html" class="btn"><i class="bi bi-exclamation-triangle"></i>Inventario bajo mínimo
-            de
-            reposición</a></li> -->
         <li>
           <button class="btn" id="btnSolicitudes" type="button"><i class="bi bi-file-bar-graph"></i>Total de solicitudes
             en un período</button>
@@ -81,7 +77,6 @@
             <button type="submit" class="btn"><i class="bi bi-search"></i>Ver Informe</button>
           </form>
         </li>
-        <!-- <li><a href="#" class="btn"><i class="bi bi-box-arrow-up-right"></i>Total de salidas por departamento</a></li> -->
       </ul>
     </section>
 
@@ -94,22 +89,48 @@
       verificarAuth("SUPERVISOR");
   </script>
   <script>
+    // Fecha actual local en formato YYYY-MM-DD
+    const hoy = new Date().toLocaleDateString("en-CA");
+
+    // Establecer máximo (hoy) para todos los inputs tipo date
+    document.querySelectorAll('input[type="date"]').forEach(input => input.setAttribute("max", hoy));
+
+    // ----- FORMULARIO DE INGRESOS -----
     const btnIngresos = document.getElementById("btnIngresos");
     const formIngresos = document.getElementById("formIngresos");
+    const desdeIngresos = document.getElementById("desde");
+    const hastaIngresos = document.getElementById("hasta");
 
     btnIngresos.addEventListener("click", () => {
       formIngresos.classList.toggle("hidden");
       btnIngresos.style.backgroundColor = formIngresos.classList.contains("hidden") ? "" : "var(--azul-profundo)";
     });
 
-    document.getElementById("formIngresos").onsubmit = e => {
+    // Ajustar el min de "hasta" al seleccionar "desde"
+    desdeIngresos.addEventListener("change", () => {
+      hastaIngresos.setAttribute("min", desdeIngresos.value);
+    });
+
+    formIngresos.onsubmit = e => {
       e.preventDefault();
-      const desde = document.getElementById("desde").value;
-      const hasta = document.getElementById("hasta").value;
+      const desde = desdeIngresos.value;
+      const hasta = hastaIngresos.value;
+
       if (!desde || !hasta) {
         alert("Seleccioná ambas fechas.");
         return;
       }
+
+      if (desde > hasta) {
+        alert("La fecha inicial no puede ser posterior a la fecha final.");
+        return;
+      }
+
+      if (desde > hoy || hasta > hoy) {
+        alert("Las fechas no pueden ser futuras.");
+        return;
+      }
+
       window.location.href = `informe_ingresos.html?desde=${desde}&hasta=${hasta}`;
     };
   </script>
@@ -118,20 +139,39 @@
   <script>
     const btnSolicitudes = document.getElementById("btnSolicitudes");
     const formSolicitudes = document.getElementById("formSolicitudes");
+    const desdeSolicitudes = document.getElementById("desdeSolicitudes");
+    const hastaSolicitudes = document.getElementById("hastaSolicitudes");
 
     btnSolicitudes.addEventListener("click", () => {
       formSolicitudes.classList.toggle("hidden");
       btnSolicitudes.style.backgroundColor = formSolicitudes.classList.contains("hidden") ? "" : "var(--azul-profundo)";
     });
 
-    document.getElementById("formSolicitudes").onsubmit = e => {
+    // Ajustar el min de "hasta" al seleccionar "desde"
+    desdeSolicitudes.addEventListener("change", () => {
+      hastaSolicitudes.setAttribute("min", desdeSolicitudes.value);
+    });
+
+    formSolicitudes.onsubmit = e => {
       e.preventDefault();
-      const desde = document.getElementById("desdeSolicitudes").value;
-      const hasta = document.getElementById("hastaSolicitudes").value;
+      const desde = desdeSolicitudes.value;
+      const hasta = hastaSolicitudes.value;
+
       if (!desde || !hasta) {
         alert("Seleccioná ambas fechas.");
         return;
       }
+
+      if (desde > hasta) {
+        alert("La fecha inicial no puede ser posterior a la fecha final.");
+        return;
+      }
+
+      if (desde > hoy || hasta > hoy) {
+        alert("Las fechas no pueden ser futuras.");
+        return;
+      }
+
       window.location.href = `informe_solicitudes_dpto.html?desde=${desde}&hasta=${hasta}`;
     };
   </script>
