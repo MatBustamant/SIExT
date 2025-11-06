@@ -39,8 +39,9 @@
     <script>
         verificarAuth("SUPERVISOR", false);
     </script>
+    <script src="js/fechas.js"></script>
   <script>
-    document.getElementById("fechaActual").textContent = new Date().toLocaleString();
+    document.getElementById("fechaActual").textContent = obtenerFechaHoraActual();
 
     const params = new URLSearchParams(window.location.search);
     const desde = params.get("desde");
@@ -54,9 +55,12 @@
 
     // Filtrar solicitudes en rango de fechas
     const solicitudesFiltradas = solicitudes
-      .filter(s => new Date(s.fechaInicioSolicitud).toLocaleDateString("en-CA") >= desde && new Date(s.fechaInicioSolicitud).toLocaleDateString("en-CA") <= hasta)
+      .filter(s => {
+        const fechaSolicitudLocal = formatearFechaLocal(s.fechaInicioSolicitud);
+        return fechaSolicitudLocal >= desde && fechaSolicitudLocal <= hasta;
+      })
       .map(s => ({
-        fecha: `${new Date(s.fechaInicioSolicitud).toLocaleString().replace(",", "")}`,
+        fecha: formatearFechaHora(s.fechaInicioSolicitud),
         departamento: s.ubicacionBienes,
         descripcion: s.descripcion
       }))
