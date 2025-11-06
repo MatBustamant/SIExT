@@ -43,7 +43,19 @@
 </head>
 
 <body>
-    <header>SIExT | Ver inventario</header>
+    <header>
+        <span>SIExT | Ver inventario</span>
+        <div id="userInfo" class="user-info">
+            <span id="username"></span>
+            <i class="bi bi-person-circle"></i>
+            <div id="userMenu" class="user-menu hidden">
+                <p id="userRole"><i id="rolIcon" class="bi bi-person-circle"></i></p>
+                <button id="logoutBtn" class="btn btn-danger">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                </button>
+            </div>
+        </div>
+    </header>
 
     <div class="default-block-container">
         <nav>
@@ -97,6 +109,10 @@
 
     <footer>SIExT | 2025</footer>
 
+    <script src="js/auth.js"></script>
+    <script>
+        verificarAuth();
+    </script>
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script>
@@ -144,20 +160,20 @@
                 const matchEstado = (estado, filtro) => !filtro || estado === filtro;
                 const matchUbicacion = (ubicacion, filtro) => !filtro || ubicacion.toUpperCase().includes(filtro);
 
-                    if (matchTexto(bienFiltroTexto) && matchCategoria(prod.nombreCatBienes, bienFiltroCategoria)
-                        && matchEstado(prod.estadoBien, bienFiltroEstado)
-                        && matchUbicacion(prod.ubicacionBien, bienFiltroUbicacion)
-                    ) {
-                        const row = document.createElement("tr");
-                        row.innerHTML = `
+                if (matchTexto(bienFiltroTexto) && matchCategoria(prod.nombreCatBienes, bienFiltroCategoria)
+                    && matchEstado(prod.estadoBien, bienFiltroEstado)
+                    && matchUbicacion(prod.ubicacionBien, bienFiltroUbicacion)
+                ) {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
                     <td>${prod.id_Bien}</td>
                     <td>${prod.nombre}</td>
                     <td>${prod.nombreCatBienes}</td>
                 <td><span class="badge ${prod.estadoBien === "EN_CONDICIONES" ? 'disponible' : 'averiado'}">${(prod.estadoBien).replace("_", " ")}</span></td>
                 <td>${prod.ubicacionBien}</td>`;
-                        bienesTable.appendChild(row);
-                        countBienes++;
-                    }
+                    bienesTable.appendChild(row);
+                    countBienes++;
+                }
             });
 
             document.getElementById("counterBienes").textContent = `Mostrando ${countBienes} bien(es).`;

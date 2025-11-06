@@ -12,7 +12,19 @@
 </head>
 
 <body>
-    <header>SIExT | Editar categorías</header>
+    <header>
+        <span>SIExT | Editar categorías</span>
+        <div id="userInfo" class="user-info">
+            <span id="username"></span>
+            <i class="bi bi-person-circle"></i>
+            <div id="userMenu" class="user-menu hidden">
+                <p id="userRole"><i id="rolIcon" class="bi bi-person-circle"></i></p>
+                <button id="logoutBtn" class="btn btn-danger">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                </button>
+            </div>
+        </div>
+    </header>
 
     <div class="default-block-container">
         <nav>
@@ -82,6 +94,10 @@
 
     <footer>SIExT | 2025</footer>
 
+    <script src="js/auth.js"></script>
+    <script>
+        verificarAuth();
+    </script>
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script>
@@ -167,8 +183,8 @@
                         return;
                     }
                     else {
-                    alert(`El servidor no pudo realizar el registro de la categoría. Código: ${response.status}`);
-                    return;
+                        alert(`El servidor no pudo realizar el registro de la categoría. Código: ${response.status}`);
+                        return;
                     }
                 }
             } catch (error) {
@@ -246,8 +262,8 @@
                         alert("El servidor no pudo realizar la modificación de la categoría. Código: 500");
                         return;
                     } else {
-                    alert(`El servidor no pudo realizar la modificación de la categoría. Código: ${response.status}`);
-                    return;
+                        alert(`El servidor no pudo realizar la modificación de la categoría. Código: ${response.status}`);
+                        return;
                     }
                 }
             } catch (error) {
