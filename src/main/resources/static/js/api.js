@@ -84,6 +84,10 @@ async function eliminarUsuario(id) {
     return fetch(`${API_BASE}/usuario/eliminar/${id}`, DELETE);
 }
 
+async function loginUsuario(credentials) {
+    return fetch(`${API_BASE}/usuario/login`, POST(credentials));
+}
+
 // funciones con el crud de categorias
 async function leerCategorias() {
     return fetch(`${API_BASE}/categoria/leer`);

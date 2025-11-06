@@ -156,8 +156,8 @@
         document.getElementById("formNuevoUsuario").addEventListener("submit", async (e) => {
             e.preventDefault();
 
-            const nombre = document.getElementById("nuevoUsuario").value.toUpperCase();
-            const contraseña = document.getElementById("nuevoPassword").value;
+            const nombre = document.getElementById("nuevoUsuario").value.trim().toUpperCase();
+            const contraseña = document.getElementById("nuevoPassword").value.trim();
             const rol = document.getElementById("nuevoRol").value.toUpperCase();
             if (!nombre || !contraseña || !rol) {
                 alert("Datos incompletos.");
