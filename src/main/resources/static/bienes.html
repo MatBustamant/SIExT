@@ -99,6 +99,10 @@
                     </div>
                 </div>
                 <div>
+                    <label>Detalle</label>
+                    <input type="text" id="detalleProducto" placeholder="Detalles extras opcionales...">
+                </div>
+                <div>
                     <button type="submit" class="btn"><i class="bi bi-plus-circle"></i>Registrar</button>
                 </div>
             </form>
@@ -143,6 +147,10 @@
                         <input list="modUbicacionesSugeridas" type="text" id="modUbicacion" required>
                         <datalist id="modUbicacionesSugeridas"></datalist>
                     </div>
+                    <div>
+                        <label>Detalle</label>
+                        <input type="text" id="modDetalleProducto" placeholder="Detalles extras opcionales...">
+                    </div>
                     <div class="btn-row">
                         <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
                         <button type="button" class="btn" id="cancelarEdicionBtn"><i
@@ -168,6 +176,7 @@
         const modNombre = document.getElementById("modNombre");
         const modCategoria = document.getElementById("modCategoria");
         const modUbicacion = document.getElementById("modUbicacion");
+        const modDetalleProducto = document.getElementById("modDetalleProducto");
         const modificarForm = document.getElementById("modificarForm");
         const modificarContenedor = document.getElementById("modificarContenedor");
 
@@ -217,10 +226,12 @@
 
         document.getElementById("productoForm").onsubmit = async (e) => {
             e.preventDefault();
-            const nombre = document.getElementById("nombreProducto").value.toUpperCase();
+            const nombre = document.getElementById("nombreProducto").value.trim().toUpperCase();
             const ubicacion = ubicacionProducto.value.toUpperCase();
             const categoria = categoriaProducto.value.toUpperCase();
             const cantBienes = +document.getElementById("stockInicial").value;
+            const detalleInput = document.getElementById("detalleProducto").value.trim().toUpperCase();
+            const detalle = detalleInput === "" ? null : detalleInput;
 
             // Validación básica
             if (!nombre || !categoria || !ubicacion || cantBienes < 1) {
@@ -232,7 +243,8 @@
                 nombre,
                 nombreCatBienes: categoria,
                 ubicacionBien: ubicacion,
-                cantBienes
+                cantBienes,
+                ...(detalle ? { detalle } : {})
             };
 
             try {
@@ -311,6 +323,7 @@
                 <p><strong>Categoría:</strong> ${bien.nombreCatBienes}</p>
                 <p><strong>Estado:</strong> ${(bien.estadoBien).replace("_", " ")}</p>
                 <p><strong>Ubicación:</strong> ${bien.ubicacionBien}</p>
+                <p><strong>Detalle:</strong> ${bien.detalle ? bien.detalle : "Sin detalles"}</p>
                 `;
             const titulo = `Bien con identificador "${bienIdActual}" encontrado`;
             document.getElementById("tituloProductoEncontrado").textContent = titulo;
@@ -355,6 +368,7 @@
                 modNombre.value = bien.nombre;
                 modCategoria.value = bien.nombreCatBienes;
                 modUbicacion.value = bien.ubicacionBien;
+                modDetalleProducto.value = bien.detalle ? bien.detalle : "";
                 ocultarInfoYAcciones();
             };
 
@@ -362,10 +376,14 @@
             document.getElementById("formModificarDatos").onsubmit = async (ev) => {
                 ev.preventDefault();
 
+                const modDetalleTempInput = modDetalleProducto.value.trim().toUpperCase();
+                const modDetalleTemp = modDetalleTempInput === "" ? null : modDetalleTempInput;
+
                 const bienModificado = {
-                    nombre: modNombre.value.toUpperCase(),
+                    nombre: modNombre.value.toUpperCase().trim(),
                     nombreCatBienes: modCategoria.value.toUpperCase(),
-                    ubicacionBien: modUbicacion.value.toUpperCase()
+                    ubicacionBien: modUbicacion.value.toUpperCase(),
+                    ...(modDetalleTemp ? { detalle: modDetalleTemp } : {})
                 };
 
                 try {
