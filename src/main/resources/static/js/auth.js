@@ -1,16 +1,20 @@
+function obtenerAuth() {
+    return JSON.parse(localStorage.getItem('auth'));
+}
+
 function verificarAuth(rolRequerido = null, loginPanel = true) {
-    const auth = JSON.parse(localStorage.getItem('auth'));
+    const auth = obtenerAuth();
 
     if (!auth) {
-        alert('Por favor, inicie sesión para continuar.');
         window.location.href = 'login.html';
+        alert('Por favor, inicie sesión para continuar.');
         return;
     }
 
     // Si se requiere un rol específico (por ejemplo "SUPERVISOR")
     if (rolRequerido && auth.rol !== rolRequerido) {
-        alert('No tenés permisos para acceder a esta sección.');
         window.location.href = 'panel.html';
+        alert('No tenés permisos para acceder a esta sección.');
         return;
     }
 
@@ -51,5 +55,19 @@ function verificarAuth(rolRequerido = null, loginPanel = true) {
                 }
             });
         }
+    }
+}
+
+function mostrarSegunRol(rolNecesario) {
+    const auth = obtenerAuth();
+    if (auth && auth.rol === rolNecesario) {
+        const accion = document.getElementById("supervisor-only-accion");
+        const seccion = document.getElementById("supervisor-only-seccion");
+        [accion, seccion].forEach(el => {
+            if (el) {
+                el.classList.remove('hidden');
+            }
+        }
+        );
     }
 }
