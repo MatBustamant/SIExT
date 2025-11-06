@@ -74,7 +74,7 @@
             <h2>Bienes</h2>
             <div class="form-grid">
                 <div>
-                    <input type="text" id="filterBienInput" placeholder="Filtrar por nombre o ID...">
+                    <input type="text" id="filterBienInput" placeholder="Filtrar por nombre o nro. de inventario...">
                 </div>
                 <div>
                     <select id="filterBienCategoria"></select>
@@ -93,7 +93,7 @@
             <table id="bienesTable">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>Nro. de inv.</th>
                         <th>Nombre</th>
                         <th>Categoría</th>
                         <th>Estado</th>
@@ -122,6 +122,7 @@
             recargarCategorias();
         });
     </script>
+    <script src="js/formateo.js"></script>
     <script>
         function cargarCategorias() {
             const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
@@ -156,7 +157,7 @@
             let countBienes = 0;
 
             bienes.forEach(prod => {
-                const matchTexto = txt => prod.nombre.toUpperCase().includes(txt) || String(prod.id_Bien).includes(txt);
+                const matchTexto = txt => prod.nombre.toUpperCase().includes(txt) || String(formatearNroBien(prod.id_Bien)).includes(txt);
                 const matchCategoria = (cat, filtro) => !filtro || cat === filtro;
                 const matchEstado = (estado, filtro) => !filtro || estado === filtro;
                 const matchUbicacion = (ubicacion, filtro) => !filtro || ubicacion.toUpperCase().includes(filtro);
@@ -167,7 +168,7 @@
                 ) {
                     const row = document.createElement("tr");
                     row.innerHTML = `
-                    <td>${prod.id_Bien}</td>
+                    <td>${formatearNroBien(prod.id_Bien)}</td>
                     <td>${prod.nombre}</td>
                     <td>${prod.nombreCatBienes}</td>
                 <td><span class="badge ${prod.estadoBien === "EN_CONDICIONES" ? 'disponible' : 'averiado'}">${(prod.estadoBien).replace("_", " ")}</span></td>

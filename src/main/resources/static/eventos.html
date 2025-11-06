@@ -45,7 +45,7 @@
             <form id="registroEventoForm">
                 <div class="form-grid">
                     <div>
-                        <label>ID del bien</label>
+                        <label>Nro. de inventario</label>
                         <input id="bienAsociado" type="number" required>
                     </div>
                     <div>
@@ -71,7 +71,7 @@
             <!-- Filtros -->
             <div class="form-grid">
                 <div>
-                    <input id="filterBienInput" type="number" placeholder="Filtrar por ID de bien">
+                    <input id="filterBienInput" type="number" placeholder="Filtrar por nro. de inventario">
                 </div>
                 <div>
                     <select id="filterTipoEvento">
@@ -90,7 +90,7 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Bien</th>
+                        <th>Nro. de inv.</th>
                         <th>Tipo</th>
                         <th>Fecha</th>
                         <th>Acciones</th>
@@ -109,8 +109,11 @@
             <form id="modificarEventoForm">
                 <input type="hidden" id="modEventoId">
 
-                <label>ID del bien</label>
-                <input type="number" id="modBienId" required>
+                <label>Nro. de inventario</label>
+                <div class="input-prefix">
+                    <span>FCE-</span>
+                    <input type="number" id="modBienId" required>
+                </div>
 
                 <label>Tipo de evento</label>
                 <select id="modTipoEvento" required>
@@ -141,6 +144,7 @@
     </script>
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/formateo.js"></script>
     <script>
         recargarEventos();
         recargarBienes();
@@ -157,7 +161,7 @@
             let count = 0;
 
             eventos.forEach(evento => {
-                const matchBienInput = numero => String(evento.bienAsociado).includes(numero);
+                const matchBienInput = numero => String(formatearNroBien(evento.bienAsociado)).includes(numero);
                 const matchTipoEvento = (tipo, filtro) => !filtro || tipo === filtro;
                 const matchFecha = (fechaEvento, filtro) => !filtro || new Date(fechaEvento).toLocaleDateString("en-CA") === filtro;
 
@@ -168,7 +172,7 @@
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
                         <td>${evento.id_Evento}</td>
-                        <td>${evento.bienAsociado}</td>
+                        <td>${formatearNroBien(evento.bienAsociado)}</td>
                         <td>${evento.tipoEvento}</td>
                         <td>${new Date(evento.fechaEvento).toLocaleString()}</td>
                         <td>
