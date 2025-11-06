@@ -61,12 +61,15 @@ public class BienService implements ServiceGenerico<BienDTO> {
         Validador.validarString(categoria,CAMPO_CATEGORIA_TEXT,CAMPO_CATEGORIA_MIN,CAMPO_CATEGORIA_MAX);
         String ubicacion = dto.getUbicacionBien().toUpperCase();
         Validador.validarString(ubicacion, CAMPO_UBICACION_TEXT,CAMPO_UBICACION_MIN,CAMPO_UBICACION_MAX);
+        String detalle = dto.getDetalle();
+        if (detalle != null) detalle = detalle.toUpperCase();
         
         // Una vez validado, dejamos en el dto los datos formateados y agregamos el resto
         dto.setNombre(nombre);
         dto.setNombreCatBienes(categoria);
         dto.setUbicacionBien(ubicacion);
         dto.setEstadoBien(EstadoBien.EN_CONDICIONES);
+        dto.setDetalle(detalle);
         
         // Si no existe la categoría, la creamos
         if (catDAO.buscar(categoria) == null) {
@@ -98,11 +101,14 @@ public class BienService implements ServiceGenerico<BienDTO> {
         Validador.validarString(categoria,CAMPO_CATEGORIA_TEXT,CAMPO_CATEGORIA_MIN,CAMPO_CATEGORIA_MAX);
         String ubicacion = dto.getUbicacionBien();
         Validador.validarString(ubicacion, CAMPO_UBICACION_TEXT,CAMPO_UBICACION_MIN,CAMPO_UBICACION_MAX);
+        String detalle = dto.getDetalle();
+        if (detalle != null) detalle = detalle.toUpperCase();
         
         dto.setNombre(nombre);
         dto.setNombreCatBienes(categoria);
         dto.setUbicacionBien(ubicacion);
         dto.setID_Bien(id);
+        dto.setDetalle(detalle);
         
         // Si no existe la categoría, la creamos
         if (catDAO.buscar(categoria) == null) {
