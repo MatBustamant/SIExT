@@ -10,15 +10,17 @@ public class BienDTO {
     private int ID_Bien;
     private String Nombre;
     private String UbicacionBien;
-    private EstadoBien EstadoBien; //Cambiaria a EnUso o EnDesuso
+    private EstadoBien EstadoBien;
+    private String detalle;
     private String NombreCatBienes;
-    private int cantBienes;
+    private Integer cantBienes;
 
-    public BienDTO(int ID_Bien, String Nombre, String UbicacionBien, EstadoBien EstadoBien, String NombreCatBienes, int cantBienes) {
+    public BienDTO(int ID_Bien, String Nombre, String UbicacionBien, EstadoBien EstadoBien, String detalle, String NombreCatBienes, int cantBienes) {
         this.ID_Bien = ID_Bien;
         this.Nombre = Nombre;
         this.UbicacionBien = UbicacionBien;
         this.EstadoBien = EstadoBien;
+        this.detalle = detalle;
         this.NombreCatBienes = NombreCatBienes;
         this.cantBienes = cantBienes;
     }
@@ -26,11 +28,11 @@ public class BienDTO {
         
     }
 
-    public int getCantBienes() {
+    public Integer getCantBienes() {
         return cantBienes;
     }
 
-    public void setCantBienes(int cantBienes) {
+    public void setCantBienes(Integer cantBienes) {
         this.cantBienes = cantBienes;
     }
     
@@ -56,6 +58,14 @@ public class BienDTO {
 
     public void setEstadoBien(EstadoBien EstadoBien) {
         this.EstadoBien = EstadoBien;
+    }
+    
+    public String getDetalle() {
+        return detalle;
+    }
+    
+    public void setDetalle(String detalle) {
+        this.detalle = detalle;
     }
 
     public String getNombreCatBienes() {

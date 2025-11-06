@@ -47,12 +47,15 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
                     bien.setID_Bien(rs.getInt("ID_Bien"));
                     bien.setNombre(rs.getString("Nombre"));
                     bien.setEstadoBien(EstadoBien.valueOf(rs.getString("Estado")));
+                    bien.setDetalle(rs.getString("Detalle"));
                     
                     int ubicacionID = rs.getInt("ID_Ubicacion");
                     bien.setUbicacionBien(ubicacionDAO.buscar(ubicacionID).getNombre());
 
                     int categoriaID = rs.getInt("ID_Categoria");
                     bien.setNombreCatBienes(categoriaDAO.buscar(categoriaID).getNombre());
+                    
+                    bien.setCantBienes(null);
                 }
             }
         } catch (SQLException ex) {
@@ -86,6 +89,9 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
                     int ubicacionID = rs.getInt("ID_Ubicacion");
                     bien.setUbicacionBien(ubicacionDAO.buscar(ubicacionID).getNombre());
                     bien.setEstadoBien(EstadoBien.valueOf(rs.getString("Estado")));
+                    bien.setDetalle(rs.getString("Detalle"));
+                    
+                    bien.setCantBienes(null);
 
                     bienes.add(bien);
                 }
@@ -98,7 +104,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
 
     @Override
     public int insertar(BienDTO bien) {
-        String sql = "INSERT INTO Bien (Nombre, ID_Categoria, Estado, ID_Ubicacion) VALUES (?,?,?,?)";
+        String sql = "INSERT INTO Bien (Nombre, ID_Categoria, Estado, ID_Ubicacion, Detalle) VALUES (?,?,?,?,?)";
         int resultado = 0;
         int idCategoria = categoriaDAO.buscar(bien.getNombreCatBienes()).getID_Categoria();
         int idUbicacion = ubicacionDAO.buscar(bien.getUbicacionBien()).getID_Ubicacion();
@@ -110,6 +116,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
             ps.setInt(2, idCategoria); //el id de categoria que mande a buscar antes
             ps.setString(3, bien.getEstadoBien().name());
             ps.setInt(4, idUbicacion);
+            ps.setString(5, bien.getDetalle()); // puede ser nulo
             
             resultado = ps.executeUpdate();
             
@@ -131,7 +138,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
 
     @Override
     public int actualizar(BienDTO bien) {
-        String sql = "UPDATE Bien SET Nombre = ?, ID_Categoria = ?, ID_Ubicacion = ? WHERE ID_Bien = ?";
+        String sql = "UPDATE Bien SET Nombre = ?, ID_Categoria = ?, ID_Ubicacion = ?, Detalle = ? WHERE ID_Bien = ?";
         int idCategoria = categoriaDAO.buscar(bien.getNombreCatBienes()).getID_Categoria();
         int idUbicacion = ubicacionDAO.buscar(bien.getUbicacionBien()).getID_Ubicacion();
         int resultado = 0;
@@ -142,7 +149,8 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
             ps.setString(1, bien.getNombre());
             ps.setInt(2, idCategoria);  //use lo mismo en insertar ya que buscamos el id antes de actualizar, si existe, lo setea
             ps.setInt(3, idUbicacion);
-            ps.setInt(4, bien.getID_Bien());
+            ps.setString(4, bien.getDetalle()); // puede ser nulo
+            ps.setInt(5, bien.getID_Bien());
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
