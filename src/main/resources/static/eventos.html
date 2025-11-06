@@ -90,7 +90,7 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Nro. de inv.</th>
+                        <th>Bien</th>
                         <th>Tipo</th>
                         <th>Fecha</th>
                         <th>Acciones</th>
@@ -151,6 +151,7 @@
         recargarBienes();
         function renderEventos() {
             const eventos = JSON.parse(localStorage.getItem("eventos")) || [];
+            const bienes = JSON.parse(localStorage.getItem("bienes")) || [];
 
             const filterBienInput = document.getElementById("filterBienInput");
             const filterTipoEvento = document.getElementById("filterTipoEvento");
@@ -170,10 +171,11 @@
                     matchTipoEvento(evento.tipoEvento, filterTipoEvento.value) &&
                     matchFecha(evento.fechaEvento, filterFecha.value)
                 ) {
+                    const bien = bienes.find(b => b.id_Bien === evento.bienAsociado);
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
                         <td>${evento.id_Evento}</td>
-                        <td>${formatearNroBien(evento.bienAsociado)}</td>
+                        <td>#${formatearNroBien(evento.bienAsociado)} — ${bien.nombre}</td>
                         <td>${evento.tipoEvento}</td>
                         <td>${formatearFechaHora(evento.fechaEvento)}</td>
                         <td>
