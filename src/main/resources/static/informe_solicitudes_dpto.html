@@ -54,9 +54,9 @@
 
     // Filtrar solicitudes en rango de fechas
     const solicitudesFiltradas = solicitudes
-      .filter(s => s.fechaInicioSolicitud >= desde && s.fechaInicioSolicitud <= hasta)
+      .filter(s => new Date(s.fechaInicioSolicitud).toLocaleDateString("en-CA") >= desde && new Date(s.fechaInicioSolicitud).toLocaleDateString("en-CA") <= hasta)
       .map(s => ({
-        fecha: s.fechaInicioSolicitud.split("T")[0] + " " + s.fechaInicioSolicitud.split("T")[1].replace("Z", ""),
+        fecha: `${new Date(s.fechaInicioSolicitud).toLocaleString().replace(",", "")}`,
         departamento: s.ubicacionBienes,
         descripcion: s.descripcion
       }))

@@ -168,7 +168,7 @@
                     const fila = document.createElement("tr");
                     fila.innerHTML = `
                         <td>${sol.numSolicitud}</td>
-                        <td>${new Date(sol.fechaInicioSolicitud).toLocaleString()}</td>
+                        <td>${new Date(sol.fechaInicioSolicitud).toLocaleString().replace(",", "")}</td>
                         <td>${sol.ubicacionBienes}</td>
                         <td>${(sol.estado).replace("_", " ")}</td>
                         <td>
