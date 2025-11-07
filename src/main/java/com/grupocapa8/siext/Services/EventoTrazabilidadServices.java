@@ -24,9 +24,13 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
     
     @Override
     public EventoTrazabilidadDTO buscar(int idEventoTraz) throws NoSuchElementException {
+        return this.buscar(idEventoTraz, true);
+    }
+    
+    public EventoTrazabilidadDTO buscar(int idEventoTraz, boolean checkEliminado) throws NoSuchElementException {
         Validador.validarId(idEventoTraz, CAMPO_ID_TEXT);
         EventoTrazabilidadDTO evento = eventoTrazDAO.buscar(idEventoTraz);
-        if (evento == null){
+        if (evento == null || (checkEliminado && evento.isEliminado())){
             throw new NoSuchElementException("No existe el evento de trazabilidad.");
         }
         return evento;
@@ -69,10 +73,8 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
     
     @Override
     public void modificar(EventoTrazabilidadDTO dto, int id) throws NoSuchElementException {
-        Validador.validarId(id, CAMPO_ID_TEXT);
-        if (eventoTrazDAO.buscar(id) == null){
-            throw new NoSuchElementException("No existe el evento de trazabilidad.");
-        }
+        this.buscar(id);
+        
         int idBien = dto.getBienAsociado();
         if (bienService.buscar(idBien) == null){
             throw new NoSuchElementException("No existe el bien.");
@@ -107,11 +109,7 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
     
     @Override
     public void eliminar(int idEventoTraz) throws NoSuchElementException {
-        Validador.validarId(idEventoTraz, CAMPO_ID_TEXT);
-        EventoTrazabilidadDTO evento = eventoTrazDAO.buscar(idEventoTraz);
-        if (evento == null){ //hacer una validacion del id
-            throw new NoSuchElementException("No existe el evento de trazabilidad.");
-        }
+        EventoTrazabilidadDTO evento = this.buscar(idEventoTraz);
         
         int idBien = evento.getBienAsociado();
         TipoEvento tipoDelEventoActual = evento.getTipoEvento();

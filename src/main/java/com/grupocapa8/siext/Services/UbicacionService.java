@@ -24,9 +24,13 @@ public class UbicacionService implements ServiceGenerico<UbicacionDTO>{
     
     @Override
     public UbicacionDTO buscar(int idUbicacion) throws NoSuchElementException {
+        return this.buscar(idUbicacion, true);
+    }
+    
+    public UbicacionDTO buscar(int idUbicacion, boolean checkEliminado) throws NoSuchElementException {
         Validador.validarId(idUbicacion, CAMPO_ID_TEXT);
         UbicacionDTO ubicacion = ubicacionDAO.buscar(idUbicacion);
-        if (ubicacion == null){
+        if (ubicacion == null || (checkEliminado && ubicacion.isEliminado())){
             throw new NoSuchElementException("No existe la ubicación.");
         }
         return ubicacion;
@@ -49,10 +53,8 @@ public class UbicacionService implements ServiceGenerico<UbicacionDTO>{
     
     @Override
     public void modificar(UbicacionDTO dto, int id) throws NoSuchElementException {
-        Validador.validarId(id, CAMPO_ID_TEXT);
-        if (ubicacionDAO.buscar(id) == null){
-            throw new NoSuchElementException("No existe la ubicación.");
-        }
+        this.buscar(id);
+        
         String nombre = dto.getNombre().trim().toUpperCase();
         Validador.validarString(nombre,CAMPO_NOMBRE_TEXT,CAMPO_NOMBRE_MIN,CAMPO_NOMBRE_MAX);
         
@@ -64,10 +66,8 @@ public class UbicacionService implements ServiceGenerico<UbicacionDTO>{
    
     @Override
     public void eliminar(int idUbicacion) throws NoSuchElementException {
-        Validador.validarId(idUbicacion, CAMPO_ID_TEXT);
-        if (ubicacionDAO.buscar(idUbicacion) == null){
-            throw new NoSuchElementException("No existe la ubicación.");
-        }
+        this.buscar(idUbicacion);
+        
         ubicacionDAO.eliminar(idUbicacion);
     }
     
