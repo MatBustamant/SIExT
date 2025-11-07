@@ -9,6 +9,31 @@
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/tablas.css">
     <link rel="icon" href="images\icon.png">
+    <style>
+        .detalle-fila {
+        background-color: #f9f9f9;
+        }
+
+        .detalle-contenido {
+        padding: 10px 20px;
+        font-size: 0.95em;
+        line-height: 1.4em;
+        border-top: 1px solid #ddd;
+        }
+
+        .hidden {
+        display: none;
+        }
+
+        .pagination-controls {
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        justify-content: flex-end;
+        font-size: 0.9em;
+        }
+    </style>
 </head>
 
 <body>
@@ -33,7 +58,8 @@
                 <li><a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver al Panel</a></li>
                 <li><a href="ubicaciones.html" class="btn"><i class="bi bi-geo-alt"></i>Editar Ubicaciones</a></li>
                 <li><a href="bienes.html" class="btn"><i class="bi bi-box-seam"></i>Gestionar Bienes</a></li>
-                <li id="supervisor-only-accion" class="hidden"><a href="informes.html" class="btn"><i class="bi bi-file-earmark-text"></i>Generar Informes</a></li>
+                <li id="supervisor-only-accion" class="hidden"><a href="informes.html" class="btn"><i
+                            class="bi bi-file-earmark-text"></i>Generar Informes</a></li>
             </ul>
         </nav>
     </div>
@@ -88,6 +114,7 @@
             <table id="tablaSolicitudes">
                 <thead>
                     <tr>
+                        <th></th>
                         <th>N° Solicitud</th>
                         <th>Fecha</th>
                         <th>Ubicación</th>
@@ -97,6 +124,21 @@
                 </thead>
                 <tbody></tbody>
             </table>
+
+            <div class="pagination-controls">
+                <button id="prevPage" class="btn"><i class="bi bi-chevron-left"></i> Anterior</button>
+                <span id="pageInfo">Página 1 de 1</span>
+                <button id="nextPage" class="btn">Siguiente <i class="bi bi-chevron-right"></i></button>
+                <select id="rowsPerPageSelect">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="15" selected>15</option>
+                    <option value="20">20</option>
+                    <option value="25">25</option>
+                    <option value="30">30</option>
+                </select>
+                <label for="rowsPerPageSelect">por página</label>
+            </div>
 
             <div class="informativo" id="counterSolicitudes"></div>
         </section>
@@ -142,6 +184,11 @@
     <script>
         recargarSolicitudes();
         recargarUbicaciones();
+
+        let currentPage = 1;
+        let rowsPerPage = parseInt(document.getElementById("rowsPerPageSelect").value, 10);
+        let totalPages = 1;
+
         function renderSolicitudes() {
             const solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
             const solicitudesHabilitadas = solicitudes.filter(s => !s.eliminado);
@@ -154,35 +201,99 @@
             const tbody = document.querySelector("#tablaSolicitudes tbody");
             tbody.innerHTML = "";
 
-            let count = 0;
-
-            solicitudesHabilitadas.forEach(sol => {
-                const matchNumSolicitud = numero => String(sol.numSolicitud).includes(numero);
+            // Filtrado
+            const filtradas = solicitudesHabilitadas.filter(sol => {
+                const matchNumSolicitud = numero => !numero || String(sol.numSolicitud).includes(numero);
                 const matchUbicacion = (ubi, filtro) => !filtro || ubi === filtro;
                 const matchEstado = (est, filtro) => !filtro || est === filtro;
                 const matchFecha = (fecha, filtro) => !filtro || formatearFechaLocal(fecha) === filtro;
 
-                if (matchNumSolicitud(filterNroSolicitud.value)
-                    && matchUbicacion(sol.ubicacionBienes, filterUbicacion.value)
-                    && matchEstado(sol.estado, filterEstado.value)
-                    && matchFecha(sol.fechaInicioSolicitud, filterFecha.value)
-                ) {
+                return (
+                    matchNumSolicitud(filterNroSolicitud.value) &&
+                    matchUbicacion(sol.ubicacionBienes, filterUbicacion.value) &&
+                    matchEstado(sol.estado, filterEstado.value) &&
+                    matchFecha(sol.fechaInicioSolicitud, filterFecha.value)
+                );
+            });
+
+            // Paginación
+            const totalRows = filtradas.length;
+            totalPages = Math.ceil(totalRows / rowsPerPage);
+            if (currentPage > totalPages) currentPage = totalPages || 1;
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const paginadas = filtradas.slice(startIndex, endIndex);
+
+            if (paginadas.length === 0) {
+                const filaVacia = document.createElement("tr");
+                filaVacia.innerHTML = `<td colspan="6" class="text-center">(No hay resultados que coincidan)</td>`;
+                tbody.appendChild(filaVacia);
+            }
+
+            paginadas.forEach(sol => {
                     const fila = document.createElement("tr");
                     fila.innerHTML = `
+                        <td><button class="btn btn-toggle" onclick="toggleDetalles(this)" title="Expandir detalles">
+                            <i class="bi bi-caret-down-fill"></i></button></td>
                         <td>${sol.numSolicitud}</td>
                         <td>${formatearFechaHora(sol.fechaInicioSolicitud)}</td>
                         <td>${sol.ubicacionBienes}</td>
-                        <td>${(sol.estado).replace("_", " ")}</td>
+                        <td>${(sol.estado).replace(/_/g, " ")}</td>
                         <td>
-                            <button class="btn" onclick="editarSolicitud(${sol.numSolicitud})"><i class="bi bi-pencil"></i></button>
+                            <button class="btn" onclick="editarSolicitud(${sol.numSolicitud})" title="Editar solicitud"><i class="bi bi-pencil"></i></button>
                         </td>`;
                     tbody.appendChild(fila);
-                    count++;
-                }
-            });
 
-            document.getElementById("counterSolicitudes").textContent = `Mostrando ${count} solicitud(es).`;
+                    // Fila oculta de detalles
+                    const detalle = document.createElement("tr");
+                    detalle.classList.add("detalle-fila", "hidden");
+                    detalle.innerHTML = `
+                        <td colspan="6" class="detalle-contenido">
+                            <p><strong>Descripción:</strong> ${sol.descripcion || "(Sin descripción)"}</p>
+                            <p><strong>Fecha inicio:</strong> ${formatearFechaHora(sol.fechaInicioSolicitud)}</p>
+                            <p><strong>Estado:</strong> ${(sol.estado).replace(/_/g, " ")}</p>
+                            <p><strong>Ubicación destino:</strong> ${sol.ubicacionBienes}</p>
+                        </td>
+                    `;
+                    tbody.appendChild(detalle);
+                });
+
+            document.getElementById("counterSolicitudes").textContent = `Mostrando ${paginadas.length} de ${totalRows} solicitud(es).`;
+            document.getElementById("pageInfo").textContent = `Página ${currentPage} de ${totalPages || 1}`;
         }
+
+        // Función para expandir/contraer detalle
+        function toggleDetalles(button) {
+            const fila = button.closest("tr");
+            const siguiente = fila.nextElementSibling;
+            if (siguiente && siguiente.classList.contains("detalle-fila")) {
+                siguiente.classList.toggle("hidden");
+                const icono = button.querySelector("i");
+                icono.classList.toggle("bi-caret-down-fill");
+                icono.classList.toggle("bi-caret-up-fill");
+            }
+        }
+
+        // Controles de paginación
+        document.getElementById("prevPage").addEventListener("click", () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderSolicitudes();
+        }
+        });
+
+        document.getElementById("nextPage").addEventListener("click", () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderSolicitudes();
+            }
+        });
+
+        document.getElementById("rowsPerPageSelect").addEventListener("change", (e) => {
+            rowsPerPage = parseInt(e.target.value);
+            currentPage = 1;
+            renderSolicitudes();
+        });
 
         document.getElementById("filterNroSolicitud").addEventListener("input", renderSolicitudes);
         document.getElementById("filterUbicacion").addEventListener("change", renderSolicitudes);
