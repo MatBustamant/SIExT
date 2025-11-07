@@ -147,7 +147,8 @@
         <section id="modificarSolicitudSection" class="hidden">
             <h2>Editar solicitud</h2>
             <form id="modificarSolicitudForm">
-                <input type="hidden" id="modSolicitudId">
+                <label>Nro. de solicitud</label>
+                <input type="number" id="modSolicitudId" disabled>
                 <label>Ubicación destino</label>
                 <input list="modUbicacionesSugeridas" type="text" id="modUbicacion" required>
                 <datalist id="modUbicacionesSugeridas"></datalist>
@@ -233,14 +234,19 @@
             paginadas.forEach(sol => {
                     const fila = document.createElement("tr");
                     fila.innerHTML = `
-                        <td><button class="btn btn-toggle" onclick="toggleDetalles(this)" title="Expandir detalles">
-                            <i class="bi bi-caret-down-fill"></i></button></td>
+                        <td>
+                            <button class="btn btn-toggle" title="Expandir detalles">
+                                <i class="bi bi-caret-down-fill"></i>
+                            </button>
+                        </td>
                         <td>${sol.numSolicitud}</td>
                         <td>${formatearFechaHora(sol.fechaInicioSolicitud)}</td>
                         <td>${sol.ubicacionBienes}</td>
                         <td>${(sol.estado).replace(/_/g, " ")}</td>
                         <td>
-                            <button class="btn" onclick="editarSolicitud(${sol.numSolicitud})" title="Editar solicitud"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-editar" data-id="${sol.numSolicitud}" title="Editar solicitud">
+                                <i class="bi bi-pencil"></i>
+                            </button>
                         </td>`;
                     tbody.appendChild(fila);
 
@@ -295,6 +301,22 @@
             renderSolicitudes();
         });
 
+        document.querySelector("#tablaSolicitudes tbody").addEventListener("click", (e) => {
+            // Buscamos si el clic fue en un botón de editar
+            const btnEditar = e.target.closest(".btn-editar");
+            if (btnEditar) {
+                const nroSolicitud = Number(btnEditar.dataset.id);
+                editarSolicitud(nroSolicitud);
+                return;
+            }
+
+            // Buscamos si el clic fue en un botón de toggle detalles
+            const btnToggle = e.target.closest(".btn-toggle");
+            if (btnToggle) {
+                toggleDetalles(btnToggle);
+                return;
+            }
+        });
         document.getElementById("filterNroSolicitud").addEventListener("input", renderSolicitudes);
         document.getElementById("filterUbicacion").addEventListener("change", renderSolicitudes);
         document.getElementById("filterEstado").addEventListener("change", renderSolicitudes);
@@ -380,7 +402,10 @@
             document.getElementById("modUbicacion").value = sol.ubicacionBienes;
             document.getElementById("modEstado").value = sol.estado;
             document.getElementById("modDescripcion").value = sol.descripcion;
+
             document.getElementById("modificarSolicitudSection").classList.remove("hidden");
+
+            document.getElementById("modUbicacion").focus();
         }
 
         document.getElementById("modificarSolicitudForm").addEventListener("submit", async (e) => {
@@ -428,6 +453,8 @@
             renderSolicitudes();
             document.getElementById("modificarSolicitudSection").classList.add("hidden");
             e.target.reset();
+
+            document.getElementById("tablaSolicitudes").parentElement.scrollIntoView({ behavior: "smooth" });
         });
 
         document.getElementById("eliminarSolicitudBtn").addEventListener("click", async () => {
@@ -460,6 +487,8 @@
             renderSolicitudes();
             document.getElementById("modificarSolicitudSection").classList.add("hidden");
             document.getElementById("modificarSolicitudForm").reset();
+
+            document.getElementById("tablaSolicitudes").parentElement.scrollIntoView({ behavior: "smooth" });
         });
 
         // Cancelar edición de datos
@@ -467,6 +496,8 @@
             if (confirm("¿Deseás cancelar la edición? Se perderán los cambios no guardados.")) {
                 document.getElementById("modificarSolicitudSection").classList.add("hidden");
                 document.getElementById("modificarSolicitudForm").reset();
+
+                document.getElementById("tablaSolicitudes").parentElement.scrollIntoView({ behavior: "smooth" });
             }
         };
 

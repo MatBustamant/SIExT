@@ -86,7 +86,7 @@
                 </div>
             </div>
 
-            <table>
+            <table id="tablaEventos">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -107,7 +107,8 @@
         <section id="modificarEventoSection" class="hidden">
             <h2>Actualizar evento</h2>
             <form id="modificarEventoForm">
-                <input type="hidden" id="modEventoId">
+                <label>Identificador de evento</label>
+                <input type="number" id="modEventoId" disabled>
 
                 <label>Nro. de inventario</label>
                 <div class="input-prefix">
@@ -159,7 +160,7 @@
             const filterTipoEvento = document.getElementById("filterTipoEvento");
             const filterFecha = document.getElementById("filterFecha");
 
-            const tbody = document.querySelector("table tbody");
+            const tbody = document.querySelector("#tablaEventos tbody");
             tbody.innerHTML = "";
 
             let count = 0;
@@ -181,7 +182,9 @@
                         <td>${evento.tipoEvento}</td>
                         <td>${formatearFechaHora(evento.fechaEvento)}</td>
                         <td>
-                            <button class="btn" onClick="editarEvento(${evento.id_Evento})"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-editar" data-id="${evento.id_Evento}" title="Editar evento">
+                                <i class="bi bi-pencil"></i>
+                            </button>
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -192,6 +195,22 @@
             document.getElementById("counterEventos").textContent = `Mostrando ${count} evento(s).`;
         }
 
+        document.querySelector("#tablaEventos tbody").addEventListener("click", (e) => {
+            // Buscamos si el clic fue en un botón de editar
+            const btnEditar = e.target.closest(".btn-editar");
+            if (btnEditar) {
+                const id = Number(btnEditar.dataset.id);
+                editarEvento(id);
+                return;
+            }
+
+            // Buscamos si el clic fue en un botón de toggle detalles
+            // const btnToggle = e.target.closest(".btn-toggle");
+            // if (btnToggle) {
+            //     toggleDetalles(btnToggle);
+            //     return;
+            // }
+        });
         document.getElementById("filterBienInput").addEventListener("input", renderEventos);
         document.getElementById("filterTipoEvento").addEventListener("change", renderEventos);
         document.getElementById("filterFecha").addEventListener("change", renderEventos);
@@ -249,7 +268,10 @@
             document.getElementById("modEventoId").value = evento.id_Evento;
             document.getElementById("modBienId").value = evento.bienAsociado;
             document.getElementById("modTipoEvento").value = evento.tipoEvento;
+
             document.getElementById("modificarEventoSection").classList.remove("hidden");
+
+            document.getElementById("modBienId").focus();
         }
 
         document.getElementById("modificarEventoForm").addEventListener("submit", async (e) => {
@@ -293,13 +315,17 @@
             renderEventos();
             document.getElementById("modificarEventoSection").classList.add("hidden");
             e.target.reset();
+
+            document.getElementById("tablaEventos").parentElement.scrollIntoView({ behavior: "smooth" });
         });
 
         // Cancelar edición de datos
         document.getElementById("cancelarEdicionBtn").onclick = () => {
             if (confirm("¿Deseás cancelar la edición? Se perderán los cambios no guardados.")) {
                 document.getElementById("modificarEventoSection").classList.add("hidden");
-                document.getElementById("modificarEventoSection").reset();
+                document.getElementById("modificarEventoForm").reset();
+
+                document.getElementById("tablaEventos").parentElement.scrollIntoView({ behavior: "smooth" });
             }
         };
 
@@ -334,6 +360,8 @@
             renderEventos();
             document.getElementById("modificarEventoSection").classList.add("hidden");
             document.getElementById("modificarEventoForm").reset();
+
+            document.getElementById("tablaEventos").parentElement.scrollIntoView({ behavior: "smooth" });
         });
     </script>
 
