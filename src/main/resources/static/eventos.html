@@ -255,34 +255,6 @@
         document.getElementById("modificarEventoForm").addEventListener("submit", async (e) => {
             e.preventDefault();
             const id = +document.getElementById("modEventoId").value;
-            let evento;
-            try {
-                const response = await leerEvento(id);
-                if (!response.ok) {
-                    document.getElementById("modificarEventoSection").classList.add("hidden");
-                    const errorData = await response.json();
-                    if (response.status == 422) {
-                        alert(errorData.error);
-                        return;
-                    }
-                    if (response.status == 404) {
-                        alert("Evento no encontrado.");
-                        return;
-                    }
-                    else if (response.status == 500) {
-                        alert("El servidor no pudo realizar la búsqueda del evento. Código: 500");
-                        return;
-                    }
-                    else {
-                        alert(`El servidor no pudo realizar la búsqueda del evento. Código: ${response.status}`);
-                        return;
-                    }
-                }
-                evento = await response.json();
-            } catch (error) {
-                alert("No se pudo conectar con el servidor.");
-                return;
-            }
 
             const eventoModificado = {
                 tipoEvento: document.getElementById("modTipoEvento").value.trim().toUpperCase(),
@@ -294,7 +266,7 @@
                 if (!response.ok) {
                     const errorData = await response.json();
                     if (response.status == 404) {
-                        alert("Bien no encontrado.");
+                        alert("Evento no encontrado.");
                         return;
                     }
                     if (response.status == 422) {

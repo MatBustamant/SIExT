@@ -363,35 +363,6 @@
         document.getElementById("modificarBienForm").addEventListener("submit", async (e) => {
             e.preventDefault();
             const id = modBienId.value;
-            let bien;
-            try {
-                const response = await leerBien(id);
-                if (!response.ok) {
-                    document.getElementById("modificarBienSection").classList.add("hidden");
-                    const errorData = await response.json();
-                    if (response.status == 422) {
-                        alert(errorData.error);
-                        return;
-                    }
-                    if (response.status == 404) {
-                        alert("Bien no encontrado.");
-                        return;
-                    }
-                    else if (response.status == 500) {
-                        alert("El servidor no pudo realizar la búsqueda del bien. Código: 500");
-                        return;
-                    }
-                    else {
-                        alert(`El servidor no pudo realizar la búsqueda del bien. Código: ${response.status}`);
-                        return;
-                    }
-                }
-                bien = await response.json();
-            } catch (error) {
-                alert("No se pudo conectar con el servidor.");
-                return;
-            }
-
             const modDetalleTempInput = modDetalleProducto.value.trim().toUpperCase();
             const modDetalleTemp = modDetalleTempInput === "" ? null : modDetalleTempInput;
 
