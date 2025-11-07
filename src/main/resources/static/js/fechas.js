@@ -10,6 +10,22 @@ function formatearFechaLocal(fecha) {
   return new Date(fecha).toLocaleDateString("en-CA");
 }
 
+function formatearFechaLocalEsp(fecha) {
+  return new Date(fecha).toLocaleDateString("es-AR");
+}
+
+function formatearFechaLocalLegible(fecha) {
+  fechaFinal = new Date(fecha).toLocaleString("es-AR", {
+    weekday: "long",
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+  return fechaFinal.charAt(0).toUpperCase() + fechaFinal.slice(1);
+}
+
 function formatearFechaHora(fecha) {
   return new Date(fecha).toLocaleString().replace(",", "");
 }
