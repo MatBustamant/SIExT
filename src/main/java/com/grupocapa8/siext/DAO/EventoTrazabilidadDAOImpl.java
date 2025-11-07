@@ -29,13 +29,12 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
     public EventoTrazabilidadDTO buscar(int id) {
 
         EventoTrazabilidadDTO evento = null;
-        String sql = "SELECT * FROM EventoTrazabilidad WHERE ID_Evento = ? AND Eliminado = ?";
+        String sql = "SELECT * FROM EventoTrazabilidad WHERE ID_Evento = ?";
         
         try (Connection con = getConnection();
             PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, id);
-            ps.setInt(2, 0);
             try (ResultSet rs = ps.executeQuery()){
                 if (rs.next()){
                     evento = new EventoTrazabilidadDTO();
@@ -47,6 +46,7 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
                     Instant fecha = LocalDateTime.parse(fechaString, 
                     DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toInstant(ZoneOffset.UTC);
                     evento.setFechaEvento(fecha);
+                    evento.setEliminado(rs.getInt("Eliminado") != 0);
                 }
             }
             
@@ -59,10 +59,9 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
     @Override
     public List<EventoTrazabilidadDTO> buscarTodos() {
         List<EventoTrazabilidadDTO> eventos = new ArrayList<>();
-        String sql = "SELECT * FROM EventoTrazabilidad WHERE Eliminado = ?";
+        String sql = "SELECT * FROM EventoTrazabilidad";
         try (Connection con = getConnection();
             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, 0);
         
             try(ResultSet rs = ps.executeQuery()) {
 
@@ -76,6 +75,7 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
                 Instant fecha = LocalDateTime.parse(fechaString,
                 DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toInstant(ZoneOffset.UTC);
                 evento.setFechaEvento(fecha);
+                evento.setEliminado(rs.getInt("Eliminado") != 0);
                 
                 eventos.add(evento);
             }
@@ -137,7 +137,7 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, idBien);
-            ps.setString(2, "ENTREGA");
+            ps.setString(2, TipoEvento.ENTREGA.name());
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
@@ -148,7 +148,7 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
 
     @Override
     public int actualizar(EventoTrazabilidadDTO Evento) {
-        String sql = "UPDATE EventoTrazabilidad SET ID_Bien = ?, TipoEvento = ? WHERE ID_Evento = ?";
+        String sql = "UPDATE EventoTrazabilidad SET ID_Bien = ?, TipoEvento = ? WHERE ID_Evento = ? AND Eliminado = ?";
         int resultado = 0;
         
         try (Connection con = BasedeDatos.getConnection();
@@ -157,6 +157,7 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
             ps.setInt(1, Evento.getBienAsociado());
             ps.setString(2, Evento.getTipoEvento().name());
             ps.setInt(3, Evento.getID_Evento());
+            ps.setInt(4, 0);
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
@@ -167,13 +168,14 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
 
     @Override
     public int eliminar(int id) {
-        String sql = "UPDATE EventoTrazabilidad SET Eliminado = ? WHERE ID_Evento = ?";
+        String sql = "UPDATE EventoTrazabilidad SET Eliminado = ? WHERE ID_Evento = ? AND Eliminado = ?";
         int resultado = 0;
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, 1);
             ps.setInt(2, id);
+            ps.setInt(3, 0);
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
             System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);

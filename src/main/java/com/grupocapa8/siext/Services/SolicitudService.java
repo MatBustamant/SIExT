@@ -49,7 +49,7 @@ public class SolicitudService implements ServiceGenerico<SolicitudDTO> {
         dto.setUbicacionBienes(ubicacion);
         
         if (ubiDAO.buscar(ubicacion) == null) {
-            UbicacionDTO nuevaUbicacion = new UbicacionDTO(0, ubicacion);
+            UbicacionDTO nuevaUbicacion = new UbicacionDTO(0, ubicacion, false);
             ubiDAO.insertar(nuevaUbicacion);
         }
         // Convertir DTO a entidad y guardarlo en BD
@@ -73,7 +73,7 @@ public class SolicitudService implements ServiceGenerico<SolicitudDTO> {
         dto.setNumSolicitud(id);
         
         if (ubiDAO.buscar(ubicacion) == null) {
-            UbicacionDTO nuevaUbicacion = new UbicacionDTO(0, ubicacion);
+            UbicacionDTO nuevaUbicacion = new UbicacionDTO(0, ubicacion, false);
             ubiDAO.insertar(nuevaUbicacion);
         }
         // Convertir DTO a entidad y guardarlo en BD

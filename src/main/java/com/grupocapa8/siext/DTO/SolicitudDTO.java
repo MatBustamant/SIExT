@@ -13,15 +13,17 @@ public class SolicitudDTO {
     private String UbicacionBienes;
     private EstadoSolicitud Estado;
     private String Descripcion;
+    private boolean eliminado;
     
     public SolicitudDTO(){
         
     }
-    public SolicitudDTO(Integer numSolicitud, Instant FechaInicioSolicitud, String UbicacionBienes, EstadoSolicitud Estado) {
+    public SolicitudDTO(Integer numSolicitud, Instant FechaInicioSolicitud, String UbicacionBienes, EstadoSolicitud Estado, boolean eliminado) {
         this.numSolicitud = numSolicitud;
         this.FechaInicioSolicitud = FechaInicioSolicitud;
         this.UbicacionBienes = UbicacionBienes;
         this.Estado = Estado;
+        this.eliminado = eliminado;
     }
 
     public String getDescripcion() {
@@ -62,5 +64,14 @@ public class SolicitudDTO {
 
     public void setEstado(EstadoSolicitud Estado) {
         this.Estado = Estado;
-    }   
+    }
+
+    public boolean isEliminado() {
+        return eliminado;
+    }
+
+    public void setEliminado(boolean eliminado) {
+        this.eliminado = eliminado;
+    }
+    
 }

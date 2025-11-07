@@ -11,12 +11,14 @@ public class UsuarioDTO {
     private String Nombre;
     private String Contraseña;
     private RolUsuario Rol;
+    private boolean eliminado;
 
-    public UsuarioDTO(int ID_Usuario, String Nombre, String Contraseña, RolUsuario Rol) {
+    public UsuarioDTO(int ID_Usuario, String Nombre, String Contraseña, RolUsuario Rol, boolean eliminado) {
         this.ID_Usuario = ID_Usuario;
         this.Nombre = Nombre;
         this.Contraseña = Contraseña;
         this.Rol = Rol;
+        this.eliminado = eliminado;
     }
 
     public int getID_Usuario() {
@@ -52,6 +54,14 @@ public class UsuarioDTO {
 
     public void setRol(RolUsuario Rol) {
         this.Rol = Rol;
+    }
+
+    public boolean isEliminado() {
+        return eliminado;
+    }
+
+    public void setEliminado(boolean eliminado) {
+        this.eliminado = eliminado;
     }
     
 }

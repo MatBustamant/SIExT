@@ -34,13 +34,12 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
     public BienDTO buscar(int id) {
 
         BienDTO bien = null;
-        String sql = "SELECT * FROM Bien WHERE ID_Bien = ? AND Eliminado = ?";
+        String sql = "SELECT * FROM Bien WHERE ID_Bien = ?";
 
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, id);
-            ps.setInt(2, 0);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     bien = new BienDTO();
@@ -56,6 +55,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
                     bien.setNombreCatBienes(categoriaDAO.buscar(categoriaID).getNombre());
                     
                     bien.setCantBienes(null);
+                    bien.setEliminado(rs.getInt("Eliminado") != 0);
                 }
             }
         } catch (SQLException ex) {
@@ -69,12 +69,10 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
     public List<BienDTO> buscarTodos() {
         List<BienDTO> bienes = new ArrayList<>();
 
-        String sql = "SELECT * FROM Bien WHERE Eliminado = ?";
+        String sql = "SELECT * FROM Bien";
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
-            ps.setInt(1, 0);
-        
             try (ResultSet rs = ps.executeQuery()) {
 
                 while (rs.next()) {
@@ -92,6 +90,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
                     bien.setDetalle(rs.getString("Detalle"));
                     
                     bien.setCantBienes(null);
+                    bien.setEliminado(rs.getInt("Eliminado") != 0);
 
                     bienes.add(bien);
                 }
@@ -138,7 +137,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
 
     @Override
     public int actualizar(BienDTO bien) {
-        String sql = "UPDATE Bien SET Nombre = ?, ID_Categoria = ?, ID_Ubicacion = ?, Detalle = ? WHERE ID_Bien = ?";
+        String sql = "UPDATE Bien SET Nombre = ?, ID_Categoria = ?, ID_Ubicacion = ?, Detalle = ? WHERE ID_Bien = ? AND Eliminado = ?";
         int idCategoria = categoriaDAO.buscar(bien.getNombreCatBienes()).getID_Categoria();
         int idUbicacion = ubicacionDAO.buscar(bien.getUbicacionBien()).getID_Ubicacion();
         int resultado = 0;
@@ -151,6 +150,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
             ps.setInt(3, idUbicacion);
             ps.setString(4, bien.getDetalle()); // puede ser nulo
             ps.setInt(5, bien.getID_Bien());
+            ps.setInt(6, 0);
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
@@ -177,7 +177,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
 
     @Override
     public int eliminar(int id) {
-        String sql = "UPDATE Bien SET Eliminado = ? WHERE ID_Bien = ?";
+        String sql = "UPDATE Bien SET Eliminado = ? WHERE ID_Bien = ? AND Eliminado = ?";
         int resultado = 0;
         
         try (Connection con = BasedeDatos.getConnection();
@@ -185,6 +185,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
             
             ps.setInt(1, 1);
             ps.setInt(2, id);
+            ps.setInt(3, 0);
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
