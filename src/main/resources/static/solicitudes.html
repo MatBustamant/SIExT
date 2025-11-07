@@ -9,31 +9,6 @@
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/tablas.css">
     <link rel="icon" href="images/icon.png">
-    <style>
-        .detalle-fila {
-        background-color: #f9f9f9;
-        }
-
-        .detalle-contenido {
-        padding: 10px 20px;
-        font-size: 0.95em;
-        line-height: 1.4em;
-        border-top: 1px solid #ddd;
-        }
-
-        .hidden {
-        display: none;
-        }
-
-        .pagination-controls {
-        margin-top: 10px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        justify-content: flex-end;
-        font-size: 0.9em;
-        }
-    </style>
 </head>
 
 <body>
@@ -228,17 +203,17 @@
                     const fila = document.createElement("tr");
                     fila.innerHTML = `
                         <td>
-                            <button class="btn btn-toggle" title="Expandir detalles">
+                            <button class="btn btn-toggle btn-icon-table" title="Expandir detalles">
                                 <i class="bi bi-caret-down-fill"></i>
                             </button>
                         </td>
                         <td>${sol.numSolicitud}</td>
-                        <td>${formatearFechaHora(sol.fechaInicioSolicitud)}</td>
+                        <td>${formatearFechaLocalEsp(sol.fechaInicioSolicitud)}</td>
                         <td>${sol.ubicacionBienes}</td>
                         <td>${(sol.estado).replace(/_/g, " ")}</td>
                         <td>
-                            <button class="btn btn-editar" data-id="${sol.numSolicitud}" title="Editar solicitud">
-                                <i class="bi bi-pencil"></i>
+                            <button class="btn btn-editar btn-icon-table" data-id="${sol.numSolicitud}" title="Editar solicitud">
+                                <i class="bi bi-pencil-fill"></i>
                             </button>
                         </td>`;
                     tbody.appendChild(fila);
@@ -249,8 +224,8 @@
                     detalle.innerHTML = `
                         <td colspan="6" class="detalle-contenido">
                             <p><strong>Descripción:</strong> ${sol.descripcion || "(Sin descripción)"}</p>
-                            <p><strong>Fecha inicio:</strong> ${formatearFechaHora(sol.fechaInicioSolicitud)}</p>
-                            <p><strong>Estado:</strong> ${(sol.estado).replace(/_/g, " ")}</p>
+                            <p><strong>Momento en que se registró:</strong> ${formatearFechaLocalLegible(sol.fechaInicioSolicitud)}</p>
+                            <p><strong>Estado actual de la solicitud:</strong> ${(sol.estado).replace(/_/g, " ")}</p>
                             <p><strong>Ubicación destino:</strong> ${sol.ubicacionBienes}</p>
                         </td>
                     `;

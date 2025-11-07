@@ -1,37 +1,156 @@
 table {
+    border: 1px solid #ddd;
     border-collapse: collapse;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    /* Sombra muy sutil */
     /* margin: 1rem, 0, 0, 0; */
     margin-top: 1rem;
+    overflow: hidden;
+    /* Importante para que el border-radius funcione */
     width: 100%;
+}
+
+th {
+    border-bottom: 2px solid #444;
 }
 
 th,
 td {
-    border: 1px solid #ddd;
+    /* border: 1px solid #ddd; */
+    border: none;
     font-size: 0.95rem;
-    padding: 0.8rem;
+    padding: 0.8rem 1rem;
     text-align: left;
     vertical-align: middle;
 }
 
-th, tfoot td{
+th,
+tfoot td {
     background-color: var(--gris-oscuro);
     color: var(--blanco);
     cursor: pointer;
 }
 
-tr:hover {
+/* tr:hover {
     background-color: #f5f5f5;
+} */
+
+/* Separadores horizontales solo para las filas de datos */
+tbody tr:not(.detalle-fila) {
+    border-bottom: 1px solid #eee;
+}
+
+/* Hover solo para las filas de datos */
+tbody tr:not(.detalle-fila):hover {
+    background-color: #f9f9f9;
+}
+
+/* Columna de Expandir (primera) */
+th:first-child,
+td:first-child {
+    text-align: center;
+    width: 50px;
+    /* Ancho fijo */
+}
+
+/* Columna de Acciones (última) */
+th:last-child,
+td:last-child {
+    text-align: center;
+    width: 80px;
+    /* Ancho fijo */
+}
+
+.btn.btn-icon-table {
+    background: transparent;
+    color: var(--gris-oscuro);
+    border: none;
+
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border-radius: 50%;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.btn.btn-icon-table:hover {
+    background: #eef5ff;
+    color: var(--azul-profundo);
+}
+
+.btn.btn-icon-table.btn-editar {
+    background-color: #eef5ff;
+    color: var(--azul)
+}
+
+.btn.btn-icon-table.btn-editar:hover {
+    background-color: #c7deff;
+}
+
+.detalle-contenido {
+    padding: 1.2rem 1.5rem;
+    font-size: 0.95em;
+    line-height: 1.5em;
+
+    background-color: #f7f9fc;
+    box-shadow: inset 0 4px 5px -3px rgba(0, 0, 0, 0.06);
+}
+
+.detalle-contenido p {
+    margin-bottom: 0.5rem;
+}
+
+.detalle-contenido p:last-child {
+    margin-bottom: 0;
+}
+
+.hidden {
+    display: none;
+}
+
+.pagination-controls {
+    margin-top: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    font-size: 0.9em;
+}
+
+.pagination-controls select {
+    height: 42px;
+    font-size: 1rem;
+    padding: 0.6rem;
+    margin-bottom: 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: var(--blanco);
+}
+
+.pagination-controls .btn:disabled {
+    background-color: var(--fondo);
+    color: var(--texto-secundario);
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 @media print {
     table * {
         color: black !important;
     }
-    th, td {
+
+    th,
+    td {
         border: 1px solid black !important;
     }
-    th, tfoot td {
+
+    th,
+    tfoot td {
         background-color: darkgray !important;
     }
 }

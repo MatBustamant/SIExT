@@ -89,6 +89,7 @@
             <table id="tablaEventos">
                 <thead>
                     <tr>
+                        <th></th>
                         <th>ID</th>
                         <th>Bien</th>
                         <th>Tipo</th>
@@ -100,6 +101,21 @@
                 </tbody>
             </table>
 
+            <div class="pagination-controls">
+                <button id="prevPage" class="btn"><i class="bi bi-chevron-left"></i> Anterior</button>
+                <span id="pageInfo">Página 1 de 1</span>
+                <button id="nextPage" class="btn">Siguiente <i class="bi bi-chevron-right"></i></button>
+                <select id="rowsPerPageSelect">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="15" selected>15</option>
+                    <option value="20">20</option>
+                    <option value="25">25</option>
+                    <option value="30">30</option>
+                </select>
+                <label for="rowsPerPageSelect">por página</label>
+            </div>
+            
             <div class="informativo" id="counterEventos"></div>
         </section>
 
@@ -151,6 +167,11 @@
     <script>
         recargarEventos();
         recargarBienes();
+        
+        let currentPage = 1;
+        let rowsPerPage = parseInt(document.getElementById("rowsPerPageSelect").value, 10);
+        let totalPages = 1;
+
         function renderEventos() {
             const eventos = JSON.parse(localStorage.getItem("eventos")) || [];
             const eventosHabilitados = eventos.filter(e => !e.eliminado);
@@ -164,33 +185,98 @@
             const tbody = document.querySelector("#tablaEventos tbody");
             tbody.innerHTML = "";
 
-            let count = 0;
+            // Filtrado
+            const filtradas = eventosHabilitados.filter(evento => {
+                return matchNumero(formatearNroBien(evento.bienAsociado), filterBienInput) &&
+                       matchValor(evento.tipoEvento, filterTipoEvento) &&
+                       matchFecha(evento.fechaEvento, filterFecha);
+            });
 
-            eventosHabilitados.forEach(evento => {
-                if (matchNumero(formatearNroBien(evento.bienAsociado), filterBienInput) &&
-                    matchValor(evento.tipoEvento, filterTipoEvento) &&
-                    matchFecha(evento.fechaEvento, filterFecha)
-                ) {
+            // Paginación
+            const totalRows = filtradas.length;
+            totalPages = Math.ceil(totalRows / rowsPerPage);
+            if (currentPage > totalPages) currentPage = totalPages || 1;
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const paginadas = filtradas.slice(startIndex, endIndex);
+
+            if (paginadas.length === 0) {
+                const filaVacia = document.createElement("tr");
+                filaVacia.innerHTML = `<td colspan="6" class="text-center">(No hay resultados que coincidan)</td>`;
+                tbody.appendChild(filaVacia);
+            }
+
+            paginadas.forEach(evento => {
                     const bien = bienes.find(b => b.id_Bien === evento.bienAsociado);
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
+                        <td>
+                            <button class="btn btn-toggle btn-icon-table" title="Expandir detalles">
+                                <i class="bi bi-caret-down-fill"></i>
+                            </button>
+                        </td>
                         <td>${evento.id_Evento}</td>
                         <td>#${formatearNroBien(evento.bienAsociado)} — ${bien.nombre}</td>
                         <td>${evento.tipoEvento}</td>
-                        <td>${formatearFechaHora(evento.fechaEvento)}</td>
+                        <td>${formatearFechaLocalEsp(evento.fechaEvento)}</td>
                         <td>
-                            <button class="btn btn-editar" data-id="${evento.id_Evento}" title="Editar evento">
-                                <i class="bi bi-pencil"></i>
+                            <button class="btn btn-editar btn-icon-table" data-id="${evento.id_Evento}" title="Editar evento">
+                                <i class="bi bi-pencil-fill"></i>
                             </button>
                         </td>
                     `;
                     tbody.appendChild(tr);
-                    count++;
-                }
+
+                    // Fila oculta de detalles
+                    const detalle = document.createElement("tr");
+                    detalle.classList.add("detalle-fila", "hidden");
+                    detalle.innerHTML = `
+                        <td colspan="6" class="detalle-contenido">
+                            <p><strong>Identificador de evento:</strong> ${evento.id_Evento}</p>
+                            <p><strong>Bien asociado:</strong> #${formatearNroBien(evento.bienAsociado)} — ${bien.nombre}</p>
+                            <p><strong>Tipo de evento:</strong> ${evento.tipoEvento}</p>
+                            <p><strong>Momento en que se registró:</strong> ${formatearFechaLocalLegible(evento.fechaEvento)}</p>
+                        </td>`;
+                    tbody.appendChild(detalle);
             });
 
-            document.getElementById("counterEventos").textContent = `Mostrando ${count} evento(s).`;
+            document.getElementById("counterEventos").textContent = `Mostrando ${paginadas.length} de ${totalRows} evento(s).`;
+            document.getElementById("pageInfo").textContent = `Página ${currentPage} de ${totalPages || 1}`;
+
+            document.getElementById("prevPage").disabled = (currentPage === 1);
+            document.getElementById("nextPage").disabled = (currentPage === totalPages || totalPages === 0);
         }
+
+        // Función para expandir/contraer detalle
+        function toggleDetalles(button) {
+            const fila = button.closest("tr");
+            const siguiente = fila.nextElementSibling;
+            if (siguiente && siguiente.classList.contains("detalle-fila")) {
+                siguiente.classList.toggle("hidden");
+                const icono = button.querySelector("i");
+                icono.classList.toggle("bi-caret-down-fill");
+                icono.classList.toggle("bi-caret-up-fill");
+            }
+        }
+
+        // Controles de paginación
+        document.getElementById("prevPage").addEventListener("click", () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderEventos();
+        }
+        });
+        document.getElementById("nextPage").addEventListener("click", () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderEventos();
+            }
+        });
+        document.getElementById("rowsPerPageSelect").addEventListener("change", (e) => {
+            rowsPerPage = parseInt(e.target.value);
+            currentPage = 1;
+            renderEventos();
+        });
 
         document.querySelector("#tablaEventos tbody").addEventListener("click", (e) => {
             // Buscamos si el clic fue en un botón de editar
@@ -202,11 +288,11 @@
             }
 
             // Buscamos si el clic fue en un botón de toggle detalles
-            // const btnToggle = e.target.closest(".btn-toggle");
-            // if (btnToggle) {
-            //     toggleDetalles(btnToggle);
-            //     return;
-            // }
+            const btnToggle = e.target.closest(".btn-toggle");
+            if (btnToggle) {
+                toggleDetalles(btnToggle);
+                return;
+            }
         });
 
         // Filtros

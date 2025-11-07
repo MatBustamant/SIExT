@@ -63,6 +63,7 @@
             <table id="tablaUbicaciones">
                 <thead>
                     <tr>
+                        <th></th>
                         <th>ID</th>
                         <th>Ubicación</th>
                         <th>Acciones</th>
@@ -71,6 +72,21 @@
                 <tbody></tbody>
             </table>
 
+            <div class="pagination-controls">
+                <button id="prevPage" class="btn"><i class="bi bi-chevron-left"></i> Anterior</button>
+                <span id="pageInfo">Página 1 de 1</span>
+                <button id="nextPage" class="btn">Siguiente <i class="bi bi-chevron-right"></i></button>
+                <select id="rowsPerPageSelect">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="15" selected>15</option>
+                    <option value="20">20</option>
+                    <option value="25">25</option>
+                    <option value="30">30</option>
+                </select>
+                <label for="rowsPerPageSelect">por página</label>
+            </div>
+            
             <div class="informativo" id="contadorUbicaciones"></div>
         </section>
 
@@ -113,6 +129,10 @@
             return false;
         }
 
+        let currentPage = 1;
+        let rowsPerPage = parseInt(document.getElementById("rowsPerPageSelect").value, 10);
+        let totalPages = 1;
+
         function renderizarUbicaciones() {
             const ubicaciones = JSON.parse(localStorage.getItem("ubicaciones")) || [];
             const ubicacionesHabilitadas = ubicaciones.filter(u => !u.eliminado);
@@ -120,30 +140,67 @@
             const filtroNombreId = document.getElementById("filterNombreCat").value.toUpperCase();
             const tbody = document.querySelector("#tablaUbicaciones tbody");
             tbody.innerHTML = "";
-            let count = 0;
 
-            ubicacionesHabilitadas.forEach(ubi => {
-                if (
-                    (matchTexto(ubi.nombre, filtroNombreId) || matchNumero(ubi.id_Ubicacion, filtroNombreId))
-                ) {
+            // Filtrado
+            const filtradas = ubicacionesHabilitadas.filter(ubi =>
+                (matchTexto(ubi.nombre, filtroNombreId) || matchNumero(ubi.id_Ubicacion, filtroNombreId))
+            );
+
+            // Paginación
+            const totalRows = filtradas.length;
+            totalPages = Math.ceil(totalRows / rowsPerPage);
+            if (currentPage > totalPages) currentPage = totalPages || 1;
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const paginadas = filtradas.slice(startIndex, endIndex);
+
+            if (paginadas.length === 0) {
+                const filaVacia = document.createElement("tr");
+                filaVacia.innerHTML = `<td colspan="4" class="text-center">(No hay resultados que coincidan)</td>`;
+                tbody.appendChild(filaVacia);
+            }
+
+            paginadas.forEach(ubi => {
                     const fila = document.createElement("tr");
                     fila.innerHTML = `
-                <td>${ubi.id_Ubicacion}</td>
-                <td>${ubi.nombre}</td>
-                <td>
-                    <button class="btn btn-editar" data-id="${ubi.id_Ubicacion}" title="Editar ubicación">
-                        <i class='bi bi-pencil'></i>
-                    </button>
-                </td>`;
+                        <td></td>
+                        <td>${ubi.id_Ubicacion}</td>
+                        <td>${ubi.nombre}</td>
+                        <td>
+                            <button class="btn btn-editar btn-icon-table" data-id="${ubi.id_Ubicacion}" title="Editar ubicación">
+                                <i class='bi bi-pencil-fill'></i>
+                            </button>
+                        </td>`;
                     tbody.appendChild(fila);
-                    count++;
-                }
             });
-            document.getElementById("contadorUbicaciones").textContent = `Mostrando ${count} ubicación(s).`;
+            document.getElementById("contadorUbicaciones").textContent = `Mostrando ${paginadas.length} de ${totalRows} ubicación(s).`;
+            document.getElementById("pageInfo").textContent = `Página ${currentPage} de ${totalPages || 1}`;
+
+            document.getElementById("prevPage").disabled = (currentPage === 1);
+            document.getElementById("nextPage").disabled = (currentPage === totalPages || totalPages === 0);
         }
         recargarUbicaciones();
         cargarOpciones("ubicacionesExistentes", "ubicaciones");
         renderizarUbicaciones();
+
+        // Controles de paginación
+        document.getElementById("prevPage").addEventListener("click", () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderizarUbicaciones();
+        }
+        });
+        document.getElementById("nextPage").addEventListener("click", () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderizarUbicaciones();
+            }
+        });
+        document.getElementById("rowsPerPageSelect").addEventListener("change", (e) => {
+            rowsPerPage = parseInt(e.target.value);
+            currentPage = 1;
+            renderizarUbicaciones();
+        });
 
         document.querySelector("#tablaUbicaciones tbody").addEventListener("click", (e) => {
             // Buscamos si el clic fue en un botón de editar
@@ -153,13 +210,6 @@
                 editarUbicacion(id);
                 return;
             }
-
-            // Buscamos si el clic fue en un botón de toggle detalles
-            // const btnToggle = e.target.closest(".btn-toggle");
-            // if (btnToggle) {
-            //     toggleDetalles(btnToggle);
-            //     return;
-            // }
         });
         document.getElementById("filterNombreCat").addEventListener("input", renderizarUbicaciones);
 
