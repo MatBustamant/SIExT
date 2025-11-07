@@ -134,6 +134,7 @@
     </script>
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/forms.js"></script>
     <script>
         recargarUsuarios();
         function renderUsuarios() {
@@ -148,11 +149,8 @@
             let count = 0;
 
             usuariosHabilitados.forEach(usuario => {
-                const matchUsuario = txt => usuario.nombre.toUpperCase().includes(txt) || String(usuario.id_Usuario).includes(txt);
-                const matchRol = (rol, filtro) => !filtro || rol === filtro;
-
-                if (matchUsuario(filtroUsuario) && matchRol(usuario.rol, filtroRol)
-                ) {
+                if ((matchTexto(usuario.nombre, filtroUsuario) || matchNumero(usuario.id_Usuario, filtroUsuario))
+                    && matchValor(usuario.rol, filtroRol)) {
                     const fila = document.createElement("tr");
                     fila.innerHTML = `
                     <td>${usuario.id_Usuario}</td>
@@ -188,8 +186,16 @@
             //     return;
             // }
         });
-        document.getElementById("filterUsuario").addEventListener("input", renderUsuarios);
-        document.getElementById("filterRol").addEventListener("change", renderUsuarios);
+
+        // Filtros
+        document.querySelectorAll("#filterUsuario, #filterRol")
+            .forEach(input => {
+                const eventType = (input.tagName === "SELECT" || input.type === "date") ? "change" : "input";
+                input.addEventListener(eventType, () => {
+                    // currentPage = 1;
+                    renderUsuarios();
+                });
+        });
         renderUsuarios();
 
         document.getElementById("formNuevoUsuario").addEventListener("submit", async (e) => {

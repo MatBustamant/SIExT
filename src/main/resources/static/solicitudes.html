@@ -95,7 +95,7 @@
                     <input type="number" id="filterNroSolicitud" placeholder="Filtrar por nro de solicitud...">
                 </div>
                 <div>
-                    <select id="filterUbicacion"></select>
+                    <input list="ubicacionesSugeridas" type="text" id="filterUbicacion" placeholder="Filtrar por ubicación...">
                 </div>
                 <div>
                     <select id="filterEstado">
@@ -150,8 +150,7 @@
                 <label>Nro. de solicitud</label>
                 <input type="number" id="modSolicitudId" disabled>
                 <label>Ubicación destino</label>
-                <input list="modUbicacionesSugeridas" type="text" id="modUbicacion" required>
-                <datalist id="modUbicacionesSugeridas"></datalist>
+                <input list="ubicacionesSugeridas" type="text" id="modUbicacion" required>
                 <label>Estado</label>
                 <select id="modEstado" required>
                     <option value="POR_REVISAR">Pendiente de aprobación</option>
@@ -182,6 +181,7 @@
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script src="js/fechas.js"></script>
+    <script src="js/forms.js"></script>
     <script>
         recargarSolicitudes();
         recargarUbicaciones();
@@ -194,28 +194,21 @@
             const solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
             const solicitudesHabilitadas = solicitudes.filter(s => !s.eliminado);
 
-            const filterNroSolicitud = document.getElementById("filterNroSolicitud");
-            const filterUbicacion = document.getElementById("filterUbicacion");
-            const filterEstado = document.getElementById("filterEstado");
-            const filterFecha = document.getElementById("filterFecha");
+            const filterNroSolicitud = document.getElementById("filterNroSolicitud").value;
+            const filterUbicacion = document.getElementById("filterUbicacion").value.toUpperCase().trim();
+            const filterEstado = document.getElementById("filterEstado").value;
+            const filterFecha = document.getElementById("filterFecha").value;
 
             const tbody = document.querySelector("#tablaSolicitudes tbody");
             tbody.innerHTML = "";
 
             // Filtrado
-            const filtradas = solicitudesHabilitadas.filter(sol => {
-                const matchNumSolicitud = numero => !numero || String(sol.numSolicitud).includes(numero);
-                const matchUbicacion = (ubi, filtro) => !filtro || ubi === filtro;
-                const matchEstado = (est, filtro) => !filtro || est === filtro;
-                const matchFecha = (fecha, filtro) => !filtro || formatearFechaLocal(fecha) === filtro;
-
-                return (
-                    matchNumSolicitud(filterNroSolicitud.value) &&
-                    matchUbicacion(sol.ubicacionBienes, filterUbicacion.value) &&
-                    matchEstado(sol.estado, filterEstado.value) &&
-                    matchFecha(sol.fechaInicioSolicitud, filterFecha.value)
-                );
-            });
+            const filtradas = solicitudesHabilitadas.filter(sol => (
+                matchNumero(sol.numSolicitud, filterNroSolicitud)
+                && matchTexto(sol.ubicacionBienes, filterUbicacion)
+                && matchValor(sol.estado, filterEstado)
+                && matchFecha(sol.fechaInicioSolicitud, filterFecha)
+            ));
 
             // Paginación
             const totalRows = filtradas.length;
@@ -266,6 +259,9 @@
 
             document.getElementById("counterSolicitudes").textContent = `Mostrando ${paginadas.length} de ${totalRows} solicitud(es).`;
             document.getElementById("pageInfo").textContent = `Página ${currentPage} de ${totalPages || 1}`;
+
+            document.getElementById("prevPage").disabled = (currentPage === 1);
+            document.getElementById("nextPage").disabled = (currentPage === totalPages || totalPages === 0);
         }
 
         // Función para expandir/contraer detalle
@@ -287,20 +283,18 @@
             renderSolicitudes();
         }
         });
-
         document.getElementById("nextPage").addEventListener("click", () => {
             if (currentPage < totalPages) {
                 currentPage++;
                 renderSolicitudes();
             }
         });
-
         document.getElementById("rowsPerPageSelect").addEventListener("change", (e) => {
             rowsPerPage = parseInt(e.target.value);
             currentPage = 1;
             renderSolicitudes();
         });
-
+        // Manejo de clicks en la tabla
         document.querySelector("#tablaSolicitudes tbody").addEventListener("click", (e) => {
             // Buscamos si el clic fue en un botón de editar
             const btnEditar = e.target.closest(".btn-editar");
@@ -317,37 +311,17 @@
                 return;
             }
         });
-        document.getElementById("filterNroSolicitud").addEventListener("input", renderSolicitudes);
-        document.getElementById("filterUbicacion").addEventListener("change", renderSolicitudes);
-        document.getElementById("filterEstado").addEventListener("change", renderSolicitudes);
-        document.getElementById("filterFecha").addEventListener("change", renderSolicitudes);
+        // Filtros
+        document.querySelectorAll("#filterNroSolicitud, #filterUbicacion, #filterEstado, #filterFecha")
+            .forEach(input => {
+                const eventType = (input.tagName === "SELECT" || input.type === "date") ? "change" : "input";
+                input.addEventListener(eventType, () => {
+                    currentPage = 1;
+                    renderSolicitudes();
+                });
+        });
 
-        function cargarUbicaciones(idSelect) {
-            const sel = document.getElementById(idSelect);
-            sel.innerHTML = "";
-            const cats = JSON.parse(localStorage.getItem("ubicaciones")) || [];
-            if (idSelect == "filterUbicacion") {
-                const opt = document.createElement("option");
-                opt.value = "";
-                opt.textContent = "Todas las ubicaciones";
-                sel.appendChild(opt);
-            }
-            if (cats.length === 0) {
-                sel.disabled = true;
-                sel.innerHTML = "<option>Sin ubicaciones</option>";
-                return;
-            }
-            cats.forEach(c => {
-                const o = document.createElement("option");
-                o.textContent = c.nombre;
-                sel.appendChild(o);
-            });
-            sel.disabled = false;
-        }
-
-        cargarUbicaciones("ubicacionesSugeridas");
-        cargarUbicaciones("modUbicacionesSugeridas");
-        cargarUbicaciones("filterUbicacion");
+        cargarOpciones("ubicacionesSugeridas", "ubicaciones");
 
         document.getElementById("solicitudForm").addEventListener("submit", async (e) => {
             e.preventDefault();
@@ -387,9 +361,7 @@
             await recargarSolicitudes();
             await recargarUbicaciones();
 
-            cargarUbicaciones("ubicacionesSugeridas");
-            cargarUbicaciones("modUbicacionesSugeridas");
-            cargarUbicaciones("filterUbicacion");
+            cargarOpciones("ubicacionesSugeridas", "ubicaciones");
             renderSolicitudes();
             e.target.reset();
         });
@@ -447,9 +419,7 @@
             await recargarSolicitudes();
             await recargarUbicaciones();
 
-            cargarUbicaciones("ubicacionesSugeridas");
-            cargarUbicaciones("modUbicacionesSugeridas");
-            cargarUbicaciones("filterUbicacion");
+            cargarOpciones("ubicacionesSugeridas", "ubicaciones");
             renderSolicitudes();
             document.getElementById("modificarSolicitudSection").classList.add("hidden");
             e.target.reset();

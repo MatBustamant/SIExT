@@ -81,8 +81,7 @@
                 <label>Identificador de ubicación</label>
                 <input type="number" id="modUbicacionId" disabled>
                 <label>Nombre de Ubicación</label>
-                <input list="modUbicacionesExistentes" type="text" id="modNombreUbicacion" required>
-                <datalist id="modUbicacionesExistentes"></datalist>
+                <input list="ubicacionesExistentes" type="text" id="modNombreUbicacion" required>
                 <div class="btn-row">
                     <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
                     <button type="button" class="btn" id="cancelarBtn"><i class="bi bi-x-circle"></i>Cancelar</button>
@@ -102,6 +101,7 @@
     </script>
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/forms.js"></script>
     <script>
         function ubicacionExiste(nombre) {
             const ubicaciones = JSON.parse(localStorage.getItem("ubicaciones")) || [];
@@ -113,23 +113,6 @@
             return false;
         }
 
-        function cargarUbicacionesExistentes(idSelect) {
-            const sel = document.getElementById(idSelect);
-            sel.innerHTML = "";
-            const cats = JSON.parse(localStorage.getItem("ubicaciones")) || [];
-            if (cats.length === 0) {
-                sel.disabled = true;
-                sel.innerHTML = "<option>Sin ubicaciones</option>";
-                return;
-            }
-            cats.forEach(c => {
-                const o = document.createElement("option");
-                o.textContent = c.nombre;
-                sel.appendChild(o);
-            });
-            sel.disabled = false;
-        }
-
         function renderizarUbicaciones() {
             const ubicaciones = JSON.parse(localStorage.getItem("ubicaciones")) || [];
             const ubicacionesHabilitadas = ubicaciones.filter(u => !u.eliminado);
@@ -139,16 +122,16 @@
             tbody.innerHTML = "";
             let count = 0;
 
-            ubicacionesHabilitadas.forEach(cat => {
+            ubicacionesHabilitadas.forEach(ubi => {
                 if (
-                    (cat.nombre.toUpperCase().includes(filtroNombreId) || String(cat.id_Ubicacion).includes(filtroNombreId))
+                    (matchTexto(ubi.nombre, filtroNombreId) || matchNumero(ubi.id_Ubicacion, filtroNombreId))
                 ) {
                     const fila = document.createElement("tr");
                     fila.innerHTML = `
-                <td>${cat.id_Ubicacion}</td>
-                <td>${cat.nombre}</td>
+                <td>${ubi.id_Ubicacion}</td>
+                <td>${ubi.nombre}</td>
                 <td>
-                    <button class="btn btn-editar" data-id="${cat.id_Ubicacion}" title="Editar ubicación">
+                    <button class="btn btn-editar" data-id="${ubi.id_Ubicacion}" title="Editar ubicación">
                         <i class='bi bi-pencil'></i>
                     </button>
                 </td>`;
@@ -159,8 +142,7 @@
             document.getElementById("contadorUbicaciones").textContent = `Mostrando ${count} ubicación(s).`;
         }
         recargarUbicaciones();
-        cargarUbicacionesExistentes("ubicacionesExistentes");
-        cargarUbicacionesExistentes("modUbicacionesExistentes");
+        cargarOpciones("ubicacionesExistentes", "ubicaciones");
         renderizarUbicaciones();
 
         document.querySelector("#tablaUbicaciones tbody").addEventListener("click", (e) => {
@@ -217,8 +199,7 @@
             await recargarUbicaciones();
 
             renderizarUbicaciones();
-            cargarUbicacionesExistentes("ubicacionesExistentes");
-            cargarUbicacionesExistentes("modUbicacionesExistentes");
+            cargarOpciones("ubicacionesExistentes", "ubicaciones");
             e.target.reset();
         });
 
@@ -274,8 +255,7 @@
             await recargarUbicaciones();
 
             renderizarUbicaciones();
-            cargarUbicacionesExistentes("ubicacionesExistentes");
-            cargarUbicacionesExistentes("modUbicacionesExistentes");
+            cargarOpciones("ubicacionesExistentes", "ubicaciones");
             document.getElementById("modificarUbicacionSection").classList.add("hidden");
             e.target.reset();
 
@@ -320,8 +300,7 @@
             alert("Ubicación eliminada.");
             await recargarUbicaciones();
             renderizarUbicaciones();
-            cargarUbicacionesExistentes("ubicacionesExistentes");
-            cargarUbicacionesExistentes("modUbicacionesExistentes");
+            cargarOpciones("ubicacionesExistentes", "ubicaciones");
             document.getElementById("modificarUbicacionSection").classList.add("hidden");
             document.getElementById("modificarUbicacionForm").reset();
 
