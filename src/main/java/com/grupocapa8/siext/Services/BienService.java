@@ -39,9 +39,13 @@ public class BienService implements ServiceGenerico<BienDTO> {
     
     @Override
     public BienDTO buscar(int idBien) throws NoSuchElementException {
+        return this.buscar(idBien, true);
+    }
+    
+    public BienDTO buscar(int idBien, boolean checkEliminado) throws NoSuchElementException {
         Validador.validarId(idBien, CAMPO_ID_TEXT);
         BienDTO bien = bienDAO.buscar(idBien);
-        if (bien == null){
+        if (bien == null || (checkEliminado && bien.isEliminado())){
             throw new NoSuchElementException("No existe el bien.");
         }
         return bien;
@@ -91,10 +95,8 @@ public class BienService implements ServiceGenerico<BienDTO> {
     
     @Override
     public void modificar(BienDTO dto, int id) throws NoSuchElementException {
-        Validador.validarId(id, CAMPO_ID_TEXT);
-        if (bienDAO.buscar(id) == null){
-            throw new NoSuchElementException("No existe el bien.");
-        }
+        this.buscar(id);
+        
         String nombre = dto.getNombre().toUpperCase();
         Validador.validarString(nombre,CAMPO_NOMBRE_TEXT,CAMPO_NOMBRE_MIN,CAMPO_NOMBRE_MAX);
         String categoria = dto.getNombreCatBienes();
@@ -126,27 +128,18 @@ public class BienService implements ServiceGenerico<BienDTO> {
     }
     
     void averiar(int id) throws NoSuchElementException {
-        Validador.validarId(id, CAMPO_ID_TEXT);
-        if (bienDAO.buscar(id) == null){
-            throw new NoSuchElementException("No existe el bien.");
-        }
+        this.buscar(id, false);
         bienDAO.cambiarEstado(EstadoBien.AVERIADO, id);
     }
     
     void reparar(int id) throws NoSuchElementException {
-        Validador.validarId(id, CAMPO_ID_TEXT);
-        if (bienDAO.buscar(id) == null){
-            throw new NoSuchElementException("No existe el bien.");
-        }
+        this.buscar(id, false);
         bienDAO.cambiarEstado(EstadoBien.EN_CONDICIONES, id);
     }
    
     @Override
     public void eliminar(int idBien) throws NoSuchElementException {
-        Validador.validarId(idBien, CAMPO_ID_TEXT);
-        if (bienDAO.buscar(idBien) == null){
-            throw new NoSuchElementException("No existe el bien.");
-        }
+        this.buscar(idBien);
         bienDAO.eliminar(idBien);
     }
 

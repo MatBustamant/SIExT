@@ -24,9 +24,13 @@ public class CategoriaBienServices implements ServiceGenerico<CategoriaBienDTO>{
     
     @Override
     public CategoriaBienDTO buscar(int idCategoriaBien) throws NoSuchElementException {
+        return this.buscar(idCategoriaBien, true);
+    }
+    
+    public CategoriaBienDTO buscar(int idCategoriaBien, boolean checkEliminado) throws NoSuchElementException {
         Validador.validarId(idCategoriaBien, CAMPO_ID_TEXT);
         CategoriaBienDTO categoria = categoriaBienDAO.buscar(idCategoriaBien);
-        if (categoria == null){
+        if (categoria == null || (checkEliminado && categoria.isEliminado())){
             throw new NoSuchElementException("No existe la categoría.");
         }
         return categoria;
@@ -49,10 +53,8 @@ public class CategoriaBienServices implements ServiceGenerico<CategoriaBienDTO>{
     
     @Override
     public void modificar(CategoriaBienDTO dto, int id) throws NoSuchElementException {
-        Validador.validarId(id, CAMPO_ID_TEXT);
-        if (categoriaBienDAO.buscar(id) == null){
-            throw new NoSuchElementException("No existe la categoría.");
-        }
+        this.buscar(id);
+        
         String nombre = dto.getNombre().trim().toUpperCase();
         Validador.validarString(dto.getNombre(),CAMPO_NOMBRE_TEXT,CAMPO_NOMBRE_MIN,CAMPO_NOMBRE_MAX);
         
@@ -64,10 +66,7 @@ public class CategoriaBienServices implements ServiceGenerico<CategoriaBienDTO>{
    
     @Override
     public void eliminar(int idCategoriaBien) throws NoSuchElementException {
-        Validador.validarId(idCategoriaBien, CAMPO_ID_TEXT);
-        if (categoriaBienDAO.buscar(idCategoriaBien) == null){
-            throw new NoSuchElementException("No existe la categoría.");
-        }
+        this.buscar(idCategoriaBien);
         categoriaBienDAO.eliminar(idCategoriaBien);
     }
     

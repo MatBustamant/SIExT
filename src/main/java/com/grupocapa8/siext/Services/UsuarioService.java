@@ -25,10 +25,14 @@ public class UsuarioService implements ServiceGenerico<UsuarioDTO> {
     
    @Override
     public UsuarioDTO buscar(int idUsuario) throws NoSuchElementException {
+        return this.buscar(idUsuario, true);
+    }
+    
+    public UsuarioDTO buscar(int idUsuario, boolean checkEliminado) throws NoSuchElementException {
         Validador.validarId(idUsuario, CAMPO_ID_TEXT);
         UsuarioDTO usuario = usuarioDAO.buscar(idUsuario);
         
-        if (usuario == null){
+        if (usuario == null || (checkEliminado && usuario.isEliminado())){
             throw new NoSuchElementException("No existe el usuario");
         }
         
@@ -59,10 +63,8 @@ public class UsuarioService implements ServiceGenerico<UsuarioDTO> {
     
    @Override
     public void modificar(UsuarioDTO dto, int id) throws NoSuchElementException {
-        Validador.validarId(id, CAMPO_ID_TEXT);
-        if (usuarioDAO.buscar(id) == null){
-            throw new NoSuchElementException("No existe el Usuario");
-        }
+        this.buscar(id);
+        
         String nombre = dto.getNombre();
         Validador.validarString(nombre,CAMPO_NOMBRE_TEXT, CAMPO_NOMBRE_MIN, CAMPO_NOMBRE_MAX);
         RolUsuario rol = dto.getRol();
@@ -81,10 +83,7 @@ public class UsuarioService implements ServiceGenerico<UsuarioDTO> {
     
    @Override
     public void eliminar(int idUsuario) throws NoSuchElementException {
-        Validador.validarId(idUsuario, CAMPO_ID_TEXT);
-        if (usuarioDAO.buscar(idUsuario) == null){ //hacer una validacion del id
-            throw new NoSuchElementException("No existe el usuario");
-        }
+        this.buscar(idUsuario);
         
         usuarioDAO.eliminar(idUsuario);
     }

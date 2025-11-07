@@ -25,9 +25,13 @@ public class SolicitudService implements ServiceGenerico<SolicitudDTO> {
     
     @Override
     public SolicitudDTO buscar(int numSolicitud) throws NoSuchElementException {
+        return this.buscar(numSolicitud, true);
+    }
+    
+    public SolicitudDTO buscar(int numSolicitud, boolean checkEliminado) throws NoSuchElementException {
         Validador.validarId(numSolicitud, CAMPO_ID_TEXT);
         SolicitudDTO solicitud = solicitudDAO.buscar(numSolicitud);
-        if (solicitud == null){
+        if (solicitud == null || (checkEliminado && solicitud.isEliminado())){
             throw new NoSuchElementException("No existe la solicitud.");
         }
         return solicitud;
@@ -58,10 +62,7 @@ public class SolicitudService implements ServiceGenerico<SolicitudDTO> {
     
     @Override
     public void modificar(SolicitudDTO dto, int id) throws NoSuchElementException {
-        Validador.validarId(id, CAMPO_ID_TEXT);
-        if (solicitudDAO.buscar(id) == null){
-            throw new NoSuchElementException("No existe la solicitud.");
-        }
+        this.buscar(id);
         
         EstadoSolicitud estado = dto.getEstado();
 //        validarString(estado,3);
@@ -82,10 +83,7 @@ public class SolicitudService implements ServiceGenerico<SolicitudDTO> {
     
     @Override
     public void eliminar(int numSolicitud) throws NoSuchElementException {
-        Validador.validarId(numSolicitud, CAMPO_ID_TEXT);
-        if (solicitudDAO.buscar(numSolicitud) == null){ //hacer una validacion del id
-            throw new NoSuchElementException("No existe la solicitud.");
-        }
+        this.buscar(numSolicitud);
         
         solicitudDAO.eliminar(numSolicitud);
     }
