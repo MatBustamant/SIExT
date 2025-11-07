@@ -142,7 +142,13 @@
         <section id="modificarBienSection" class="hidden">
             <h2>Actualizar bien</h2>
             <form id="modificarBienForm">
-                <input type="hidden" id="modBienId">
+                <div>
+                    <label>Nro. de inventario</label>
+                    <div class="input-prefix">
+                        <span>FCE-</span>
+                        <input type="number" id="modBienId" disabled>
+                    </div>
+                </div>
                 <div>
                     <label>Categoría</label>
                     <input list="categoriasSugeridas" type="text" id="modCategoria" required>
@@ -221,7 +227,9 @@
                     <td><span class="badge ${prod.estadoBien === "EN_CONDICIONES" ? 'disponible' : 'averiado'}">${(prod.estadoBien).replace("_", " ")}</span></td>
                     <td>${prod.ubicacionBien}</td>
                     <td>
-                        <button class='btn' onclick='editarBien(${prod.id_Bien})'><i class='bi bi-pencil'></i></button>
+                        <button class="btn btn-editar" data-id="${prod.id_Bien}" title="Editar bien">
+                            <i class='bi bi-pencil'></i>
+                        </button>
                     </td>`;
                     bienesTable.appendChild(row);
                     countBienes++;
@@ -287,6 +295,22 @@
 
         renderInventario();
 
+        document.querySelector("#bienesTable tbody").addEventListener("click", (e) => {
+            // Buscamos si el clic fue en un botón de editar
+            const btnEditar = e.target.closest(".btn-editar");
+            if (btnEditar) {
+                const id = Number(btnEditar.dataset.id);
+                editarBien(id);
+                return;
+            }
+
+            // Buscamos si el clic fue en un botón de toggle detalles
+            // const btnToggle = e.target.closest(".btn-toggle");
+            // if (btnToggle) {
+            //     toggleDetalles(btnToggle);
+            //     return;
+            // }
+        });
         document.getElementById("filterBienInput").oninput = renderInventario;
         document.getElementById("filterBienCategoria").oninput = renderInventario;
         document.getElementById("filterBienEstado").onchange = renderInventario;
@@ -358,6 +382,8 @@
             modDetalleProducto.value = bien.detalle ? bien.detalle : "";
 
             document.getElementById("modificarBienSection").classList.remove("hidden");
+
+            modCategoria.focus();
         }
 
         document.getElementById("modificarBienForm").addEventListener("submit", async (e) => {
@@ -409,6 +435,8 @@
             renderInventario();
             document.getElementById("modificarBienSection").classList.add("hidden");
             e.target.reset();
+
+            document.getElementById("bienesTable").parentElement.scrollIntoView({ behavior: "smooth" });
         });
 
         document.getElementById("eliminarBienBtn").addEventListener("click", async () => {
@@ -441,6 +469,8 @@
             renderInventario();
             document.getElementById("modificarBienSection").classList.add("hidden");
             document.getElementById("modificarBienForm").reset();
+
+            document.getElementById("bienesTable").parentElement.scrollIntoView({ behavior: "smooth" });
         });
 
         // Cancelar edición de datos
@@ -448,6 +478,8 @@
             if (confirm("¿Deseás cancelar la edición? Se perderán los cambios no guardados.")) {
                 document.getElementById("modificarBienSection").classList.add("hidden");
                 document.getElementById("modificarBienForm").reset();
+
+                document.getElementById("bienesTable").parentElement.scrollIntoView({ behavior: "smooth" });
             }
         };
 

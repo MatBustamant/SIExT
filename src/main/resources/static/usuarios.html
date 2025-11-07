@@ -78,7 +78,7 @@
                 </div>
             </div>
 
-            <table>
+            <table id="tablaUsuarios">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -87,7 +87,7 @@
                         <th>Acciones</th>
                     </tr>
                 </thead>
-                <tbody id="tablaUsuarios">
+                <tbody>
                 </tbody>
             </table>
 
@@ -98,7 +98,8 @@
         <section id="modificarUsuarioSection" class="hidden">
             <h2>Modificar usuario</h2>
             <form id="formModificarUsuario">
-                <input type="hidden" id="modUsuarioId">
+                <label>Identificador de usuario</label>
+                <input type="number" id="modUsuarioId" disabled>
 
                 <label>Nombre de usuario</label>
                 <input type="text" id="modNombreUsuario" required>
@@ -142,8 +143,8 @@
             const filtroUsuario = document.getElementById("filterUsuario").value.toUpperCase();
             const filtroRol = document.getElementById("filterRol").value.toUpperCase();
 
-            const tabla = document.getElementById("tablaUsuarios");
-            tabla.innerHTML = "";
+            const tbody = document.querySelector("#tablaUsuarios tbody");
+            tbody.innerHTML = "";
             let count = 0;
 
             usuariosHabilitados.forEach(usuario => {
@@ -158,16 +159,35 @@
                     <td>${usuario.nombre}</td>
                     <td>${usuario.rol}</td>
                     <td>
-                        <button class="btn" onclick='editarUsuario(${usuario.id_Usuario})'><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-editar" data-id="${usuario.id_Usuario}" title="Editar usuario">
+                            <i class="bi bi-pencil"></i>
+                        </button>
                     </td>
                     `;
-                    tabla.appendChild(fila);
+                    tbody.appendChild(fila);
                     count++;
                 }
             });
 
             document.getElementById("counterUsuarios").textContent = `Mostrando ${count} usuario(s).`;
         }
+
+        document.querySelector("#tablaUsuarios tbody").addEventListener("click", (e) => {
+            // Buscamos si el clic fue en un botón de editar
+            const btnEditar = e.target.closest(".btn-editar");
+            if (btnEditar) {
+                const id = Number(btnEditar.dataset.id);
+                editarUsuario(id);
+                return;
+            }
+
+            // Buscamos si el clic fue en un botón de toggle detalles
+            // const btnToggle = e.target.closest(".btn-toggle");
+            // if (btnToggle) {
+            //     toggleDetalles(btnToggle);
+            //     return;
+            // }
+        });
         document.getElementById("filterUsuario").addEventListener("input", renderUsuarios);
         document.getElementById("filterRol").addEventListener("change", renderUsuarios);
         renderUsuarios();
@@ -224,6 +244,8 @@
             document.getElementById("modRolUsuario").value = usuario.rol;
 
             document.getElementById("modificarUsuarioSection").classList.remove("hidden");
+
+            document.getElementById("modNombreUsuario").focus();
         }
 
         document.getElementById("formModificarUsuario").addEventListener("submit", async (e) => {
@@ -267,13 +289,17 @@
             renderUsuarios();
             document.getElementById("modificarUsuarioSection").classList.add("hidden");
             e.target.reset();
+
+            document.getElementById("tablaUsuarios").parentElement.scrollIntoView({ behavior: "smooth" });
         });
 
         // Cancelar edición de datos
         document.getElementById("btnCancelarEdicion").onclick = () => {
             if (confirm("¿Deseás cancelar la edición? Se perderán los cambios no guardados.")) {
                 document.getElementById("modificarUsuarioSection").classList.add("hidden");
-                document.getElementById("modificarUsuarioSection").reset();
+                document.getElementById("formModificarUsuario").reset();
+
+                document.getElementById("tablaUsuarios").parentElement.scrollIntoView({ behavior: "smooth" });
             }
         };
 
@@ -306,7 +332,9 @@
             await recargarUsuarios();
             renderUsuarios();
             document.getElementById("modificarUsuarioSection").classList.add("hidden");
-            document.getElementById("modificarUsuarioSection").reset();
+            document.getElementById("formModificarUsuario").reset();
+
+            document.getElementById("tablaUsuarios").parentElement.scrollIntoView({ behavior: "smooth" });
         });
     </script>
 </body>

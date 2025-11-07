@@ -78,7 +78,8 @@
         <section id="modificarUbicacionSection" class="hidden">
             <h2>Actualizar ubicación</h2>
             <form id="modificarUbicacionForm">
-                <input type="hidden" id="modUbicacionId">
+                <label>Identificador de ubicación</label>
+                <input type="number" id="modUbicacionId" disabled>
                 <label>Nombre de Ubicación</label>
                 <input list="modUbicacionesExistentes" type="text" id="modNombreUbicacion" required>
                 <datalist id="modUbicacionesExistentes"></datalist>
@@ -147,7 +148,9 @@
                 <td>${cat.id_Ubicacion}</td>
                 <td>${cat.nombre}</td>
                 <td>
-                    <button class='btn' onclick='editarUbicacion(${cat.id_Ubicacion})'><i class='bi bi-pencil'></i></button>
+                    <button class="btn btn-editar" data-id="${cat.id_Ubicacion}" title="Editar ubicación">
+                        <i class='bi bi-pencil'></i>
+                    </button>
                 </td>`;
                     tbody.appendChild(fila);
                     count++;
@@ -160,6 +163,22 @@
         cargarUbicacionesExistentes("modUbicacionesExistentes");
         renderizarUbicaciones();
 
+        document.querySelector("#tablaUbicaciones tbody").addEventListener("click", (e) => {
+            // Buscamos si el clic fue en un botón de editar
+            const btnEditar = e.target.closest(".btn-editar");
+            if (btnEditar) {
+                const id = Number(btnEditar.dataset.id);
+                editarUbicacion(id);
+                return;
+            }
+
+            // Buscamos si el clic fue en un botón de toggle detalles
+            // const btnToggle = e.target.closest(".btn-toggle");
+            // if (btnToggle) {
+            //     toggleDetalles(btnToggle);
+            //     return;
+            // }
+        });
         document.getElementById("filterNombreCat").addEventListener("input", renderizarUbicaciones);
 
         document.getElementById("ubicacionForm").addEventListener("submit", async (e) => {
@@ -212,6 +231,8 @@
             document.getElementById("modNombreUbicacion").value = cat.nombre;
 
             document.getElementById("modificarUbicacionSection").classList.remove("hidden");
+
+            document.getElementById("modNombreUbicacion").focus();
         }
 
         document.getElementById("modificarUbicacionForm").addEventListener("submit", async (e) => {
@@ -257,13 +278,17 @@
             cargarUbicacionesExistentes("modUbicacionesExistentes");
             document.getElementById("modificarUbicacionSection").classList.add("hidden");
             e.target.reset();
+
+            document.getElementById("tablaUbicaciones").parentElement.scrollIntoView({ behavior: "smooth" });
         });
 
         // Cancelar edición de datos
         document.getElementById("cancelarBtn").onclick = () => {
             if (confirm("¿Deseás cancelar la edición? Se perderán los cambios no guardados.")) {
                 document.getElementById("modificarUbicacionSection").classList.add("hidden");
-                document.getElementById("modificarUbicacionSection").reset();
+                document.getElementById("modificarUbicacionForm").reset();
+
+                document.getElementById("tablaUbicaciones").parentElement.scrollIntoView({ behavior: "smooth" });
             }
         };
 
@@ -298,7 +323,9 @@
             cargarUbicacionesExistentes("ubicacionesExistentes");
             cargarUbicacionesExistentes("modUbicacionesExistentes");
             document.getElementById("modificarUbicacionSection").classList.add("hidden");
-            document.getElementById("modificarUbicacionSection").reset();
+            document.getElementById("modificarUbicacionForm").reset();
+
+            document.getElementById("tablaUbicaciones").parentElement.scrollIntoView({ behavior: "smooth" });
         });
 
         renderizarUbicaciones();
