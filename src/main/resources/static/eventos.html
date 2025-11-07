@@ -151,6 +151,8 @@
         recargarBienes();
         function renderEventos() {
             const eventos = JSON.parse(localStorage.getItem("eventos")) || [];
+            const eventosHabilitados = eventos.filter(e => !e.eliminado);
+
             const bienes = JSON.parse(localStorage.getItem("bienes")) || [];
 
             const filterBienInput = document.getElementById("filterBienInput");
@@ -162,7 +164,7 @@
 
             let count = 0;
 
-            eventos.forEach(evento => {
+            eventosHabilitados.forEach(evento => {
                 const matchBienInput = numero => String(formatearNroBien(evento.bienAsociado)).includes(numero);
                 const matchTipoEvento = (tipo, filtro) => !filtro || tipo === filtro;
                 const matchFecha = (fechaEvento, filtro) => !filtro || formatearFechaLocal(fechaEvento) === filtro;

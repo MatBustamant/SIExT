@@ -131,12 +131,14 @@
 
         function renderizarUbicaciones() {
             const ubicaciones = JSON.parse(localStorage.getItem("ubicaciones")) || [];
+            const ubicacionesHabilitadas = ubicaciones.filter(u => !u.eliminado);
+
             const filtroNombreId = document.getElementById("filterNombreCat").value.toUpperCase();
             const tbody = document.querySelector("#tablaUbicaciones tbody");
             tbody.innerHTML = "";
             let count = 0;
 
-            ubicaciones.forEach(cat => {
+            ubicacionesHabilitadas.forEach(cat => {
                 if (
                     (cat.nombre.toUpperCase().includes(filtroNombreId) || String(cat.id_Ubicacion).includes(filtroNombreId))
                 ) {

@@ -137,6 +137,7 @@
         recargarUsuarios();
         function renderUsuarios() {
             const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+            const usuariosHabilitados = usuarios.filter(u => !u.eliminado);
 
             const filtroUsuario = document.getElementById("filterUsuario").value.toUpperCase();
             const filtroRol = document.getElementById("filterRol").value.toUpperCase();
@@ -145,7 +146,7 @@
             tabla.innerHTML = "";
             let count = 0;
 
-            usuarios.forEach(usuario => {
+            usuariosHabilitados.forEach(usuario => {
                 const matchUsuario = txt => usuario.nombre.toUpperCase().includes(txt) || String(usuario.id_Usuario).includes(txt);
                 const matchRol = (rol, filtro) => !filtro || rol === filtro;
 

@@ -191,7 +191,7 @@
 
         function renderInventario() {
             const bienes = JSON.parse(localStorage.getItem("bienes")) || [];
-            const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
+            const bienesHabilitados = bienes.filter(b => !b.eliminado);
 
             const bienFiltroTexto = document.getElementById("filterBienInput").value.toUpperCase();
             const bienFiltroCategoria = document.getElementById("filterBienCategoria").value.toUpperCase().trim();
@@ -203,7 +203,7 @@
 
             let countBienes = 0;
 
-            bienes.forEach(prod => {
+            bienesHabilitados.forEach(prod => {
                 const matchTexto = txt => prod.nombre.toUpperCase().includes(txt) || String(formatearNroBien(prod.id_Bien)).includes(txt);
                 const matchCategoria = (cat, filtro) => !filtro || cat.toUpperCase().includes(filtro);
                 const matchEstado = (estado, filtro) => !filtro || estado === filtro;
