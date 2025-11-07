@@ -43,10 +43,10 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
     
     @Override
     public void crear(EventoTrazabilidadDTO dto){
+        // Verifico existencia del bien asociado y sino, se corta todo
         int idBien = dto.getBienAsociado();
-        if (bienService.buscar(idBien) == null){
-            throw new NoSuchElementException("No existe el bien.");
-        }
+        bienService.buscar(idBien);
+        
         Validador.validarId(idBien, CAMPO_ID_TEXT);
         TipoEvento tipo = dto.getTipoEvento();
 //        Validador.validarString(tipo,CAMPO_TIPO_TEXT,CAMPO_TIPO_MIN,CAMPO_TIPO_MAX);
@@ -62,12 +62,6 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
             default:
                 break;
         }
-//        if(tipo.equals("AVERIO")) { // Cambiar a switch cuando trabajemos con enums mejor
-//            bienService.averiar(idBien);
-//        } else if (tipo.equals("REPARACION")) {
-//            bienService.reparar(idBien);
-//        }
-        
         eventoTrazDAO.insertar(dto);
     }
     
@@ -75,10 +69,16 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
     public void modificar(EventoTrazabilidadDTO dto, int id) throws NoSuchElementException {
         this.buscar(id);
         
+        // Verifico existencia (da igual si está eliminado) del bien asociado y sino, se corta todo
         int idBien = dto.getBienAsociado();
-        if (bienService.buscar(idBien) == null){
-            throw new NoSuchElementException("No existe el bien.");
+        try {
+            buscar(idBien, false);
+        } catch (NoSuchElementException e) {
+            throw new IllegalArgumentException(
+                    String.format("El bien con id %d no existe.", idBien)
+            );
         }
+        
         Validador.validarId(idBien, CAMPO_ID_TEXT);
         TipoEvento tipo = dto.getTipoEvento();
 //        Validador.validarString(tipo,CAMPO_TIPO_TEXT,CAMPO_TIPO_MIN,CAMPO_TIPO_MAX);
@@ -86,7 +86,10 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
         dto.setTipoEvento(tipo);
         dto.setID_Evento(id);
         
-        if(eventoTrazDAO.buscarMasReciente(idBien).getID_Evento() == id) {
+        // Buscamos el evento más reciente
+        EventoTrazabilidadDTO eventoUltimo = eventoTrazDAO.buscarMasReciente(idBien);
+        // Si el evento más reciente para ese bien soy yo, cambiamos el estado del bien acordemente
+        if(eventoUltimo != null && eventoUltimo.getID_Evento() == id) {
             switch(tipo) {
                 case(TipoEvento.AVERIO):
                     bienService.averiar(idBien);
@@ -97,13 +100,7 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
                 default:
                     break;
             }
-//            if(tipo.equals("AVERIO")) { // Cambiar a switch cuando trabajemos con enums mejor
-//                bienService.averiar(idBien);
-//            } else if (tipo.equals("REPARACION")) {
-//                bienService.reparar(idBien);
-//            }
         }
-        
         eventoTrazDAO.actualizar(dto);
     }
     
@@ -111,32 +108,39 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
     public void eliminar(int idEventoTraz) throws NoSuchElementException {
         EventoTrazabilidadDTO evento = this.buscar(idEventoTraz);
         
+        // Verifico existencia (da igual si está eliminado) del bien asociado y sino, se corta todo
         int idBien = evento.getBienAsociado();
+        try {
+            buscar(idBien, false);
+        } catch (NoSuchElementException e) {
+            throw new IllegalArgumentException(
+                    String.format("El bien con id %d no existe.", idBien)
+            );
+        }
         TipoEvento tipoDelEventoActual = evento.getTipoEvento();
         
         // Eliminamos lo que se nos pide
         eventoTrazDAO.eliminar(idEventoTraz);
         
         // Buscamos el evento anterior (El más reciente luego de la eliminación)
-        TipoEvento tipoDelEventoAnterior = eventoTrazDAO.buscarMasReciente(idBien).getTipoEvento();
-        // Si es distinto al que acabamos de eliminar, tenemos que modificar el estado del bien
-        if(tipoDelEventoAnterior != null && !tipoDelEventoAnterior.equals(tipoDelEventoActual)) {
-            switch(tipoDelEventoAnterior) {
-                case(TipoEvento.AVERIO):
-                    bienService.averiar(idBien);
-                    break;
-                case(TipoEvento.REPARACION):
-                case(TipoEvento.ENTREGA):
-                    bienService.reparar(idBien);
-                    break;
-                default:
-                    break;
+        EventoTrazabilidadDTO eventoAnterior = eventoTrazDAO.buscarMasReciente(idBien);
+        if (eventoAnterior != null) {
+            // Si encontramos alguno, tomamos su tipo
+            TipoEvento tipoDelEventoAnterior = eventoAnterior.getTipoEvento();
+            // Si es distinto al que acabamos de eliminar, tenemos que modificar el estado del bien
+            if(tipoDelEventoAnterior != null && !tipoDelEventoAnterior.equals(tipoDelEventoActual)) {
+                switch(tipoDelEventoAnterior) {
+                    case(TipoEvento.AVERIO):
+                        bienService.averiar(idBien);
+                        break;
+                    case(TipoEvento.REPARACION):
+                    case(TipoEvento.ENTREGA):
+                        bienService.reparar(idBien);
+                        break;
+                    default:
+                        break;
+                }
             }
-//            if(tipoDelEventoAnterior.equals("AVERIO")) {
-//                bienService.averiar(idBien);
-//            } else if (tipoDelEventoAnterior.equals("REPARACION") || tipoDelEventoAnterior.equals("ENTREGA")) {
-//                bienService.reparar(idBien);
-//            }
         }
     }
     
