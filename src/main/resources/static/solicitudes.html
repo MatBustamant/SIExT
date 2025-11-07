@@ -386,34 +386,6 @@
         document.getElementById("modificarSolicitudForm").addEventListener("submit", async (e) => {
             e.preventDefault();
             const id = +document.getElementById("modSolicitudId").value;
-            let solicitud;
-            try {
-                const response = await leerSolicitud(id);
-                if (!response.ok) {
-                    document.getElementById("modificarSolicitudSection").classList.add("hidden");
-                    const errorData = await response.json();
-                    if (response.status == 422) {
-                        alert(errorData.error);
-                        return;
-                    }
-                    if (response.status == 404) {
-                        alert("Solicitud no encontrada.");
-                        return;
-                    }
-                    else if (response.status == 500) {
-                        alert("El servidor no pudo realizar la búsqueda de la solicitud. Código: 500");
-                        return;
-                    }
-                    else {
-                        alert(`El servidor no pudo realizar la búsqueda de la solicitud. Código: ${response.status}`);
-                        return;
-                    }
-                }
-                solicitud = await response.json();
-            } catch (error) {
-                alert("No se pudo conectar con el servidor.");
-                return;
-            }
 
             const solicitudModificada = {
                 ubicacionBienes: document.getElementById("modUbicacion").value.trim().toUpperCase(),
@@ -427,6 +399,10 @@
                     const errorData = await response.json();
                     if (response.status == 422) {
                         alert(errorData.error);
+                        return;
+                    }
+                    if (response.status == 404) {
+                        alert("Solicitud no encontrada.");
                         return;
                     }
                     if (response.status == 500) {

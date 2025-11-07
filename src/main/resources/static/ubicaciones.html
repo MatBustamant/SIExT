@@ -218,35 +218,6 @@
             e.preventDefault();
             const id = +document.getElementById("modUbicacionId").value;
 
-            let ubicacion;
-            try {
-                const response = await leerUbicacion(id);
-                if (!response.ok) {
-                    document.getElementById("modificarUbicacionSection").classList.add("hidden");
-                    const errorData = await response.json();
-                    if (response.status == 422) {
-                        alert(errorData.error);
-                        return;
-                    }
-                    if (response.status == 404) {
-                        alert("Ubicación no encontrada.");
-                        return;
-                    }
-                    else if (response.status == 500) {
-                        alert("El servidor no pudo realizar la búsqueda de la ubicación. Código: 500");
-                        return;
-                    }
-                    else {
-                        alert(`El servidor no pudo realizar la búsqueda de la ubicación. Código: ${response.status}`);
-                        return;
-                    }
-                }
-                ubicacion = await response.json();
-            } catch (error) {
-                alert("No se pudo conectar con el servidor.");
-                return;
-            }
-
             const ubicacionModificada = {
                 nombre: document.getElementById("modNombreUbicacion").value.trim().toUpperCase(),
             }
@@ -259,6 +230,10 @@
                     const errorData = await response.json();
                     if (response.status == 422) {
                         alert(errorData.error);
+                        return;
+                    }
+                    if (response.status == 404) {
+                        alert("Ubicación no encontrada.");
                         return;
                     }
                     if (response.status == 500) {

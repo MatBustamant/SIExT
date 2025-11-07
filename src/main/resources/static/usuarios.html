@@ -229,34 +229,6 @@
         document.getElementById("formModificarUsuario").addEventListener("submit", async (e) => {
             e.preventDefault();
             const id = +document.getElementById("modUsuarioId").value;
-            let usuario;
-            try {
-                const response = await leerUsuario(id);
-                if (!response.ok) {
-                    document.getElementById("modificarUsuarioSection").classList.add("hidden");
-                    const errorData = await response.json();
-                    if (response.status == 422) {
-                        alert(errorData.error);
-                        return;
-                    }
-                    if (response.status == 404) {
-                        alert("Usuario no encontrado.");
-                        return;
-                    }
-                    else if (response.status == 500) {
-                        alert("El servidor no pudo realizar la búsqueda del usuario. Código: 500");
-                        return;
-                    }
-                    else {
-                        alert(`El servidor no pudo realizar la búsqueda del usuario. Código: ${response.status}`);
-                        return;
-                    }
-                }
-                usuario = await response.json();
-            } catch (error) {
-                alert("No se pudo conectar con el servidor.");
-                return;
-            }
 
             const usuarioModificado = {
                 nombre: document.getElementById("modNombreUsuario").value.toUpperCase(),
@@ -270,6 +242,10 @@
                     const errorData = await response.json();
                     if (response.status == 422) {
                         alert(errorData.error);
+                        return;
+                    }
+                    if (response.status == 404) {
+                        alert("Usuario no encontrado.");
                         return;
                     }
                     if (response.status == 500) {
