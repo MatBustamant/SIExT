@@ -40,7 +40,7 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
 
     @Override
     public int actualizar(UbicacionDTO Ubicacion) {
-        String sql = "UPDATE Ubicacion SET Nombre = ? WHERE ID_Ubicacion = ?";
+        String sql = "UPDATE Ubicacion SET Nombre = ? WHERE ID_Ubicacion = ? AND Eliminado = ?";
         int resultado = 0;
 
         try (Connection con = BasedeDatos.getConnection();
@@ -48,6 +48,7 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
             
             ps.setString(1, Ubicacion.getNombre());
             ps.setInt(2, Ubicacion.getID_Ubicacion());
+            ps.setInt(3, 0);
 
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
@@ -61,18 +62,18 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
     public UbicacionDTO buscar(int id) {
 
         UbicacionDTO ubicacionBien = null;
-        String sql = "SELECT * FROM Ubicacion WHERE ID_Ubicacion = ? AND Eliminado = ?";
+        String sql = "SELECT * FROM Ubicacion WHERE ID_Ubicacion = ?";
         
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, id);
-            ps.setInt(2,0);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     ubicacionBien = new UbicacionDTO();
                     ubicacionBien.setID_Ubicacion(rs.getInt("ID_Ubicacion"));
                     ubicacionBien.setNombre(rs.getString("Nombre"));
+                    ubicacionBien.setEliminado(rs.getInt("Eliminado") != 0);
                 }
             }
             
@@ -87,10 +88,9 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
     public List<UbicacionDTO> buscarTodos() {
         List<UbicacionDTO> ubicaciones = new ArrayList<>();
 
-        String sql = "SELECT * FROM Ubicacion WHERE Eliminado = ?";
+        String sql = "SELECT * FROM Ubicacion";
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, 0);
         
             try(ResultSet rs = ps.executeQuery()) {
 
@@ -98,6 +98,7 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
                 UbicacionDTO ubicacion = new UbicacionDTO();
                 ubicacion.setID_Ubicacion(rs.getInt("ID_Ubicacion"));
                 ubicacion.setNombre(rs.getString("Nombre"));
+                ubicacion.setEliminado(rs.getInt("Eliminado") != 0);
 
                 ubicaciones.add(ubicacion);
             }
@@ -111,7 +112,7 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
 
     @Override
     public int eliminar(int id) {
-        String sql = "UPDATE Ubicacion SET Eliminado = ? WHERE ID_Ubicacion = ?";
+        String sql = "UPDATE Ubicacion SET Eliminado = ? WHERE ID_Ubicacion = ? AND Eliminado = ?";
         int resultado = 0;
         
         try (Connection con = BasedeDatos.getConnection();
@@ -119,6 +120,7 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
             
             ps.setInt(1, 1);
             ps.setInt(2, id);
+            ps.setInt(3, 0);
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
@@ -131,7 +133,7 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
     public UbicacionDTO buscar(String nombre) {
 
         UbicacionDTO ubicacion = null;
-        String sql = "SELECT ID_Ubicacion, Nombre FROM Ubicacion WHERE Nombre = ?";
+        String sql = "SELECT * FROM Ubicacion WHERE Nombre = ?";
 
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
@@ -142,6 +144,7 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
                     ubicacion = new UbicacionDTO();
                     ubicacion.setID_Ubicacion(rs.getInt("ID_Ubicacion"));
                     ubicacion.setNombre(rs.getString("Nombre"));
+                    ubicacion.setEliminado(rs.getInt("Eliminado") != 0);
                 }
             }
             

@@ -12,15 +12,16 @@ public class EventoTrazabilidadDTO {
     private Instant FechaEvento;
     private int BienAsociado;
     private TipoEvento TipoEvento;
-
+    private boolean eliminado;
     
     public EventoTrazabilidadDTO(){
     }
     
-    public EventoTrazabilidadDTO(Instant FechaEvento, Integer BienAsociado, TipoEvento TipoEvento) {
+    public EventoTrazabilidadDTO(Instant FechaEvento, Integer BienAsociado, TipoEvento TipoEvento, boolean eliminado) {
         this.FechaEvento = FechaEvento;
         this.BienAsociado = BienAsociado;
         this.TipoEvento = TipoEvento;
+        this.eliminado = eliminado;
     }
 
     public int getID_Evento() {
@@ -55,6 +56,12 @@ public class EventoTrazabilidadDTO {
         this.TipoEvento = TipoEvento;
     }
 
-   
+    public boolean isEliminado() {
+        return eliminado;
+    }
+
+    public void setEliminado(boolean eliminado) {
+        this.eliminado = eliminado;
+    }
     
 }

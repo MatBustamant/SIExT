@@ -7,11 +7,12 @@ package com.grupocapa8.siext.DTO;
 public class UbicacionDTO {
     private int ID_Ubicacion;
     private String Nombre;
-    
+    private boolean eliminado;
 
-    public UbicacionDTO(int ID_Ubicacion, String Nombre) {
+    public UbicacionDTO(int ID_Ubicacion, String Nombre, boolean eliminado) {
         this.ID_Ubicacion = ID_Ubicacion;
         this.Nombre = Nombre;
+        this.eliminado = eliminado;
     }
     
     public UbicacionDTO(){
@@ -32,6 +33,14 @@ public class UbicacionDTO {
 
     public void setID_Ubicacion(int ID_Ubicacion) {
         this.ID_Ubicacion = ID_Ubicacion;
+    }
+
+    public boolean isEliminado() {
+        return eliminado;
+    }
+
+    public void setEliminado(boolean eliminado) {
+        this.eliminado = eliminado;
     }
     
 }

@@ -73,13 +73,13 @@ public class BienService implements ServiceGenerico<BienDTO> {
         
         // Si no existe la categoría, la creamos
         if (catDAO.buscar(categoria) == null) {
-            CategoriaBienDTO nuevaCategoria = new CategoriaBienDTO(0, categoria);
+            CategoriaBienDTO nuevaCategoria = new CategoriaBienDTO(0, categoria, false);
             catDAO.insertar(nuevaCategoria);
         }
         
         // Si no existe la ubicación, la creamos
         if (ubiDAO.buscar(ubicacion) == null) {
-            UbicacionDTO nuevaUbicacion = new UbicacionDTO(0, ubicacion);
+            UbicacionDTO nuevaUbicacion = new UbicacionDTO(0, ubicacion, false);
             ubiDAO.insertar(nuevaUbicacion);
         }
         
@@ -112,13 +112,13 @@ public class BienService implements ServiceGenerico<BienDTO> {
         
         // Si no existe la categoría, la creamos
         if (catDAO.buscar(categoria) == null) {
-            CategoriaBienDTO nuevaCategoria = new CategoriaBienDTO(0, categoria);
+            CategoriaBienDTO nuevaCategoria = new CategoriaBienDTO(0, categoria, false);
             catDAO.insertar(nuevaCategoria);
         }
         
         // Si no existe la ubicación, la creamos
         if (ubiDAO.buscar(ubicacion) == null) {
-            UbicacionDTO nuevaUbicacion = new UbicacionDTO(0, ubicacion);
+            UbicacionDTO nuevaUbicacion = new UbicacionDTO(0, ubicacion, false);
             ubiDAO.insertar(nuevaUbicacion);
         }
        

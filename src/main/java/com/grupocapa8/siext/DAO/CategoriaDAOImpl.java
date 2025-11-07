@@ -40,7 +40,7 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
 
     @Override
     public int actualizar(CategoriaBienDTO Categoria) {
-        String sql = "UPDATE Categoria SET Nombre = ? WHERE ID_Categoria = ?";
+        String sql = "UPDATE Categoria SET Nombre = ? WHERE ID_Categoria = ? AND Eliminado = ?";
         int resultado = 0;
 
         try (Connection con = BasedeDatos.getConnection();
@@ -48,6 +48,7 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
             
             ps.setString(1, Categoria.getNombre());
             ps.setInt(2, Categoria.getID_Categoria());
+            ps.setInt(3, 0);
 
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
@@ -61,18 +62,18 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
     public CategoriaBienDTO buscar(int id) {
 
         CategoriaBienDTO categoriaBien = null;
-        String sql = "SELECT * FROM Categoria WHERE ID_Categoria = ? AND Eliminado = ?";
+        String sql = "SELECT * FROM Categoria WHERE ID_Categoria = ?";
         
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, id);
-            ps.setInt(2,0);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     categoriaBien = new CategoriaBienDTO();
                     categoriaBien.setID_Categoria(rs.getInt("ID_Categoria"));
                     categoriaBien.setNombre(rs.getString("Nombre"));
+                    categoriaBien.setEliminado(rs.getInt("Eliminado") != 0);
                 }
             }
             
@@ -87,10 +88,9 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
     public List<CategoriaBienDTO> buscarTodos() {
         List<CategoriaBienDTO> categoriaBienes = new ArrayList<>();
 
-        String sql = "SELECT * FROM Categoria WHERE Eliminado = ?";
+        String sql = "SELECT * FROM Categoria";
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, 0);
         
             try(ResultSet rs = ps.executeQuery()) {
 
@@ -98,6 +98,7 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
                 CategoriaBienDTO categoriaBien = new CategoriaBienDTO();
                 categoriaBien.setID_Categoria(rs.getInt("ID_Categoria"));
                 categoriaBien.setNombre(rs.getString("Nombre"));
+                categoriaBien.setEliminado(rs.getInt("Eliminado") != 0);
 
                 categoriaBienes.add(categoriaBien);
             }
@@ -111,7 +112,7 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
 
     @Override
     public int eliminar(int id) {
-        String sql = "UPDATE Categoria SET Eliminado = ? WHERE ID_Categoria = ?";
+        String sql = "UPDATE Categoria SET Eliminado = ? WHERE ID_Categoria = ? AND Eliminado = ?";
         int resultado = 0;
         
         try (Connection con = BasedeDatos.getConnection();
@@ -119,6 +120,7 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
             
             ps.setInt(1, 1);
             ps.setInt(2, id);
+            ps.setInt(3, 0);
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
@@ -131,7 +133,7 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
     public CategoriaBienDTO buscar(String nombre) {
 
         CategoriaBienDTO categoriaBien = null;
-        String sql = "SELECT ID_Categoria, Nombre FROM Categoria WHERE Nombre = ?";
+        String sql = "SELECT * FROM Categoria WHERE Nombre = ?";
 
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
@@ -142,6 +144,7 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
                     categoriaBien = new CategoriaBienDTO();
                     categoriaBien.setID_Categoria(rs.getInt("ID_Categoria"));
                     categoriaBien.setNombre(rs.getString("Nombre"));
+                    categoriaBien.setEliminado(rs.getInt("Eliminado") != 0);
                 }
             }
             

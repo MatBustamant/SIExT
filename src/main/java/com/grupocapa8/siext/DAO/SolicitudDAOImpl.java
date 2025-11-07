@@ -30,12 +30,11 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
     @Override
     public SolicitudDTO buscar(int id) {
         SolicitudDTO soli = null;
-        String sql = "SELECT * FROM Solicitud WHERE Num_Solicitud = ? AND Eliminado = ?";
+        String sql = "SELECT * FROM Solicitud WHERE Num_Solicitud = ?";
         try (Connection con = getConnection();
             PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, id);
-            ps.setInt(2, 0);
             try (ResultSet rs = ps.executeQuery()){
                 if (rs.next()){
                     soli = new SolicitudDTO();
@@ -51,6 +50,7 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
                     
                     soli.setEstado(EstadoSolicitud.valueOf(rs.getString("Estado")));
                     soli.setDescripcion(rs.getString("Descripcion"));
+                    soli.setEliminado(rs.getInt("Eliminado") != 0);
                 }
             }
         } catch (SQLException ex) {
@@ -62,10 +62,9 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
     @Override
     public List<SolicitudDTO> buscarTodos() {
         List<SolicitudDTO> solicitudes = new ArrayList<>();
-        String sql = "SELECT * FROM Solicitud WHERE Eliminado = ?";
+        String sql = "SELECT * FROM Solicitud";
         try (Connection con = getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1,0);
         
             try(ResultSet rs = ps.executeQuery()) {
 
@@ -83,6 +82,7 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
 
                 soli.setEstado(EstadoSolicitud.valueOf(rs.getString("Estado")));
                 soli.setDescripcion(rs.getString("Descripcion"));
+                soli.setEliminado(rs.getInt("Eliminado") != 0);
                 
                 solicitudes.add(soli);
             }
@@ -115,7 +115,7 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
 
     @Override
     public int actualizar(SolicitudDTO Solicitud) {
-        String sql = "UPDATE Solicitud SET Estado = ?, Destino = ?, Descripcion = ? WHERE Num_Solicitud = ?";
+        String sql = "UPDATE Solicitud SET Estado = ?, Destino = ?, Descripcion = ? WHERE Num_Solicitud = ? AND Eliminado = ?";
         int idUbicacion = ubicacionDAO.buscar(Solicitud.getUbicacionBienes()).getID_Ubicacion();
         
         int resultado = 0;
@@ -127,6 +127,7 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
             ps.setInt(2, idUbicacion);
             ps.setString(3, Solicitud.getDescripcion());
             ps.setInt(4, Solicitud.getNumSolicitud());
+            ps.setInt(5, 0);
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
@@ -137,13 +138,14 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
 
     @Override
     public int eliminar(int id) {
-        String sql = "UPDATE Solicitud SET Eliminado = ? WHERE Num_Solicitud = ?";
+        String sql = "UPDATE Solicitud SET Eliminado = ? WHERE Num_Solicitud = ? AND Eliminado = ?";
         int resultado = 0;
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, 1);
             ps.setInt(2, id);
+            ps.setInt(3, 0);
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {

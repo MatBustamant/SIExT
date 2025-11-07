@@ -14,8 +14,9 @@ public class BienDTO {
     private String detalle;
     private String NombreCatBienes;
     private Integer cantBienes;
+    private boolean eliminado;
 
-    public BienDTO(int ID_Bien, String Nombre, String UbicacionBien, EstadoBien EstadoBien, String detalle, String NombreCatBienes, int cantBienes) {
+    public BienDTO(int ID_Bien, String Nombre, String UbicacionBien, EstadoBien EstadoBien, String detalle, String NombreCatBienes, int cantBienes, boolean eliminado) {
         this.ID_Bien = ID_Bien;
         this.Nombre = Nombre;
         this.UbicacionBien = UbicacionBien;
@@ -23,6 +24,7 @@ public class BienDTO {
         this.detalle = detalle;
         this.NombreCatBienes = NombreCatBienes;
         this.cantBienes = cantBienes;
+        this.eliminado = eliminado;
     }
     public BienDTO(){
         
@@ -84,7 +86,12 @@ public class BienDTO {
         this.ID_Bien = ID_Bien;
     }
 
-   
-    
+    public boolean isEliminado() {
+        return eliminado;
+    }
+
+    public void setEliminado(boolean eliminado) {
+        this.eliminado = eliminado;
+    }
     
 }
