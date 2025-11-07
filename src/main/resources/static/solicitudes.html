@@ -144,6 +144,7 @@
         recargarUbicaciones();
         function renderSolicitudes() {
             const solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
+            const solicitudesHabilitadas = solicitudes.filter(s => !s.eliminado);
 
             const filterNroSolicitud = document.getElementById("filterNroSolicitud");
             const filterUbicacion = document.getElementById("filterUbicacion");
@@ -155,7 +156,7 @@
 
             let count = 0;
 
-            solicitudes.forEach(sol => {
+            solicitudesHabilitadas.forEach(sol => {
                 const matchNumSolicitud = numero => String(sol.numSolicitud).includes(numero);
                 const matchUbicacion = (ubi, filtro) => !filtro || ubi === filtro;
                 const matchEstado = (est, filtro) => !filtro || est === filtro;

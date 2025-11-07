@@ -129,12 +129,14 @@
 
         function renderizarCategorias() {
             const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
+            const categoriasHabilitadas = categorias.filter(c => !c.eliminado);
+
             const filtroNombreId = document.getElementById("filterNombreCat").value.toUpperCase();
             const tbody = document.querySelector("#tablaCategorias tbody");
             tbody.innerHTML = "";
             let count = 0;
 
-            categorias.forEach(cat => {
+            categoriasHabilitadas.forEach(cat => {
                 if (
                     (cat.nombre.toUpperCase().includes(filtroNombreId) || String(cat.id_Categoria).includes(filtroNombreId))
                 ) {
