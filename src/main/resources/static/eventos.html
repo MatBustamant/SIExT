@@ -147,6 +147,7 @@
     <script src="js/main.js"></script>
     <script src="js/formateo.js"></script>
     <script src="js/fechas.js"></script>
+    <script src="js/forms.js"></script>
     <script>
         recargarEventos();
         recargarBienes();
@@ -156,9 +157,9 @@
 
             const bienes = JSON.parse(localStorage.getItem("bienes")) || [];
 
-            const filterBienInput = document.getElementById("filterBienInput");
-            const filterTipoEvento = document.getElementById("filterTipoEvento");
-            const filterFecha = document.getElementById("filterFecha");
+            const filterBienInput = document.getElementById("filterBienInput").value;
+            const filterTipoEvento = document.getElementById("filterTipoEvento").value;
+            const filterFecha = document.getElementById("filterFecha").value;
 
             const tbody = document.querySelector("#tablaEventos tbody");
             tbody.innerHTML = "";
@@ -166,13 +167,9 @@
             let count = 0;
 
             eventosHabilitados.forEach(evento => {
-                const matchBienInput = numero => String(formatearNroBien(evento.bienAsociado)).includes(numero);
-                const matchTipoEvento = (tipo, filtro) => !filtro || tipo === filtro;
-                const matchFecha = (fechaEvento, filtro) => !filtro || formatearFechaLocal(fechaEvento) === filtro;
-
-                if (matchBienInput(filterBienInput.value) &&
-                    matchTipoEvento(evento.tipoEvento, filterTipoEvento.value) &&
-                    matchFecha(evento.fechaEvento, filterFecha.value)
+                if (matchNumero(formatearNroBien(evento.bienAsociado), filterBienInput) &&
+                    matchValor(evento.tipoEvento, filterTipoEvento) &&
+                    matchFecha(evento.fechaEvento, filterFecha)
                 ) {
                     const bien = bienes.find(b => b.id_Bien === evento.bienAsociado);
                     const tr = document.createElement("tr");
@@ -211,9 +208,16 @@
             //     return;
             // }
         });
-        document.getElementById("filterBienInput").addEventListener("input", renderEventos);
-        document.getElementById("filterTipoEvento").addEventListener("change", renderEventos);
-        document.getElementById("filterFecha").addEventListener("change", renderEventos);
+
+        // Filtros
+        document.querySelectorAll("#filterBienInput, #filterTipoEvento, #filterFecha")
+            .forEach(input => {
+                const eventType = (input.tagName === "SELECT" || input.type === "date") ? "change" : "input";
+                input.addEventListener(eventType, () => {
+                    // currentPage = 1;
+                    renderEventos();
+                });
+        });
 
         renderEventos();
 

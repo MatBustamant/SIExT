@@ -106,7 +106,7 @@
                     <input type="text" id="filterBienInput" placeholder="Filtrar por nombre o nro. de inventario...">
                 </div>
                 <div>
-                    <input list="categoriasSugeridas" type="text" id="filterBienCategoria" placeholder="Filtrar por ubicación..."></input>
+                    <input list="categoriasSugeridas" type="text" id="filterBienCategoria" placeholder="Filtrar por categoría..."></input>
                 </div>
                 <div>
                     <select id="filterBienEstado">
@@ -185,6 +185,7 @@
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script src="js/formateo.js"></script>
+    <script src="js/forms.js"></script>
     <script>
         const categoriaProducto = document.getElementById("categoriaProducto");
         const ubicacionProducto = document.getElementById("ubicacionProducto");
@@ -210,14 +211,10 @@
             let countBienes = 0;
 
             bienesHabilitados.forEach(prod => {
-                const matchTexto = txt => prod.nombre.toUpperCase().includes(txt) || String(formatearNroBien(prod.id_Bien)).includes(txt);
-                const matchCategoria = (cat, filtro) => !filtro || cat.toUpperCase().includes(filtro);
-                const matchEstado = (estado, filtro) => !filtro || estado === filtro;
-                const matchUbicacion = (ubicacion, filtro) => !filtro || ubicacion.toUpperCase().includes(filtro);
-
-                if (matchTexto(bienFiltroTexto) && matchCategoria(prod.nombreCatBienes, bienFiltroCategoria)
-                    && matchEstado(prod.estadoBien, bienFiltroEstado)
-                    && matchUbicacion(prod.ubicacionBien, bienFiltroUbicacion)
+                if ((matchTexto(prod.nombre, bienFiltroTexto) || matchNumero(formatearNroBien(prod.id_Bien), bienFiltroTexto)) &&
+                    matchTexto(prod.nombreCatBienes, bienFiltroCategoria) &&
+                    matchTexto(prod.ubicacionBien, bienFiltroUbicacion) &&
+                    matchValor(prod.estadoBien, bienFiltroEstado)
                 ) {
                     const row = document.createElement("tr");
                     row.innerHTML = `
@@ -239,59 +236,13 @@
             document.getElementById("counterBienes").textContent = `Mostrando ${countBienes} bien(es).`;
         }
 
-        function cargarCategorias(idSelect) {
-            const sel = document.getElementById(idSelect);
-            sel.innerHTML = "";
-            const cats = JSON.parse(localStorage.getItem("categorias")) || [];
-            if (idSelect == "filterBienCategoria") {
-                const opt = document.createElement("option");
-                opt.value = "";
-                opt.textContent = "Todas las categorías";
-                sel.appendChild(opt);
-            }
-            if (cats.length === 0) {
-                sel.disabled = true;
-                sel.innerHTML = "<option>Sin categorías</option>";
-                return;
-            }
-            cats.forEach(c => {
-                const o = document.createElement("option");
-                o.textContent = c.nombre;
-                sel.appendChild(o);
-            });
-            sel.disabled = false;
-        }
-
-        function cargarUbicaciones(idSelect) {
-            const sel = document.getElementById(idSelect);
-            sel.innerHTML = "";
-            const cats = JSON.parse(localStorage.getItem("ubicaciones")) || [];
-            if (idSelect == "filterBienUbicacion") {
-                const opt = document.createElement("option");
-                opt.value = "";
-                opt.textContent = "Todas las ubicaciones";
-                sel.appendChild(opt);
-            }
-            if (cats.length === 0) {
-                sel.disabled = true;
-                sel.innerHTML = "<option>Sin ubicaciones</option>";
-                return;
-            }
-            cats.forEach(c => {
-                const o = document.createElement("option");
-                o.textContent = c.nombre;
-                sel.appendChild(o);
-            });
-            sel.disabled = false;
-        }
-
         recargarBienes();
         recargarCategorias();
         recargarUbicaciones();
         recargarEventos();
 
-        cargarCategorias("categoriasSugeridas");
-        cargarUbicaciones("ubicacionesSugeridas");
+        cargarOpciones("categoriasSugeridas", "categorias");
+        cargarOpciones("ubicacionesSugeridas", "ubicaciones");
 
         renderInventario();
 
@@ -311,10 +262,16 @@
             //     return;
             // }
         });
-        document.getElementById("filterBienInput").oninput = renderInventario;
-        document.getElementById("filterBienCategoria").oninput = renderInventario;
-        document.getElementById("filterBienEstado").onchange = renderInventario;
-        document.getElementById("filterBienUbicacion").oninput = renderInventario
+
+        // Filtros
+        document.querySelectorAll("#filterBienInput, #filterBienCategoria, #filterBienEstado, #filterBienUbicacion")
+            .forEach(input => {
+                const eventType = (input.tagName === "SELECT" || input.type === "date") ? "change" : "input";
+                input.addEventListener(eventType, () => {
+                    // currentPage = 1;
+                    renderInventario();
+                });
+        });
 
         document.getElementById("productoForm").onsubmit = async (e) => {
             e.preventDefault();
@@ -364,8 +321,8 @@
             await recargarEventos();
 
             // Reiniciamos el form y lo preparamos para nuevos inserts
-            cargarCategorias("categoriasSugeridas");
-            cargarUbicaciones("ubicacionesSugeridas");
+            cargarOpciones("categoriasSugeridas", "categorias");
+            cargarOpciones("ubicacionesSugeridas", "ubicaciones");
             renderInventario();
             e.target.reset();
         };
@@ -430,8 +387,8 @@
             await recargarUbicaciones();
             await recargarEventos();
 
-            cargarCategorias("categoriasSugeridas");
-            cargarUbicaciones("ubicacionesSugeridas");
+            cargarOpciones("categoriasSugeridas", "categorias");
+            cargarOpciones("ubicacionesSugeridas", "ubicaciones");
             renderInventario();
             document.getElementById("modificarBienSection").classList.add("hidden");
             e.target.reset();

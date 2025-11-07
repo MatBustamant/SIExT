@@ -79,8 +79,7 @@
                 <label>Identificador de categoria</label>
                 <input type="number" id="modCategoriaId" disabled>
                 <label>Nombre de Categoría</label>
-                <input list="modCategoriasExistentes" type="text" id="modNombreCategoria" required>
-                <datalist id="modCategoriasExistentes"></datalist>
+                <input list="categoriasExistentes" type="text" id="modNombreCategoria" required>
                 <div class="btn-row">
                     <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
                     <button type="button" class="btn" id="cancelarBtn"><i class="bi bi-x-circle"></i>Cancelar</button>
@@ -100,6 +99,7 @@
     </script>
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/forms.js"></script>
     <script>
         function categoriaExiste(nombre) {
             const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
@@ -109,23 +109,6 @@
                 return true;
             }
             return false;
-        }
-
-        function cargarCategoriasExistentes(idSelect) {
-            const sel = document.getElementById(idSelect);
-            sel.innerHTML = "";
-            const cats = JSON.parse(localStorage.getItem("categorias")) || [];
-            if (cats.length === 0) {
-                sel.disabled = true;
-                sel.innerHTML = "<option>Sin categorías</option>";
-                return;
-            }
-            cats.forEach(c => {
-                const o = document.createElement("option");
-                o.textContent = c.nombre;
-                sel.appendChild(o);
-            });
-            sel.disabled = false;
         }
 
         function renderizarCategorias() {
@@ -139,7 +122,7 @@
 
             categoriasHabilitadas.forEach(cat => {
                 if (
-                    (cat.nombre.toUpperCase().includes(filtroNombreId) || String(cat.id_Categoria).includes(filtroNombreId))
+                    (matchTexto(cat.nombre, filtroNombreId) || matchNumero(cat.id_Categoria, filtroNombreId))
                 ) {
                     const fila = document.createElement("tr");
                     fila.innerHTML = `
@@ -157,8 +140,7 @@
             document.getElementById("contadorCategorias").textContent = `Mostrando ${count} categoría(s).`;
         }
         recargarCategorias();
-        cargarCategoriasExistentes("categoriasExistentes");
-        cargarCategoriasExistentes("modCategoriasExistentes");
+        cargarOpciones("categoriasExistentes", "categorias");
         renderizarCategorias();
 
         document.querySelector("#tablaCategorias tbody").addEventListener("click", (e) => {
@@ -215,8 +197,7 @@
             await recargarCategorias();
 
             renderizarCategorias();
-            cargarCategoriasExistentes("categoriasExistentes");
-            cargarCategoriasExistentes("modCategoriasExistentes");
+            cargarOpciones("categoriasExistentes", "categorias");
             e.target.reset();
         });
 
@@ -272,8 +253,7 @@
             await recargarCategorias();
 
             renderizarCategorias();
-            cargarCategoriasExistentes("categoriasExistentes");
-            cargarCategoriasExistentes("modCategoriasExistentes");
+            cargarOpciones("categoriasExistentes", "categorias");
             document.getElementById("modificarCategoriaSection").classList.add("hidden");
             e.target.reset();
 
@@ -318,8 +298,7 @@
             alert("Categoría eliminada.");
             await recargarCategorias();
             renderizarCategorias();
-            cargarCategoriasExistentes("categoriasExistentes");
-            cargarCategoriasExistentes("modCategoriasExistentes");
+            cargarOpciones("categoriasExistentes", "categorias");
             document.getElementById("modificarCategoriaSection").classList.add("hidden");
             document.getElementById("modificarCategoriaForm").reset();
 
