@@ -41,8 +41,8 @@
         <section>
             <h2>Agregar nueva categoría</h2>
             <form id="categoriaForm">
-                <label>Nombre de Categoría</label>
-                <input list="categoriasExistentes" type="text" id="nombreCategoria" required>
+                <label for="nombreCategoria">Nombre de Categoría</label>
+                <input list="categoriasExistentes" type="text" id="nombreCategoria" placeholder="INFORMÁTICOS" required>
                 <datalist id="categoriasExistentes"></datalist>
                 <button type="submit" class="btn"><i class="bi bi-plus-circle"></i>Registrar</button>
             </form>
@@ -54,7 +54,12 @@
             <!-- Filtros -->
             <div class="form-grid">
                 <div>
-                    <input type="text" id="filterNombreCat" placeholder="Filtrar por nombre o ID...">
+                    <label for="filterIdCat">Id. de categoría</label>
+                    <input type="number" id="filterIdCat" placeholder="Filtrar por ID...">
+                </div>
+                <div>
+                    <label for="filterNombreCat">Nombre</label>
+                    <input type="text" id="filterNombreCat" placeholder="Filtrar por nombre...">
                 </div>
             </div>
 
@@ -92,10 +97,10 @@
         <section id="modificarCategoriaSection" class="hidden">
             <h2>Actualizar categoría</h2>
             <form id="modificarCategoriaForm">
-                <label>Identificador de categoria</label>
+                <label for="modCategoriaId">Id. de categoria</label>
                 <input type="number" id="modCategoriaId" disabled>
-                <label>Nombre de Categoría</label>
-                <input list="categoriasExistentes" type="text" id="modNombreCategoria" required>
+                <label for="modNombreCategoria">Nombre de Categoría</label>
+                <input list="categoriasExistentes" type="text" id="modNombreCategoria" placeholder="INFORMÁTICOS" required>
                 <div class="btn-row">
                     <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
                     <button type="button" class="btn" id="cancelarBtn"><i class="bi bi-x-circle"></i>Cancelar</button>
@@ -135,13 +140,14 @@
             const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
             const categoriasHabilitadas = categorias.filter(c => !c.eliminado);
 
-            const filtroNombreId = document.getElementById("filterNombreCat").value.toUpperCase();
+            const filtroNombre = document.getElementById("filterNombreCat").value.toUpperCase().trim();
+            const filtroId = document.getElementById("filterIdCat").value;
             const tbody = document.querySelector("#tablaCategorias tbody");
             tbody.innerHTML = "";
 
             // Filtrado
             const filtradas = categoriasHabilitadas.filter(cat =>
-                matchTexto(cat.nombre, filtroNombreId) || matchNumero(cat.id_Categoria, filtroNombreId)
+                matchTexto(cat.nombre, filtroNombre) && matchNumero(cat.id_Categoria, filtroId)
             );
 
             // Paginación
@@ -209,7 +215,13 @@
                 return;
             }
         });
-        document.getElementById("filterNombreCat").addEventListener("input", renderizarCategorias);
+        document.querySelectorAll("#filterIdCat, #filterNombreCat").forEach(input => {
+            const eventType = (input.tagName === "SELECT" || input.type === "date") ? "change" : "input";
+            input.addEventListener(eventType, () => {
+                currentPage = 1;
+                renderizarCategorias();
+            });
+        });
 
         document.getElementById("categoriaForm").addEventListener("submit", async (e) => {
             e.preventDefault();
@@ -261,7 +273,8 @@
 
             document.getElementById("modificarCategoriaSection").classList.remove("hidden");
 
-            document.getElementById("modNombreCategoria").focus();
+            document.getElementById("modificarCategoriaSection").scrollIntoView({ behavior: "smooth" });
+            document.getElementById("modNombreCategoria").focus({ preventScroll: true });
         }
 
         document.getElementById("modificarCategoriaForm").addEventListener("submit", async (e) => {

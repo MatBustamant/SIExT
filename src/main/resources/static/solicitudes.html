@@ -45,18 +45,18 @@
         <section>
             <h2>Registrar nueva solicitud</h2>
             <form id="solicitudForm">
-                <label>Ubicación destino</label>
-                <input list="ubicacionesSugeridas" type="text" id="ubicacion" required>
+                <label for="ubicacion">Ubicación destino</label>
+                <input list="ubicacionesSugeridas" type="text" id="ubicacion" placeholder="BEDELÍA" required>
                 <datalist id="ubicacionesSugeridas"></datalist>
-                <label>Estado</label>
+                <label for="estado">Estado</label>
                 <select id="estado" required>
                     <option value="POR_REVISAR">Pendiente de aprobación</option>
                     <option value="APROBADA">Aprobada</option>
                     <option value="DESAPROBADA">No aprobada</option>
                     <option value="SATISFECHA">Completada</option>
                 </select>
-                <label>Descripción</label>
-                <textarea id="descripcion" rows="4" required></textarea>
+                <label for="descripcion">Descripción</label>
+                <textarea id="descripcion" rows="4" placeholder="Detalles extra opcionales..." required></textarea>
                 <button type="submit" class="btn"><i class="bi bi-plus-circle"></i>Registrar</button>
             </form>
         </section>
@@ -67,12 +67,15 @@
             <!-- Filtros -->
             <div class="form-grid">
                 <div>
+                    <label for="filterNroSolicitud">Nro. de solicitud</label>
                     <input type="number" id="filterNroSolicitud" placeholder="Filtrar por nro de solicitud...">
                 </div>
                 <div>
+                    <label for="filterUbicacion">Ubicación</label>
                     <input list="ubicacionesSugeridas" type="text" id="filterUbicacion" placeholder="Filtrar por ubicación...">
                 </div>
                 <div>
+                    <label for="filterEstado">Estado actual</label>
                     <select id="filterEstado">
                         <option value="">Todos los estados</option>
                         <option value="POR_REVISAR">Pendiente de aprobación</option>
@@ -82,6 +85,7 @@
                     </select>
                 </div>
                 <div>
+                    <label for="filterFecha">Fecha de solicitud</label>
                     <input type="date" id="filterFecha">
                 </div>
             </div>
@@ -122,19 +126,19 @@
         <section id="modificarSolicitudSection" class="hidden">
             <h2>Editar solicitud</h2>
             <form id="modificarSolicitudForm">
-                <label>Nro. de solicitud</label>
+                <label for="modSolicitudId">Nro. de solicitud</label>
                 <input type="number" id="modSolicitudId" disabled>
-                <label>Ubicación destino</label>
-                <input list="ubicacionesSugeridas" type="text" id="modUbicacion" required>
-                <label>Estado</label>
+                <label for="modUbicacion">Ubicación destino</label>
+                <input list="ubicacionesSugeridas" type="text" id="modUbicacion" placeholder="BEDELÍA" required>
+                <label for="modEstado">Estado</label>
                 <select id="modEstado" required>
                     <option value="POR_REVISAR">Pendiente de aprobación</option>
                     <option value="APROBADA">Aprobada</option>
                     <option value="DESAPROBADA">No aprobada</option>
                     <option value="SATISFECHA">Completada</option>
                 </select>
-                <label>Descripción</label>
-                <textarea id="modDescripcion" rows="4" required></textarea>
+                <label for="modDescripcion">Descripción</label>
+                <textarea id="modDescripcion" rows="4" required placeholder="Detalles extra opcionales..."></textarea>
                 <div class="btn-row">
                     <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
                     <button type="button" class="btn" id="cancelarBtn"><i class="bi bi-x-circle"></i>Cancelar</button>
@@ -352,7 +356,8 @@
 
             document.getElementById("modificarSolicitudSection").classList.remove("hidden");
 
-            document.getElementById("modUbicacion").focus();
+            document.getElementById("modificarSolicitudSection").scrollIntoView({ behavior: "smooth" });
+            document.getElementById("modUbicacion").focus({ preventScroll: true });
         }
 
         document.getElementById("modificarSolicitudForm").addEventListener("submit", async (e) => {

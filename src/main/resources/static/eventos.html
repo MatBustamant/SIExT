@@ -45,11 +45,14 @@
             <form id="registroEventoForm">
                 <div class="form-grid">
                     <div>
-                        <label>Nro. de inventario</label>
-                        <input id="bienAsociado" type="number" required>
+                        <label for="bienAsociado">Nro. de inventario</label>
+                        <div class="input-prefix">
+                            <span>FCE-</span>
+                            <input id="bienAsociado" type="number" placeholder="150" required>
+                        </div>
                     </div>
                     <div>
-                        <label>Tipo de evento</label>
+                        <label for="tipoEvento">Tipo de evento</label>
                         <select id="tipoEvento" required>
                             <option value="">Seleccionar</option>
                             <option value="AVERIO">Averío</option>
@@ -71,9 +74,22 @@
             <!-- Filtros -->
             <div class="form-grid">
                 <div>
-                    <input id="filterBienInput" type="number" placeholder="Filtrar por nro. de inventario">
+                    <label for="filterEstadoId">Id. de estado</label>
+                    <input type="number" id="filterEstadoId" placeholder="Filtrar por ID...">
                 </div>
                 <div>
+                    <label for="filterBienInput">Nro. de inventario</label>
+                    <div class="input-prefix">
+                        <span>FCE-</span>
+                        <input id="filterBienInput" type="number" placeholder="Filtrar por nro...">
+                    </div>
+                </div>
+                <div>
+                    <label for="filterBienNombre">Nombre de bien</label>
+                    <input type="text" id="filterBienNombre" placeholder="Filtrar por nombre...">
+                </div>
+                <div>
+                    <label for="filterTipoEvento">Tipo de evento</label>
                     <select id="filterTipoEvento">
                         <option value="">Todos los eventos</option>
                         <option value="AVERIO">Averío</option>
@@ -82,6 +98,7 @@
                     </select>
                 </div>
                 <div>
+                    <label for="filterFecha">Fecha del evento</label>
                     <input type="date" id="filterFecha">
                 </div>
             </div>
@@ -123,16 +140,16 @@
         <section id="modificarEventoSection" class="hidden">
             <h2>Actualizar evento</h2>
             <form id="modificarEventoForm">
-                <label>Identificador de evento</label>
+                <label for="modEventoId">Identificador de evento</label>
                 <input type="number" id="modEventoId" disabled>
 
-                <label>Nro. de inventario</label>
+                <label for="modBienId">Nro. de inventario</label>
                 <div class="input-prefix">
                     <span>FCE-</span>
-                    <input type="number" id="modBienId" required>
+                    <input type="number" id="modBienId" placeholder="150" required>
                 </div>
 
-                <label>Tipo de evento</label>
+                <label for="modTipoEvento">Tipo de evento</label>
                 <select id="modTipoEvento" required>
                     <option value="">Seleccionar</option>
                     <option value="AVERIO">Averío</option>
@@ -178,6 +195,8 @@
 
             const bienes = JSON.parse(localStorage.getItem("bienes")) || [];
 
+            const filterEstadoId = document.getElementById("filterEstadoId").value;
+            const filterBienNombre = document.getElementById("filterBienNombre").value.toUpperCase().trim();
             const filterBienInput = document.getElementById("filterBienInput").value;
             const filterTipoEvento = document.getElementById("filterTipoEvento").value;
             const filterFecha = document.getElementById("filterFecha").value;
@@ -187,7 +206,12 @@
 
             // Filtrado
             const filtradas = eventosHabilitados.filter(evento => {
-                return matchNumero(formatearNroBien(evento.bienAsociado), filterBienInput) &&
+                return matchTexto(formatearNroBien(evento.bienAsociado), filterBienInput) &&
+                matchTexto(
+                    bienes.find(b => b.id_Bien === evento.bienAsociado)?.nombre || "",
+                    filterBienNombre
+                ) &&
+                          matchNumero(evento.id_Evento, filterEstadoId) &&
                        matchValor(evento.tipoEvento, filterTipoEvento) &&
                        matchFecha(evento.fechaEvento, filterFecha);
             });
@@ -296,11 +320,11 @@
         });
 
         // Filtros
-        document.querySelectorAll("#filterBienInput, #filterTipoEvento, #filterFecha")
+        document.querySelectorAll("#filterBienInput, #filterTipoEvento, #filterFecha, #filterEstadoId, #filterBienNombre")
             .forEach(input => {
                 const eventType = (input.tagName === "SELECT" || input.type === "date") ? "change" : "input";
                 input.addEventListener(eventType, () => {
-                    // currentPage = 1;
+                    currentPage = 1;
                     renderEventos();
                 });
         });
@@ -361,7 +385,8 @@
 
             document.getElementById("modificarEventoSection").classList.remove("hidden");
 
-            document.getElementById("modBienId").focus();
+            document.getElementById("modificarEventoSection").scrollIntoView({ behavior: "smooth" });
+            document.getElementById("modBienId").focus({ preventScroll: true });
         }
 
         document.getElementById("modificarEventoForm").addEventListener("submit", async (e) => {

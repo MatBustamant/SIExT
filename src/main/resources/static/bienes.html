@@ -69,26 +69,26 @@
             <form id="productoForm">
                 <div class="form-grid">
                     <div>
-                        <label>Categoría</label>
-                        <input list="categoriasSugeridas" type="text" id="categoriaProducto" required>
+                        <label for="categoriaProducto">Categoría</label>
+                        <input list="categoriasSugeridas" type="text" id="categoriaProducto" placeholder="INFORMÁTICOS" required>
                         <datalist id="categoriasSugeridas"></datalist>
                     </div>
                     <div>
-                        <label>Nombre</label>
-                        <input type="text" id="nombreProducto" required>
+                        <label for="nombreProducto">Nombre</label>
+                        <input type="text" id="nombreProducto" placeholder="NOTEBOOK THINKPAD" required>
                     </div>
                     <div>
-                        <label>Ubicación</label>
-                        <input list="ubicacionesSugeridas" type="text" id="ubicacionProducto" required>
+                        <label for="ubicacionProducto">Ubicación</label>
+                        <input list="ubicacionesSugeridas" type="text" id="ubicacionProducto" placeholder="BEDELÍA" required>
                         <datalist id="ubicacionesSugeridas"></datalist>
                     </div>
                     <div>
-                        <label>Cantidad</label>
-                        <input type="number" id="stockInicial" min="1" value="1" required>
+                        <label for="stockInicial">Cantidad</label>
+                        <input type="number" id="stockInicial" min="1" value="1" placeholder="1" required>
                     </div>
                 </div>
                 <div>
-                    <label>Detalle</label>
+                    <label for="detalleProducto">Detalle</label>
                     <input type="text" id="detalleProducto" placeholder="Detalles extras opcionales...">
                 </div>
                 <div>
@@ -103,12 +103,22 @@
             <!-- Filtros -->
             <div class="form-grid">
                 <div>
-                    <input type="text" id="filterBienInput" placeholder="Filtrar por nombre o nro. de inventario...">
+                    <label for="filterBienInput">Nro. de inventario</label>
+                    <div class="input-prefix">
+                        <span>FCE-</span>
+                        <input type="number" id="filterBienInput" placeholder="Filtrar por nro...">
+                    </div>
                 </div>
                 <div>
+                    <label for="filterBienNombre">Nombre</label>
+                    <input type="text" id="filterBienNombre" placeholder="Filtrar por nombre...">
+                </div>
+                <div>
+                    <label for="filterBienCategoria">Categoría</label>
                     <input list="categoriasSugeridas" type="text" id="filterBienCategoria" placeholder="Filtrar por categoría..."></input>
                 </div>
                 <div>
+                    <label for="filterBienEstado">Estado</label>
                     <select id="filterBienEstado">
                         <option value="">Todos los estados</option>
                         <option value="EN_CONDICIONES">EN CONDICIONES</option>
@@ -116,6 +126,7 @@
                     </select>
                 </div>
                 <div>
+                    <label for="filterBienUbicacion">Ubicación</label>
                     <input list="ubicacionesSugeridas" type="text" id="filterBienUbicacion" placeholder="Filtrar por ubicación..."></select>
                 </div>
             </div>
@@ -159,26 +170,26 @@
             <h2>Actualizar bien</h2>
             <form id="modificarBienForm">
                 <div>
-                    <label>Nro. de inventario</label>
+                    <label for="modBienId">Nro. de inventario</label>
                     <div class="input-prefix">
                         <span>FCE-</span>
                         <input type="number" id="modBienId" disabled>
                     </div>
                 </div>
                 <div>
-                    <label>Categoría</label>
-                    <input list="categoriasSugeridas" type="text" id="modCategoria" required>
+                    <label for="modCategoria">Categoría</label>
+                    <input list="categoriasSugeridas" type="text" id="modCategoria" placeholder="INFORMÁTICOS" required>
                 </div>
                 <div>
-                    <label>Nombre</label>
-                    <input type="text" id="modNombre" required>
+                    <label for="modNombre">Nombre</label>
+                    <input type="text" id="modNombre" placeholder="NOTEBOOK THINKPAD" required>
                 </div>
                 <div>
-                    <label>Ubicación</label>
-                    <input list="ubicacionesSugeridas" type="text" id="modUbicacion" required>
+                    <label for="modUbicacion">Ubicación</label>
+                    <input list="ubicacionesSugeridas" type="text" id="modUbicacion" placeholder="BEDELÍA" required>
                 </div>
                 <div>
-                    <label>Detalle</label>
+                    <label for="modDetalleProducto">Detalle</label>
                     <input type="text" id="modDetalleProducto" placeholder="Detalles extras opcionales...">
                 </div>
                 <div class="btn-row">
@@ -220,21 +231,23 @@
             const bienes = JSON.parse(localStorage.getItem("bienes")) || [];
             const bienesHabilitados = bienes.filter(b => !b.eliminado);
 
-            const bienFiltroTexto = document.getElementById("filterBienInput").value.toUpperCase();
+            const bienFiltroNroInv = document.getElementById("filterBienInput").value;
+            const bienFiltroNombre = document.getElementById("filterBienNombre").value.toUpperCase().trim();
             const bienFiltroCategoria = document.getElementById("filterBienCategoria").value.toUpperCase().trim();
             const bienFiltroEstado = document.getElementById("filterBienEstado").value;
             const bienFiltroUbicacion = document.getElementById("filterBienUbicacion").value.toUpperCase().trim();
 
-            const bienesTable = document.getElementById("bienesTable").querySelector("tbody");
-            bienesTable.innerHTML = "";
+            const tbody = document.getElementById("bienesTable").querySelector("tbody");
+            tbody.innerHTML = "";
 
             // Filtrado
             const filtradas = bienesHabilitados.filter(prod => 
-            ((matchTexto(prod.nombre, bienFiltroTexto) || matchNumero(formatearNroBien(prod.id_Bien), bienFiltroTexto))
+                matchTexto(prod.nombre, bienFiltroNombre)
+                && matchTexto(formatearNroBien(prod.id_Bien), bienFiltroNroInv)
                 && matchTexto(prod.nombreCatBienes, bienFiltroCategoria)
                 && matchTexto(prod.ubicacionBien, bienFiltroUbicacion)
                 && matchValor(prod.estadoBien, bienFiltroEstado)
-            ));
+            );
 
             // Paginación
             const totalRows = filtradas.length;
@@ -268,7 +281,7 @@
                             <i class='bi bi-pencil-fill'></i>
                         </button>
                     </td>`;
-                bienesTable.appendChild(row);
+                tbody.appendChild(row);
 
                 // Fila oculta de detalles
                 const detalle = document.createElement("tr");
@@ -282,7 +295,7 @@
                         <p><strong>Ubicación actual:</strong> ${prod.ubicacionBien || "(Sin ubicación asignada)"}</p>
                         <p><strong>Detalle:</strong> ${prod.detalle || "(Sin detalle adicional)"}</p>
                     </td>`;
-                bienesTable.appendChild(detalle);
+                tbody.appendChild(detalle);
             });
 
             document.getElementById("counterBienes").textContent = `Mostrando ${paginadas.length} de ${totalRows} bien(es).`;
@@ -349,11 +362,11 @@
         });
 
         // Filtros
-        document.querySelectorAll("#filterBienInput, #filterBienCategoria, #filterBienEstado, #filterBienUbicacion")
+        document.querySelectorAll("#filterBienInput, #filterBienCategoria, #filterBienEstado, #filterBienUbicacion, #filterBienNombre")
             .forEach(input => {
                 const eventType = (input.tagName === "SELECT" || input.type === "date") ? "change" : "input";
                 input.addEventListener(eventType, () => {
-                    // currentPage = 1;
+                    currentPage = 1;
                     renderInventario();
                 });
         });
@@ -425,7 +438,8 @@
 
             document.getElementById("modificarBienSection").classList.remove("hidden");
 
-            modCategoria.focus();
+            document.getElementById("modificarBienSection").scrollIntoView({ behavior: "smooth" });
+            modCategoria.focus({ preventScroll: true });
         }
 
         document.getElementById("modificarBienForm").addEventListener("submit", async (e) => {
