@@ -106,7 +106,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
         String sql = "INSERT INTO Bien (Nombre, ID_Categoria, Estado, ID_Ubicacion, Detalle) VALUES (?,?,?,?,?)";
         int resultado = 0;
         int idCategoria = categoriaDAO.buscar(bien.getNombreCatBienes()).getID_Categoria();
-        int idUbicacion = ubicacionDAO.buscar(bien.getUbicacionBien()).getID_Ubicacion();
+        int idUbicacion = 0; //Id de la ubicación por defecto SIN ASIGNAR
 
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {

@@ -40,7 +40,7 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
 
     @Override
     public int actualizar(UbicacionDTO Ubicacion) {
-        String sql = "UPDATE Ubicacion SET Nombre = ? WHERE ID_Ubicacion = ? AND Eliminado = ?";
+        String sql = "UPDATE Ubicacion SET Nombre = ? WHERE ID_Ubicacion = ? AND Eliminado = ? AND Es_Editable = ?";
         int resultado = 0;
 
         try (Connection con = BasedeDatos.getConnection();
@@ -49,6 +49,7 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
             ps.setString(1, Ubicacion.getNombre());
             ps.setInt(2, Ubicacion.getID_Ubicacion());
             ps.setInt(3, 0);
+            ps.setInt(4, 1);
 
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
@@ -88,9 +89,11 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
     public List<UbicacionDTO> buscarTodos() {
         List<UbicacionDTO> ubicaciones = new ArrayList<>();
 
-        String sql = "SELECT * FROM Ubicacion";
+        String sql = "SELECT * FROM Ubicacion WHERE Es_Editable = ?";
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setInt(1, 1);
         
             try(ResultSet rs = ps.executeQuery()) {
 
@@ -112,7 +115,7 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
 
     @Override
     public int eliminar(int id) {
-        String sql = "UPDATE Ubicacion SET Eliminado = ? WHERE ID_Ubicacion = ? AND Eliminado = ?";
+        String sql = "UPDATE Ubicacion SET Eliminado = ? WHERE ID_Ubicacion = ? AND Eliminado = ? AND Es_Editable = ?";
         int resultado = 0;
         
         try (Connection con = BasedeDatos.getConnection();
@@ -121,6 +124,7 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
             ps.setInt(1, 1);
             ps.setInt(2, id);
             ps.setInt(3, 0);
+            ps.setInt(4, 1);
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
