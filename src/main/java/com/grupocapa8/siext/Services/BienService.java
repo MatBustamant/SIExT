@@ -63,15 +63,12 @@ public class BienService implements ServiceGenerico<BienDTO> {
         Validador.validarString(nombre,CAMPO_NOMBRE_TEXT,CAMPO_NOMBRE_MIN,CAMPO_NOMBRE_MAX);
         String categoria = dto.getNombreCatBienes().toUpperCase();
         Validador.validarString(categoria,CAMPO_CATEGORIA_TEXT,CAMPO_CATEGORIA_MIN,CAMPO_CATEGORIA_MAX);
-        String ubicacion = dto.getUbicacionBien().toUpperCase();
-        Validador.validarString(ubicacion, CAMPO_UBICACION_TEXT,CAMPO_UBICACION_MIN,CAMPO_UBICACION_MAX);
         String detalle = dto.getDetalle();
         if (detalle != null) detalle = detalle.toUpperCase();
         
         // Una vez validado, dejamos en el dto los datos formateados y agregamos el resto
         dto.setNombre(nombre);
         dto.setNombreCatBienes(categoria);
-        dto.setUbicacionBien(ubicacion);
         dto.setEstadoBien(EstadoBien.EN_CONDICIONES);
         dto.setDetalle(detalle);
         
@@ -79,12 +76,6 @@ public class BienService implements ServiceGenerico<BienDTO> {
         if (catDAO.buscar(categoria) == null) {
             CategoriaBienDTO nuevaCategoria = new CategoriaBienDTO(0, categoria, false);
             catDAO.insertar(nuevaCategoria);
-        }
-        
-        // Si no existe la ubicación, la creamos
-        if (ubiDAO.buscar(ubicacion) == null) {
-            UbicacionDTO nuevaUbicacion = new UbicacionDTO(0, ubicacion, false);
-            ubiDAO.insertar(nuevaUbicacion);
         }
         
         // Creamos la cantidad de bienes que nos pide el front
