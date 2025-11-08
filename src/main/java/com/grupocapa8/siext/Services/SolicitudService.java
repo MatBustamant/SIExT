@@ -47,7 +47,8 @@ public class SolicitudService implements ServiceGenerico<SolicitudDTO> {
         EstadoSolicitud estado = dto.getEstado();
 //        validarString(estado,3);
         String ubicacion = dto.getUbicacionBienes().toUpperCase();
-        Validador.validarString(ubicacion,CAMPO_UBICACION_TEXT,CAMPO_UBICACION_MIN,CAMPO_UBICACION_MAX);
+        Validador.validarString(ubicacion, CAMPO_UBICACION_TEXT, CAMPO_UBICACION_MIN, CAMPO_UBICACION_MAX);
+        Validador.validarDestinoSolicitud(ubicacion,CAMPO_UBICACION_TEXT);
         
         dto.setEstado(estado);
         dto.setUbicacionBienes(ubicacion);
@@ -67,7 +68,8 @@ public class SolicitudService implements ServiceGenerico<SolicitudDTO> {
         EstadoSolicitud estado = dto.getEstado();
 //        validarString(estado,3);
         String ubicacion = dto.getUbicacionBienes().toUpperCase();
-        Validador.validarString(ubicacion,CAMPO_UBICACION_TEXT,CAMPO_UBICACION_MIN,CAMPO_UBICACION_MAX);
+        Validador.validarString(ubicacion, CAMPO_UBICACION_TEXT, CAMPO_UBICACION_MIN, CAMPO_UBICACION_MAX);
+        Validador.validarDestinoSolicitud(ubicacion,CAMPO_UBICACION_TEXT);
         
         dto.setEstado(estado);
         dto.setUbicacionBienes(ubicacion);
