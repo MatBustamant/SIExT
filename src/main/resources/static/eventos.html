@@ -388,11 +388,13 @@
             const eventos = JSON.parse(localStorage.getItem("eventos")) || [];
             const evento = eventos.find(e => e.id_Evento === id);
             if (!evento) return;
+
+            const form = document.getElementById("modificarEventoForm");
+            form.dataset.originalBienId = evento.bienAsociado.toString();
+            form.dataset.originalTipoEvento = evento.tipoEvento.trim().toUpperCase() || "";
+
             document.getElementById("modEventoId").value = evento.id_Evento;
             document.getElementById("modBienId").value = evento.bienAsociado;
-            console.log(evento);
-            console.table(evento);
-            console.log(evento.tipoEvento);
             document.getElementById("modTipoEvento").value = evento.tipoEvento;
 
             document.getElementById("modificarEventoSection").classList.remove("hidden");
@@ -404,10 +406,26 @@
         document.getElementById("modificarEventoForm").addEventListener("submit", async (e) => {
             e.preventDefault();
             const id = +document.getElementById("modEventoId").value;
+            const form = e.target;
+            const originalBienId = form.dataset.originalBienId;
+            const originalTipoEvento = form.dataset.originalTipoEvento;
+
+            const idInput = document.getElementById("modBienId").value.toString();
+            const tipoEventoInput = document.getElementById("modTipoEvento").value.trim().toUpperCase();
+
+            if (originalBienId === idInput && originalTipoEvento === tipoEventoInput) {
+                alert("No se detectaron cambios en los datos.");
+                return;
+            }
+
+            if (!tipoEventoInput || !idInput) {
+                alert("Datos incompletos.");
+                return;
+            }
 
             const eventoModificado = {
-                tipoEvento: document.getElementById("modTipoEvento").value.trim().toUpperCase(),
-                bienAsociado: document.getElementById("modBienId").value
+                tipoEvento: tipoEventoInput,
+                bienAsociado: idInput
             }
 
             try {

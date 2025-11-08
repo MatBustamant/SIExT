@@ -304,6 +304,10 @@
             const usuario = usuarios.find(u => u.id_Usuario === id);
             if (!usuario) return;
 
+            const form = document.getElementById("formModificarUsuario");
+            form.dataset.originalNombre = usuario.nombre.trim().toUpperCase();
+            form.dataset.originalRol = usuario.rol.trim().toUpperCase();
+
             document.getElementById("modUsuarioId").value = usuario.id_Usuario;
             document.getElementById("modNombreUsuario").value = usuario.nombre;
             document.getElementById("modPasswordUsuario").value = "";
@@ -318,11 +322,28 @@
         document.getElementById("formModificarUsuario").addEventListener("submit", async (e) => {
             e.preventDefault();
             const id = +document.getElementById("modUsuarioId").value;
+            const form = e.target;
+            const originalNombre = form.dataset.originalNombre;
+            const originalRol = form.dataset.originalRol;
+            const nombreInput = document.getElementById("modNombreUsuario").value.toUpperCase().trim();
+            const rolInput = document.getElementById("modRolUsuario").value.toUpperCase().trim();
+            const contraseñaInput = document.getElementById("modPasswordUsuario").value.trim();
+
+            if (nombreInput === originalNombre && rolInput === originalRol &&
+                contraseñaInput === "") {
+                alert("No se detectaron cambios en los datos.");
+                return;
+            }
+
+            if (!nombreInput || !rolInput) {
+                alert("Datos incompletos.");
+                return;
+            }
 
             const usuarioModificado = {
-                nombre: document.getElementById("modNombreUsuario").value.toUpperCase(),
-                contraseña: document.getElementById("modPasswordUsuario").value,
-                rol: document.getElementById("modRolUsuario").value.toUpperCase()
+                nombre: nombreInput,
+                contraseña: contraseñaInput,
+                rol: rolInput
             }
 
             try {
