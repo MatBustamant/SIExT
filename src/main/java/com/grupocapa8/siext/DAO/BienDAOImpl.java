@@ -39,7 +39,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
         String sql = "SELECT b.*, c.Nombre AS CategoriaNombre, u.Nombre AS UbicacionNombre " +
                      "FROM Bien b " +
                      "JOIN Categoria c ON b.ID_Categoria = c.ID_Categoria " +
-                     "JOIN Ubicacion u ON b.ID_Ubicacion = u.ID_Ubicacion" +
+                     "JOIN Ubicacion u ON b.ID_Ubicacion = u.ID_Ubicacion " +
                      "WHERE b.ID_Bien = ?";
 
         try (Connection con = BasedeDatos.getConnection();
@@ -178,7 +178,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
             System.getLogger(BienDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
     }
-    
+
     @Override
     public int eliminar(int id) {
         String sql = "UPDATE Bien SET Eliminado = ? WHERE ID_Bien = ? AND Eliminado = ?";
@@ -198,5 +198,5 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
 
         return resultado;
     }
-
+    
 }
