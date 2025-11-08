@@ -87,7 +87,11 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
     }
     
     public EventoTrazabilidadDTO buscarMasReciente(int idBienAsociado) {
-        String sql = "SELECT * FROM EventoTrazabilidad WHERE ID_Bien = ? AND Eliminado = ? ORDER BY Fecha DESC LIMIT 1";
+        String sql = String.format("SELECT * FROM EventoTrazabilidad "
+                + "WHERE ID_Bien = ? AND Eliminado = ? "
+                + "AND TipoEvento IN ('%s', '%s') "
+                + "ORDER BY Fecha DESC, ID_Evento DESC LIMIT 1"
+                , TipoEvento.AVERIO.name(), TipoEvento.REPARACION.name());
         EventoTrazabilidadDTO evento = null;
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
