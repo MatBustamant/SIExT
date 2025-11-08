@@ -44,13 +44,13 @@
         <section>
             <h2>Registrar nuevo usuario</h2>
             <form id="formNuevoUsuario">
-                <label>Nombre de usuario</label>
-                <input type="text" id="nuevoUsuario" required>
+                <label for="nuevoUsuario">Nombre de usuario</label>
+                <input type="text" id="nuevoUsuario" placeholder="GARDEL" required>
 
-                <label>Contraseña</label>
-                <input type="password" id="nuevoPassword" required>
+                <label for="nuevoPassword">Contraseña</label>
+                <input type="password" id="nuevoPassword" placeholder="A?bBD34!" required>
 
-                <label>Rol</label>
+                <label for="nuevoRol">Rol</label>
                 <select id="nuevoRol" required>
                     <option value="">Seleccionar</option>
                     <option value="ADMINISTRATIVO">Administrativo</option>
@@ -67,9 +67,15 @@
             <!-- Filtros -->
             <div class="form-grid">
                 <div>
-                    <input type="text" id="filterUsuario" placeholder="Filtrar por nombre o ID...">
+                    <label for="filterIdUsuario">Id. de usuario</label>
+                    <input type="number" id="filterIdUsuario" placeholder="Filtrar por id...">
                 </div>
                 <div>
+                    <label for="filterUsuario">Nombre</label>
+                    <input type="text" id="filterUsuario" placeholder="Filtrar por nombre...">
+                </div>
+                <div>
+                    <label for="filterRol">Rol</label>
                     <select id="filterRol">
                         <option value="">Todos los roles</option>
                         <option value="ADMINISTRATIVO">Administrativo</option>
@@ -114,16 +120,16 @@
         <section id="modificarUsuarioSection" class="hidden">
             <h2>Modificar usuario</h2>
             <form id="formModificarUsuario">
-                <label>Identificador de usuario</label>
+                <label for="modUsuarioId">Identificador de usuario</label>
                 <input type="number" id="modUsuarioId" disabled>
 
-                <label>Nombre de usuario</label>
+                <label for="modNombreUsuario">Nombre de usuario</label>
                 <input type="text" id="modNombreUsuario" required>
 
-                <label>Contraseña</label>
+                <label for="modPasswordUsuario">Contraseña</label>
                 <input type="password" id="modPasswordUsuario" required>
 
-                <label>Rol</label>
+                <label for="modRolUsuario">Rol</label>
                 <select id="modRolUsuario" required>
                     <option value="">Seleccionar</option>
                     <option value="ADMINISTRATIVO">Administrativo</option>
@@ -162,7 +168,8 @@
             const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
             const usuariosHabilitados = usuarios.filter(u => !u.eliminado);
 
-            const filtroUsuario = document.getElementById("filterUsuario").value.toUpperCase();
+            const filtroIdUsuario = document.getElementById("filterIdUsuario").value;
+            const filtroUsuario = document.getElementById("filterUsuario").value.toUpperCase().trim();
             const filtroRol = document.getElementById("filterRol").value.toUpperCase();
 
             const tbody = document.querySelector("#tablaUsuarios tbody");
@@ -170,7 +177,7 @@
 
             // Filtrado
             const filtradas = usuariosHabilitados.filter(usuario =>
-                (matchTexto(usuario.nombre, filtroUsuario) || matchNumero(usuario.id_Usuario, filtroUsuario))
+                matchTexto(usuario.nombre, filtroUsuario) && matchNumero(usuario.id_Usuario, filtroIdUsuario)
                 && matchValor(usuario.rol, filtroRol)
             );
 
@@ -241,11 +248,11 @@
         });
 
         // Filtros
-        document.querySelectorAll("#filterUsuario, #filterRol")
+        document.querySelectorAll("#filterUsuario, #filterRol, #filterIdUsuario")
             .forEach(input => {
                 const eventType = (input.tagName === "SELECT" || input.type === "date") ? "change" : "input";
                 input.addEventListener(eventType, () => {
-                    // currentPage = 1;
+                    currentPage = 1;
                     renderUsuarios();
                 });
         });
@@ -304,7 +311,8 @@
 
             document.getElementById("modificarUsuarioSection").classList.remove("hidden");
 
-            document.getElementById("modNombreUsuario").focus();
+            document.getElementById("modificarUsuarioSection").scrollIntoView({ behavior: "smooth" });
+            document.getElementById("modNombreUsuario").focus({ preventScroll: true });
         }
 
         document.getElementById("formModificarUsuario").addEventListener("submit", async (e) => {
