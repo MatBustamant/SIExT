@@ -67,12 +67,12 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
     
     @Override
     public void modificar(EventoTrazabilidadDTO dto, int id) throws NoSuchElementException {
-        this.buscar(id);
+        EventoTrazabilidadDTO eventoOriginal = this.buscar(id);
         
         // Verifico existencia (da igual si está eliminado) del bien asociado y sino, se corta todo
         int idBien = dto.getBienAsociado();
         try {
-            buscar(idBien, false);
+            bienService.buscar(idBien, false);
         } catch (NoSuchElementException e) {
             throw new IllegalArgumentException(
                     String.format("El bien con id %d no existe.", idBien)
@@ -80,28 +80,19 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
         }
         
         Validador.validarId(idBien, CAMPO_ID_TEXT);
+        dto.setID_Evento(id); // Le ponemos al dto recibido el id que llegó por parámetro en el endpoint
         TipoEvento tipo = dto.getTipoEvento();
-//        Validador.validarString(tipo,CAMPO_TIPO_TEXT,CAMPO_TIPO_MIN,CAMPO_TIPO_MAX);
         
-        dto.setTipoEvento(tipo);
-        dto.setID_Evento(id);
-        
-        // Buscamos el evento más reciente
-        EventoTrazabilidadDTO eventoUltimo = eventoTrazDAO.buscarMasReciente(idBien);
-        // Si el evento más reciente para ese bien soy yo, cambiamos el estado del bien acordemente
-        if(eventoUltimo != null && eventoUltimo.getID_Evento() == id) {
-            switch(tipo) {
-                case(TipoEvento.AVERIO):
-                    bienService.averiar(idBien);
-                    break;
-                case(TipoEvento.REPARACION):
-                    bienService.reparar(idBien);
-                    break;
-                default:
-                    break;
-            }
-        }
         eventoTrazDAO.actualizar(dto);
+        
+        // Comparo si el id cambió
+        int idBienOriginal = eventoOriginal.getBienAsociado();
+        if (idBienOriginal != idBien) {
+            // Si cambió, tenemos que recalcular el estado del bien anterior
+            this.recalcularEstadoDelBien(idBienOriginal);
+        }
+        // Luego recalculamos el estado del bien actual (ya sea que sea el mismo de antes o uno nuevo)
+        this.recalcularEstadoDelBien(idBien);
     }
     
     @Override
@@ -117,30 +108,31 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
                     String.format("El bien con id %d no existe.", idBien)
             );
         }
-        TipoEvento tipoDelEventoActual = evento.getTipoEvento();
         
         // Eliminamos lo que se nos pide
         eventoTrazDAO.eliminar(idEventoTraz);
         
-        // Buscamos el evento anterior (El más reciente luego de la eliminación)
-        EventoTrazabilidadDTO eventoAnterior = eventoTrazDAO.buscarMasReciente(idBien);
-        if (eventoAnterior != null) {
-            // Si encontramos alguno, tomamos su tipo
-            TipoEvento tipoDelEventoAnterior = eventoAnterior.getTipoEvento();
-            // Si es distinto al que acabamos de eliminar, tenemos que modificar el estado del bien
-            if(tipoDelEventoAnterior != null && !tipoDelEventoAnterior.equals(tipoDelEventoActual)) {
-                switch(tipoDelEventoAnterior) {
-                    case(TipoEvento.AVERIO):
-                        bienService.averiar(idBien);
-                        break;
-                    case(TipoEvento.REPARACION):
-                    case(TipoEvento.ENTREGA):
-                        bienService.reparar(idBien);
-                        break;
-                    default:
-                        break;
-                }
+        this.recalcularEstadoDelBien(idBien);
+    }
+    
+    private void recalcularEstadoDelBien(int idBien) {
+        EventoTrazabilidadDTO eventoQueDefineEstado = eventoTrazDAO.buscarMasReciente(idBien);
+        
+        if (eventoQueDefineEstado != null) {
+            switch(eventoQueDefineEstado.getTipoEvento()) {
+                case(TipoEvento.AVERIO):
+                    bienService.averiar(idBien);
+                    break;
+                case(TipoEvento.REPARACION):
+                    bienService.reparar(idBien);
+                    break;
+                default:
+                    break;
             }
+        } else {
+            // Si el bien no tiene eventos relevantes
+            // Asumimos que su estado es el inicial/base (En condiciones)
+            bienService.reparar(idBien);
         }
     }
     
