@@ -11,7 +11,8 @@ package com.grupocapa8.siext.Enums;
 public enum TipoEvento {
     AVERIO,
     REPARACION,
-    ENTREGA;
+    ENTREGA,
+    REGISTRO;
     
     @Override
     public String toString() {

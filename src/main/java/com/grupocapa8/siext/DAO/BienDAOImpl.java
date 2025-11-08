@@ -119,12 +119,12 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
             
             resultado = ps.executeUpdate();
             
-            // Se crea un evento de ENTREGA junto a la creación de un nuevo bien. Básicamente para tener la fecha y hora de cuando pasa esto
+            // Se crea un evento de REGISTRO junto a la creación de un nuevo bien. Básicamente para tener la fecha y hora de cuando pasa esto
             if (resultado > 0) {
                 try (ResultSet rs = ps.getGeneratedKeys()) {
                     if (rs.next()) {
                         int claveGenerada = rs.getInt(1);
-                        eventoDAO.insertarNuevoIngreso(claveGenerada);
+                        eventoDAO.insertarRegistro(claveGenerada);
                     }
                 }
             }
