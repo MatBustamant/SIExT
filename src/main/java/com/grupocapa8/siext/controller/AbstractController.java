@@ -34,7 +34,7 @@ public abstract class AbstractController<E> {
             servicio.crear(entidad);
             return Response.ok().build();
         } catch (NoSuchElementException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity("{}").build();
+            return Response.status(Response.Status.NOT_FOUND).entity("{\"error\":\"" + e.getMessage() + "\"}").build();
         } catch (IllegalArgumentException e) {
             return Response.status(422, "Unprocessable Entity").entity("{\"error\":\"" + e.getMessage() + "\"}").build();
         } catch (Exception e) {
@@ -50,7 +50,7 @@ public abstract class AbstractController<E> {
             E entidad = servicio.buscar(id);
             return Response.ok(entidad).build();
         } catch (NoSuchElementException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity("{}").build();
+            return Response.status(Response.Status.NOT_FOUND).entity("{\"error\":\"" + e.getMessage() + "\"}").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"" + e.getMessage() + "\"}").build();
         }
@@ -76,7 +76,7 @@ public abstract class AbstractController<E> {
             servicio.modificar(entidad, id);
             return Response.ok().build();
         } catch (NoSuchElementException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity("{}").build();
+            return Response.status(Response.Status.NOT_FOUND).entity("{\"error\":\"" + e.getMessage() + "\"}").build();
         } catch (IllegalArgumentException e) {
             return Response.status(422, "Unprocessable Entity").entity("{\"error\":\"" + e.getMessage() + "\"}").build();
         } catch (Exception e) {
@@ -91,7 +91,7 @@ public abstract class AbstractController<E> {
             servicio.eliminar(id);
             return Response.ok().build();
         } catch (NoSuchElementException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity("{}").build();
+            return Response.status(Response.Status.NOT_FOUND).entity("{\"error\":\"" + e.getMessage() + "\"}").build();
         } catch (IllegalArgumentException e) {
             return Response.status(422, "Unprocessable Entity").entity("{\"error\":\"" + e.getMessage() + "\"}").build();
         } catch (Exception e) {
