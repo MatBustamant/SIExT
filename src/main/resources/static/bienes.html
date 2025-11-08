@@ -497,7 +497,7 @@
 
         document.getElementById("eliminarBienBtn").addEventListener("click", async () => {
             const id = modBienId.value;
-            if (!confirm("¿Eliminar este bien?")) return;
+            if (!confirm("¿Eliminar este bien? Se creará un evento de BAJA.")) return;
 
             try {
                 const response = await eliminarBien(id);

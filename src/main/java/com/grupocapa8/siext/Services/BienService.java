@@ -3,10 +3,13 @@ package com.grupocapa8.siext.Services;
 import com.grupocapa8.siext.Enums.EstadoBien;
 import com.grupocapa8.siext.DAO.BienDAOImpl;
 import com.grupocapa8.siext.DAO.CategoriaDAOImpl;
+import com.grupocapa8.siext.DAO.EventoTrazabilidadDAOImpl;
 import com.grupocapa8.siext.DAO.UbicacionDAOImpl;
 import com.grupocapa8.siext.DTO.BienDTO;
 import com.grupocapa8.siext.DTO.CategoriaBienDTO;
+import com.grupocapa8.siext.DTO.EventoTrazabilidadDTO;
 import com.grupocapa8.siext.DTO.UbicacionDTO;
+import com.grupocapa8.siext.Enums.TipoEvento;
 import com.grupocapa8.siext.Util.Validador;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -19,6 +22,7 @@ public class BienService implements ServiceGenerico<BienDTO> {
     private final BienDAOImpl bienDAO; //acceso a la BD
     private final CategoriaDAOImpl catDAO;
     private final UbicacionDAOImpl ubiDAO;
+    private final EventoTrazabilidadDAOImpl evenDAO;
     
     private final static String CAMPO_ID_TEXT = "Identificador";
     private final static String CAMPO_NOMBRE_TEXT = "Nombre";
@@ -35,6 +39,7 @@ public class BienService implements ServiceGenerico<BienDTO> {
         this.bienDAO = new BienDAOImpl();
         this.catDAO = new CategoriaDAOImpl();
         this.ubiDAO = new UbicacionDAOImpl();
+        this.evenDAO = new EventoTrazabilidadDAOImpl();
     }
     
     @Override
@@ -131,7 +136,26 @@ public class BienService implements ServiceGenerico<BienDTO> {
     @Override
     public void eliminar(int idBien) throws NoSuchElementException {
         this.buscar(idBien);
-        bienDAO.eliminar(idBien);
+        this.actualizarEstadoEliminado(idBien, true);
+        
+        EventoTrazabilidadDTO eventoBaja = new EventoTrazabilidadDTO();
+        eventoBaja.setBienAsociado(idBien);
+        eventoBaja.setTipoEvento(TipoEvento.BAJA);
+        
+        evenDAO.insertar(eventoBaja);
+    }
+    
+    void actualizarEstadoEliminado(int idBien, boolean eliminar) {
+        BienDTO bien = this.buscar(idBien, false);
+        if (eliminar) {
+            if (!bien.isEliminado()) {
+                bienDAO.eliminar(idBien);
+            }
+        } else {
+            if (bien.isEliminado()) {
+                bienDAO.rehabilitar(idBien);
+            }
+        }
     }
 
 }

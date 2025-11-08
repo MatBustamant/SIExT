@@ -199,4 +199,23 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
         return resultado;
     }
     
+    public int rehabilitar(int id) {
+        String sql = "UPDATE Bien SET Eliminado = ? WHERE ID_Bien = ? AND Eliminado = ?";
+        int resultado = 0;
+        
+        try (Connection con = BasedeDatos.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setInt(1, 0);
+            ps.setInt(2, id);
+            ps.setInt(3, 1);
+            
+            resultado = ps.executeUpdate();
+        } catch (SQLException ex) {
+            System.getLogger(BienDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+
+        return resultado;
+    }
+
 }
