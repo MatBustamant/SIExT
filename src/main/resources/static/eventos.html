@@ -55,9 +55,11 @@
                         <label for="tipoEvento">Tipo de evento</label>
                         <select id="tipoEvento" required>
                             <option value="">Seleccionar</option>
+                            <option value="REGISTRO">Registro</option>
+                            <option value="ENTREGA">Entrega</option>
                             <option value="AVERIO">Averío</option>
                             <option value="REPARACION">Reparación</option>
-                            <option value="ENTREGA">Entrega</option>
+                            <option value="BAJA">Baja</option>
                         </select>
                     </div>
                 </div>
@@ -92,9 +94,11 @@
                     <label for="filterTipoEvento">Tipo de evento</label>
                     <select id="filterTipoEvento">
                         <option value="">Todos los eventos</option>
+                        <option value="REGISTRO">Registro</option>
+                        <option value="ENTREGA">Entrega</option>
                         <option value="AVERIO">Averío</option>
                         <option value="REPARACION">Reparación</option>
-                        <option value="ENTREGA">Entrega</option>
+                        <option value="BAJA">Baja</option>
                     </select>
                 </div>
                 <div>
@@ -152,9 +156,11 @@
                 <label for="modTipoEvento">Tipo de evento</label>
                 <select id="modTipoEvento" required>
                     <option value="">Seleccionar</option>
+                    <option value="REGISTRO">Registro</option>
+                    <option value="ENTREGA">Entrega</option>
                     <option value="AVERIO">Averío</option>
                     <option value="REPARACION">Reparación</option>
-                    <option value="ENTREGA">Entrega</option>
+                    <option value="BAJA">Baja</option>
                 </select>
 
                 <div class="btn-row">
@@ -340,6 +346,9 @@
                 alert("Datos incompletos.");
                 return;
             }
+            if (tipoEvento === "BAJA" && !confirm("¿Estás seguro de registrar un evento de BAJA sobre este bien?")) {
+                return;
+            }
 
             const evento = {
                 tipoEvento,
@@ -381,6 +390,9 @@
             if (!evento) return;
             document.getElementById("modEventoId").value = evento.id_Evento;
             document.getElementById("modBienId").value = evento.bienAsociado;
+            console.log(evento);
+            console.table(evento);
+            console.log(evento.tipoEvento);
             document.getElementById("modTipoEvento").value = evento.tipoEvento;
 
             document.getElementById("modificarEventoSection").classList.remove("hidden");
