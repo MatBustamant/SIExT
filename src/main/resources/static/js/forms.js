@@ -2,6 +2,9 @@ function cargarOpciones(idlist, nombreLista) {
     const datalist = document.getElementById(idlist);
     datalist.innerHTML = "";
     const registros = JSON.parse(localStorage.getItem(nombreLista)) || [];
+    if (nombreLista === "ubicaciones") {
+        registros.unshift({ nombre: "SIN ASIGNAR" });
+    }
     if (registros.length === 0) {
         datalist.disabled = true;
         datalist.innerHTML = "<option value=''>Sin datos</option>";
