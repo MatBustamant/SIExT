@@ -270,6 +270,9 @@
             const cat = ubicaciones.find(c => c.id_Ubicacion === id);
             if (!cat) return;
 
+            const form = document.getElementById("modificarUbicacionForm");
+            form.dataset.originalNombre = cat.nombre.trim().toUpperCase();
+
             document.getElementById("modUbicacionId").value = cat.id_Ubicacion;
             document.getElementById("modNombreUbicacion").value = cat.nombre;
 
@@ -282,9 +285,23 @@
         document.getElementById("modificarUbicacionForm").addEventListener("submit", async (e) => {
             e.preventDefault();
             const id = +document.getElementById("modUbicacionId").value;
+            const form = e.target;
+            const originalNombre = form.dataset.originalNombre;
+
+            const nombreInput = document.getElementById("modNombreUbicacion").value.trim().toUpperCase();
+
+            if (originalNombre === nombreInput) {
+                alert("No se detectaron cambios en los datos.");
+                return;
+            }
+
+            if (!nombreInput) {
+                alert("Datos incompletos.");
+                return;
+            }
 
             const ubicacionModificada = {
-                nombre: document.getElementById("modNombreUbicacion").value.trim().toUpperCase(),
+                nombre: nombreInput,
             }
 
             if (ubicacionExiste(ubicacionModificada.nombre)) return;

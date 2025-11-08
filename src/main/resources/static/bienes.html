@@ -430,6 +430,12 @@
             const bien = bienes.find(b => b.id_Bien === id);
             if (!bien) return;
 
+            const form = document.getElementById("modificarBienForm");
+            form.dataset.originalNombre = bien.nombre.trim().toUpperCase() || "";
+            form.dataset.originalCategoria = bien.nombreCatBienes.trim().toUpperCase() || "";
+            form.dataset.originalUbicacion = bien.ubicacionBien.trim().toUpperCase() || "";
+            form.dataset.originalDetalle = bien.detalle ? bien.detalle.trim().toUpperCase() : "";
+
             modBienId.value = bien.id_Bien;
             modNombre.value = bien.nombre;
             modCategoria.value = bien.nombreCatBienes;
@@ -445,13 +451,35 @@
         document.getElementById("modificarBienForm").addEventListener("submit", async (e) => {
             e.preventDefault();
             const id = modBienId.value;
+            const form = e.target;
+            const originalNombre = form.dataset.originalNombre;
+            const originalCategoria = form.dataset.originalCategoria;
+            const originalUbicacion = form.dataset.originalUbicacion;
+            const originalDetalle = form.dataset.originalDetalle;
+
+            const nombreInput = modNombre.value.toUpperCase().trim();
+            const categoriaInput = modCategoria.value.toUpperCase().trim();
+            const ubicacionInput = modUbicacion.value.toUpperCase().trim();
             const modDetalleTempInput = modDetalleProducto.value.trim().toUpperCase();
             const modDetalleTemp = modDetalleTempInput === "" ? null : modDetalleTempInput;
 
+            if (originalNombre === nombreInput
+                && originalCategoria === categoriaInput
+                && originalUbicacion === ubicacionInput
+                && originalDetalle === modDetalleTempInput) {
+                alert("No se detectaron cambios en los datos.");
+                return;
+            }
+
+            if (!nombreInput || !categoriaInput || !ubicacionInput) {
+                alert("Datos incompletos.");
+                return;
+            }
+
             const bienModificado = {
-                nombre: modNombre.value.toUpperCase().trim(),
-                nombreCatBienes: modCategoria.value.toUpperCase(),
-                ubicacionBien: modUbicacion.value.toUpperCase(),
+                nombre: nombreInput,
+                nombreCatBienes: categoriaInput,
+                ubicacionBien: ubicacionInput,
                 ...(modDetalleTemp ? { detalle: modDetalleTemp } : {})
             };
 

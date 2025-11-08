@@ -268,6 +268,9 @@
             const cat = categorias.find(c => c.id_Categoria === id);
             if (!cat) return;
 
+            const form = document.getElementById("modificarCategoriaForm");
+            form.dataset.originalNombre = cat.nombre.trim().toUpperCase() || "";
+
             document.getElementById("modCategoriaId").value = cat.id_Categoria;
             document.getElementById("modNombreCategoria").value = cat.nombre;
 
@@ -280,9 +283,23 @@
         document.getElementById("modificarCategoriaForm").addEventListener("submit", async (e) => {
             e.preventDefault();
             const id = +document.getElementById("modCategoriaId").value;
+            const form = e.target;
+            const originalNombre = form.dataset.originalNombre;
+
+            const nombreInput = document.getElementById("modNombreCategoria").value.trim().toUpperCase();
+
+            if (originalNombre === nombreInput) {
+                alert("No se detectaron cambios en los datos.");
+                return;
+            }
+
+            if (!nombreInput) {
+                alert("Datos incompletos.");
+                return;
+            }
 
             const categoriaModificada = {
-                nombre: document.getElementById("modNombreCategoria").value.trim().toUpperCase(),
+                nombre: nombreInput,
             }
 
             if (categoriaExiste(categoriaModificada.nombre)) return;

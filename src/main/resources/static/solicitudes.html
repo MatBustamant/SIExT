@@ -349,6 +349,12 @@
             const solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
             const sol = solicitudes.find(s => s.numSolicitud === id);
             if (!sol) return;
+
+            const form = document.getElementById("modificarSolicitudForm");
+            form.dataset.originalUbicacion = sol.ubicacionBienes.trim().toUpperCase() || "";
+            form.dataset.originalEstado = sol.estado.toUpperCase() || "";
+            form.dataset.originalDescripcion = sol.descripcion.trim().toUpperCase() || "";
+
             document.getElementById("modSolicitudId").value = sol.numSolicitud;
             document.getElementById("modUbicacion").value = sol.ubicacionBienes;
             document.getElementById("modEstado").value = sol.estado;
@@ -363,11 +369,33 @@
         document.getElementById("modificarSolicitudForm").addEventListener("submit", async (e) => {
             e.preventDefault();
             const id = +document.getElementById("modSolicitudId").value;
+            const form = e.target;
+            const originalUbicacion = form.dataset.originalUbicacion;
+            const originalEstado = form.dataset.originalEstado;
+            const originalDescripcion = form.dataset.originalDescripcion;
+
+            const nuevaUbicacion = document.getElementById("modUbicacion").value.trim().toUpperCase();
+            const nuevoEstado = document.getElementById("modEstado").value.toUpperCase();
+            const nuevaDescripcion = document.getElementById("modDescripcion").value.trim().toUpperCase();
+
+            if(
+                nuevaUbicacion === originalUbicacion &&
+                nuevoEstado === originalEstado &&
+                nuevaDescripcion === originalDescripcion
+            ) {
+                alert("No se detectaron cambios en los datos.");
+                return;
+            }
+
+            if (!nuevaUbicacion || !nuevoEstado || !nuevaDescripcion) {
+                alert("Datos incompletos.");
+                return;
+            }
 
             const solicitudModificada = {
-                ubicacionBienes: document.getElementById("modUbicacion").value.trim().toUpperCase(),
-                estado: document.getElementById("modEstado").value.toUpperCase(),
-                descripcion: document.getElementById("modDescripcion").value.trim(),
+                ubicacionBienes: nuevaUbicacion,
+                estado: nuevoEstado,
+                descripcion: nuevaDescripcion,
             }
 
             try {
