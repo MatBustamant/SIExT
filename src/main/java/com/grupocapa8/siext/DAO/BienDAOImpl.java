@@ -34,7 +34,11 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
     public BienDTO buscar(int id) {
 
         BienDTO bien = null;
-        String sql = "SELECT * FROM Bien WHERE ID_Bien = ?";
+        String sql = "SELECT b.*, c.Nombre AS CategoriaNombre, u.Nombre AS UbicacionNombre " +
+                     "FROM Bien b " +
+                     "JOIN Categoria c ON b.ID_Categoria = c.ID_Categoria " +
+                     "JOIN Ubicacion u ON b.ID_Ubicacion = u.ID_Ubicacion" +
+                     "WHERE b.ID_Bien = ?";
 
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
@@ -47,12 +51,8 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
                     bien.setNombre(rs.getString("Nombre"));
                     bien.setEstadoBien(EstadoBien.valueOf(rs.getString("Estado")));
                     bien.setDetalle(rs.getString("Detalle"));
-                    
-                    int ubicacionID = rs.getInt("ID_Ubicacion");
-                    bien.setUbicacionBien(ubicacionDAO.buscar(ubicacionID).getNombre());
-
-                    int categoriaID = rs.getInt("ID_Categoria");
-                    bien.setNombreCatBienes(categoriaDAO.buscar(categoriaID).getNombre());
+                    bien.setUbicacionBien(rs.getString("UbicacionNombre"));
+                    bien.setNombreCatBienes(rs.getString("CategoriaNombre"));
                     
                     bien.setCantBienes(null);
                     bien.setEliminado(rs.getInt("Eliminado") != 0);
@@ -69,7 +69,11 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
     public List<BienDTO> buscarTodos() {
         List<BienDTO> bienes = new ArrayList<>();
 
-        String sql = "SELECT * FROM Bien";
+        String sql = "SELECT b.*, c.Nombre AS CategoriaNombre, u.Nombre AS UbicacionNombre " +
+                     "FROM Bien b " +
+                     "JOIN Categoria c ON b.ID_Categoria = c.ID_Categoria " +
+                     "JOIN Ubicacion u ON b.ID_Ubicacion = u.ID_Ubicacion";
+
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
@@ -79,13 +83,8 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
                     BienDTO bien = new BienDTO();
                     bien.setID_Bien(rs.getInt("ID_Bien"));
                     bien.setNombre(rs.getString("Nombre"));
-                    int categoriaID = rs.getInt("ID_Categoria");
-                    bien.setNombreCatBienes(categoriaDAO.buscar(categoriaID).getNombre());  //Ocurre que ID_Categoria es clave foranea, NO tengo el nombre de la cat
-                    //llamo a una busqueda en la tabla Categoria, enviandole el id que tengo desde tabla Bien
-                    //Porque en el DTO no me interesa el idcat, sino nombre de categoria, entonces debo buscarlo 
-                    //para ponerlo en la lista y sea compatible con BienDTO
-                    int ubicacionID = rs.getInt("ID_Ubicacion");
-                    bien.setUbicacionBien(ubicacionDAO.buscar(ubicacionID).getNombre());
+                    bien.setNombreCatBienes(rs.getString("CategoriaNombre"));
+                    bien.setUbicacionBien(rs.getString("UbicacionNombre"));
                     bien.setEstadoBien(EstadoBien.valueOf(rs.getString("Estado")));
                     bien.setDetalle(rs.getString("Detalle"));
                     
