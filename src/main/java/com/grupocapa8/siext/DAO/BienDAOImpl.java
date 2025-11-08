@@ -7,6 +7,8 @@ package com.grupocapa8.siext.DAO;
 import com.grupocapa8.siext.Enums.EstadoBien;
 import com.grupocapa8.siext.ConexionBD.BasedeDatos;
 import com.grupocapa8.siext.DTO.BienDTO;
+import com.grupocapa8.siext.DTO.EventoTrazabilidadDTO;
+import com.grupocapa8.siext.Enums.TipoEvento;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -123,7 +125,10 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
                 try (ResultSet rs = ps.getGeneratedKeys()) {
                     if (rs.next()) {
                         int claveGenerada = rs.getInt(1);
-                        eventoDAO.insertarRegistro(claveGenerada);
+                        EventoTrazabilidadDTO registro = new EventoTrazabilidadDTO();
+                        registro.setBienAsociado(claveGenerada);
+                        registro.setTipoEvento(TipoEvento.REGISTRO);
+                        eventoDAO.insertar(registro);
                     }
                 }
             }
@@ -173,7 +178,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
             System.getLogger(BienDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
     }
-
+    
     @Override
     public int eliminar(int id) {
         String sql = "UPDATE Bien SET Eliminado = ? WHERE ID_Bien = ? AND Eliminado = ?";
