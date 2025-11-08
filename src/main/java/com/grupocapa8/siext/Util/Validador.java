@@ -38,6 +38,14 @@ public class Validador {
         }
     }
     
+    public static void validarDestinoSolicitud(String valor, String campo) {
+        if (valor.equals("SIN ASIGNAR")) {
+            throw new IllegalArgumentException(
+            String.format("El campo %s no puede ser SIN ASIGNAR.", campo)
+            );
+        }
+    }
+    
     public static void validarContraseña(String contraseña){
         // 0. Campo no nulo
         if (contraseña==null) {

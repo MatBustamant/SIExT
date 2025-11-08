@@ -116,7 +116,29 @@ public class ValidadorTest {
             Validador.validarString("abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxy", campo, min, max);
         });
     }
+    
+    /**
+     * Testea que las ubicaciones de destino de una solicitud válidas funcionen bien.
+     */
+    @Test
+    @DisplayName("Debería lanzar excepción si la ubicación es SIN ASIGNAR")
+    public void testDestinoSolicitudValida() {
+        assertDoesNotThrow(() -> {
+            Validador.validarDestinoSolicitud("BEDELÍA", campo);
+        });
+    }
 
+    /**
+     * Testea que la ubicación de destino de una solicitud no se quede sin asignar.
+     */
+    @Test
+    @DisplayName("Debería lanzar excepción si la ubicación es SIN ASIGNAR")
+    public void testDestinoSolicitudNoDeberiaSerSinAsignar() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            Validador.validarDestinoSolicitud("SIN ASIGNAR", campo);
+        });
+    }
+    
     /**
      * Testea que las contraseñas válidas funcionen bien.
      */
