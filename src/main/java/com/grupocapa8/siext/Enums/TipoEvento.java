@@ -12,7 +12,10 @@ public enum TipoEvento {
     AVERIO,
     REPARACION,
     ENTREGA,
-    REGISTRO;
+    REGISTRO,
+    DEVOLUCION,
+    TRASLADO,
+    BAJA;
     
     @Override
     public String toString() {
