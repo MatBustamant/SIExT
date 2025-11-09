@@ -57,13 +57,21 @@
                             <option value="">Seleccionar</option>
                             <option value="REGISTRO">Registro</option>
                             <option value="ENTREGA">Entrega</option>
+                            <option value="DEVOLUCION">Devolución</option>
                             <option value="AVERIO">Averío</option>
                             <option value="REPARACION">Reparación</option>
                             <option value="BAJA">Baja</option>
                         </select>
                     </div>
+                    <div class="hidden" id="campoUbicacionCrear">
+                        <label for="ubicacionEntrega">Ubicación</label>
+                        <input list="ubicacionesSugeridas" type="text" id="ubicacionEntrega" placeholder="BEDELÍA">
+                    </div>
                 </div>
-
+                <div>
+                    <label for="detalleEvento">Detalle</label>
+                    <input type="text" id="detalleEvento" placeholder="Detalles extras opcionales...">
+                </div>
                 <div class="btn-row">
                     <button type="submit" class="btn"><i class="bi bi-plus-circle"></i>Registrar</button>
                 </div>
@@ -96,6 +104,7 @@
                         <option value="">Todos los eventos</option>
                         <option value="REGISTRO">Registro</option>
                         <option value="ENTREGA">Entrega</option>
+                        <option value="DEVOLUCION">Devolución</option>
                         <option value="AVERIO">Averío</option>
                         <option value="REPARACION">Reparación</option>
                         <option value="BAJA">Baja</option>
@@ -158,10 +167,22 @@
                     <option value="">Seleccionar</option>
                     <option value="REGISTRO">Registro</option>
                     <option value="ENTREGA">Entrega</option>
+                    <option value="DEVOLUCION">Devolución</option>
                     <option value="AVERIO">Averío</option>
                     <option value="REPARACION">Reparación</option>
                     <option value="BAJA">Baja</option>
                 </select>
+
+                <div class="hidden" id="campoUbicacionModificar">
+                    <label for="modUbicacion">Ubicación</label>
+                    <input list="ubicacionesSugeridas" type="text" id="modUbicacion" placeholder="BEDELÍA">
+                    <datalist id="ubicacionesSugeridas"></datalist>
+                </div>
+
+                <div>
+                    <label for="modDetalleEvento">Detalle</label>
+                    <input type="text" id="modDetalleEvento" placeholder="Detalles extras opcionales...">
+                </div>
 
                 <div class="btn-row">
                     <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
@@ -337,11 +358,51 @@
 
         renderEventos();
 
+        const selectTipoEventoCrear = document.getElementById("tipoEvento");
+        const campoUbicacionCrear = document.getElementById("campoUbicacionCrear");
+        const inputUbicacionCrear = document.getElementById("ubicacionEntrega");
+
+        const selectTipoEventoMod = document.getElementById("modTipoEvento");
+        const campoUbicacionModificar = document.getElementById("campoUbicacionModificar");
+        const inputUbicacionModificar = document.getElementById("modUbicacion");
+
+        // 1. Listener para el formulario de CREAR
+        selectTipoEventoCrear.addEventListener("change", (e) => {
+            // Obtenemos el valor seleccionado
+            const tipo = e.target.value;
+
+            if (tipo === "ENTREGA") {
+                campoUbicacionCrear.classList.remove("hidden");
+                inputUbicacionCrear.required = true;
+            } else {
+                campoUbicacionCrear.classList.add("hidden");
+                inputUbicacionCrear.required = false;
+            }
+        });
+
+        // 2. Listener para el formulario de MODIFICAR
+        selectTipoEventoMod.addEventListener("change", (e) => {
+            const tipo = e.target.value;
+
+            if (tipo === "ENTREGA") {
+                campoUbicacionModificar.classList.remove("hidden");
+                inputUbicacionModificar.required = true;
+            } else {
+                campoUbicacionModificar.classList.add("hidden");
+                inputUbicacionModificar.required = false;
+            }
+        });
+
         document.getElementById("registroEventoForm").addEventListener("submit", async (e) => {
             e.preventDefault();
 
             const tipoEvento = document.getElementById("tipoEvento").value.toUpperCase();
             const bienAsociado = document.getElementById("bienAsociado").value;
+            const detalleInput = document.getElementById("detalleEvento").value.trim().toUpperCase();
+            const detalle = detalleInput === "" ? null : detalleInput;
+            const ubicacionInput = document.getElementById("ubicacionEntrega").value.trim().toUpperCase();
+            const ubicacion = ubicacionInput === "" ? null : ubicacionInput;
+
             if (!tipoEvento || !bienAsociado) {
                 alert("Datos incompletos.");
                 return;
@@ -352,7 +413,9 @@
 
             const evento = {
                 tipoEvento,
-                bienAsociado
+                bienAsociado,
+                ...(detalle ? { detalle } : {}),
+                ...(ubicacion ? { ubicacionDestino: ubicacion } : {})
             }
 
             try {
@@ -388,14 +451,22 @@
             const eventos = JSON.parse(localStorage.getItem("eventos")) || [];
             const evento = eventos.find(e => e.id_Evento === id);
             if (!evento) return;
+            if (evento.tipoEvento === "ENTREGA") {
+                campoUbicacionModificar.classList.remove("hidden");
+                inputUbicacionModificar.required = true;
+            }
 
             const form = document.getElementById("modificarEventoForm");
             form.dataset.originalBienId = evento.bienAsociado.toString();
             form.dataset.originalTipoEvento = evento.tipoEvento.trim().toUpperCase() || "";
+            form.dataset.originalDetalle = evento.detalle ? evento.detalle.trim().toUpperCase() : "";
+            form.dataset.originalUbicacion = evento.ubicacionDestino ? evento.ubicacionDestino.trim().toUpperCase() : "";
 
             document.getElementById("modEventoId").value = evento.id_Evento;
             document.getElementById("modBienId").value = evento.bienAsociado;
             document.getElementById("modTipoEvento").value = evento.tipoEvento;
+            document.getElementById("modDetalleEvento").value = evento.detalle || "";
+            document.getElementById("modUbicacion").value = evento.ubicacionDestino || "";
 
             document.getElementById("modificarEventoSection").classList.remove("hidden");
 
@@ -409,11 +480,21 @@
             const form = e.target;
             const originalBienId = form.dataset.originalBienId;
             const originalTipoEvento = form.dataset.originalTipoEvento;
+            const originalDetalle = form.dataset.originalDetalle;
+            const originalUbicacion = form.dataset.originalUbicacion;
 
             const idInput = document.getElementById("modBienId").value.toString();
             const tipoEventoInput = document.getElementById("modTipoEvento").value.trim().toUpperCase();
+            const modDetalleTempInput = document.getElementById("modDetalleEvento").value.trim().toUpperCase();
+            const modDetalleTemp = modDetalleTempInput === "" ? null : modDetalleTempInput;
+            const modUbicacionTempInput = document.getElementById("modUbicacion").value.trim().toUpperCase();
+            const modUbicacionTemp = modUbicacionTempInput === "" ? null : modUbicacionTempInput;
 
-            if (originalBienId === idInput && originalTipoEvento === tipoEventoInput) {
+            if (originalBienId === idInput
+                && originalTipoEvento === tipoEventoInput
+                && originalDetalle === modDetalleTempInput
+                && originalUbicacion === modUbicacionTempInput
+                ) {
                 alert("No se detectaron cambios en los datos.");
                 return;
             }
@@ -425,7 +506,9 @@
 
             const eventoModificado = {
                 tipoEvento: tipoEventoInput,
-                bienAsociado: idInput
+                bienAsociado: idInput,
+                ...(modDetalleTemp ? { detalle: modDetalleTemp } : {}),
+                ...(modUbicacionTemp ? { ubicacionDestino: modUbicacionTemp } : {})
             }
 
             try {
