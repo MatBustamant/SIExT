@@ -8,6 +8,7 @@
     <link href="icons/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/tablas.css">
+    <link rel="stylesheet" href="css/historial.css">
     <link rel="icon" href="images/icon.png">
     <style>
         .badge {
@@ -70,7 +71,8 @@
                 <div class="form-grid">
                     <div>
                         <label for="categoriaProducto">Categoría</label>
-                        <input list="categoriasSugeridas" type="text" id="categoriaProducto" placeholder="INFORMÁTICOS" required>
+                        <input list="categoriasSugeridas" type="text" id="categoriaProducto" placeholder="INFORMÁTICOS"
+                            required>
                         <datalist id="categoriasSugeridas"></datalist>
                     </div>
                     <div>
@@ -110,7 +112,8 @@
                 </div>
                 <div>
                     <label for="filterBienCategoria">Categoría</label>
-                    <input list="categoriasSugeridas" type="text" id="filterBienCategoria" placeholder="Filtrar por categoría..."></input>
+                    <input list="categoriasSugeridas" type="text" id="filterBienCategoria"
+                        placeholder="Filtrar por categoría..."></input>
                 </div>
                 <div>
                     <label for="filterBienEstado">Estado</label>
@@ -122,7 +125,8 @@
                 </div>
                 <div>
                     <label for="filterBienUbicacion">Ubicación</label>
-                    <input list="ubicacionesSugeridas" type="text" id="filterBienUbicacion" placeholder="Filtrar por ubicación..."></select>
+                    <input list="ubicacionesSugeridas" type="text" id="filterBienUbicacion"
+                        placeholder="Filtrar por ubicación..."></select>
                     <datalist id="ubicacionesSugeridas"></datalist>
                 </div>
             </div>
@@ -199,6 +203,17 @@
 
     </main>
 
+    <div id="historialModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitulo">Historial del Bien</h2>
+                <button id="modalCerrarBtn" class="modal-close-btn" title="Cerrar">&times;</button>
+            </div>
+            <div id="historialContenido" class="modal-body">
+            </div>
+        </div>
+    </div>
+
     <footer>SIExT | 2025</footer>
 
     <script src="js/auth.js"></script>
@@ -209,6 +224,8 @@
     <script src="js/main.js"></script>
     <script src="js/formateo.js"></script>
     <script src="js/forms.js"></script>
+    <script src="js/fechas.js"></script>
+    <script src="js/historial.js"></script>
     <script>
         const categoriaProducto = document.getElementById("categoriaProducto");
         const modBienId = document.getElementById("modBienId");
@@ -236,7 +253,7 @@
             tbody.innerHTML = "";
 
             // Filtrado
-            const filtradas = bienesHabilitados.filter(prod => 
+            const filtradas = bienesHabilitados.filter(prod =>
                 matchTexto(prod.nombre, bienFiltroNombre)
                 && matchTexto(formatearNroBien(prod.id_Bien), bienFiltroNroInv)
                 && matchTexto(prod.nombreCatBienes, bienFiltroCategoria)
@@ -282,13 +299,18 @@
                 const detalle = document.createElement("tr");
                 detalle.classList.add("detalle-fila", "hidden");
                 detalle.innerHTML = `
-                    <td colspan="7" class="detalle-contenido">
+                    <td colspan="6" class="detalle-contenido">
                         <p><strong>Número de inventario:</strong> ${formatearNroBien(prod.id_Bien)}</p>
                         <p><strong>Nombre de bien:</strong> ${prod.nombre}</p>
                         <p><strong>Categoría:</strong> ${prod.nombreCatBienes}</p>
                         <p><strong>Estado:</strong> ${(prod.estadoBien).replace(/_/g, " ")}</p>
                         <p><strong>Ubicación actual:</strong> ${prod.ubicacionBien || "(Sin ubicación asignada)"}</p>
                         <p><strong>Detalle:</strong> ${prod.detalle || "(Sin detalle adicional)"}</p>
+                    </td>
+                    <td colspan="1" class="detalle-contenido">
+                        <button class="btn btn-historial btn-icon-table" data-id="${prod.id_Bien}" title="Ver historial">
+                            <i class="bi bi-clock-fill"></i>
+                        </button>
                     </td>`;
                 tbody.appendChild(detalle);
             });
@@ -323,10 +345,10 @@
 
         // Controles de paginación
         document.getElementById("prevPage").addEventListener("click", () => {
-        if (currentPage > 1) {
-            currentPage--;
-            renderInventario();
-        }
+            if (currentPage > 1) {
+                currentPage--;
+                renderInventario();
+            }
         });
         document.getElementById("nextPage").addEventListener("click", () => {
             if (currentPage < totalPages) {
@@ -354,6 +376,14 @@
                 toggleDetalles(btnToggle);
                 return;
             }
+
+            // Buscamos si el clic fue en un botón de historial
+            const btnHistorial = e.target.closest(".btn-historial");
+            if (btnHistorial) {
+                const id = Number(btnHistorial.dataset.id);
+                mostrarHistorial(id);
+                return;
+            }
         });
 
         // Filtros
@@ -364,7 +394,7 @@
                     currentPage = 1;
                     renderInventario();
                 });
-        });
+            });
 
         document.getElementById("productoForm").onsubmit = async (e) => {
             e.preventDefault();
