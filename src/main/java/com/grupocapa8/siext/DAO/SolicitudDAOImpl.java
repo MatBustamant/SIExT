@@ -19,7 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
+public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO, Integer>{
     
     private final UbicacionDAOImpl ubicacionDAO;
 
@@ -28,7 +28,7 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
     }
 
     @Override
-    public SolicitudDTO buscar(int id) {
+    public SolicitudDTO buscar(Integer id) {
         SolicitudDTO soli = null;
         String sql = "SELECT * FROM Solicitud WHERE Num_Solicitud = ?";
         try (Connection con = getConnection();
@@ -39,7 +39,7 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
                 if (rs.next()){
                     soli = new SolicitudDTO();
                     soli.setNumSolicitud(rs.getInt("Num_Solicitud"));
-                    
+                    soli.setLegajo(rs.getInt("Legajo"));
                     String fechaString = rs.getString("Fecha_Solicitud");
                     Instant fecha = LocalDateTime.parse(fechaString, 
                     DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toInstant(ZoneOffset.UTC);
@@ -53,8 +53,8 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
                     soli.setEliminado(rs.getInt("Eliminado") != 0);
                 }
             }
-        } catch (SQLException ex) {
-            System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        } catch (SQLException ex) { 
+            System.getLogger(SolicitudDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
         return soli;
     }
@@ -71,7 +71,7 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
             while (rs.next()) {
                 SolicitudDTO soli = new SolicitudDTO();
                 soli.setNumSolicitud(rs.getInt("Num_Solicitud"));
-                
+                soli.setLegajo(rs.getInt("Legajo"));
                 String fechaString = rs.getString("Fecha_Solicitud");
                 Instant fecha = LocalDateTime.parse(fechaString, 
                 DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toInstant(ZoneOffset.UTC);
@@ -87,15 +87,15 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
                 solicitudes.add(soli);
             }
             }
-        } catch (SQLException ex) {
-            System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        } catch (SQLException ex) { 
+            System.getLogger(SolicitudDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
         return solicitudes;
     }
 
     @Override
     public int insertar(SolicitudDTO Solicitud) {
-        String sql = "INSERT INTO Solicitud (Estado, Destino, Descripcion) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Solicitud (Estado, Destino, Legajo, Descripcion) VALUES (?, ?, ?, ?)";
         int idUbicacion = ubicacionDAO.buscar(Solicitud.getUbicacionBienes()).getID_Ubicacion();
         
         int resultado = 0;
@@ -104,18 +104,19 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
             
             ps.setString(1, Solicitud.getEstado().name());
             ps.setInt(2, idUbicacion);
-            ps.setString(3, Solicitud.getDescripcion());
+            ps.setInt(3, Solicitud.getLegajo());
+            ps.setString(4, Solicitud.getDescripcion());
             
             resultado = ps.executeUpdate();
-        } catch (SQLException ex) {
-            System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        } catch (SQLException ex) { 
+            System.getLogger(SolicitudDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
         return resultado;    
     }
 
     @Override
     public int actualizar(SolicitudDTO Solicitud) {
-        String sql = "UPDATE Solicitud SET Estado = ?, Destino = ?, Descripcion = ? WHERE Num_Solicitud = ? AND Eliminado = ?";
+        String sql = "UPDATE Solicitud SET Estado = ?, Destino = ?, Legajo = ?, Descripcion = ? WHERE Num_Solicitud = ? AND Eliminado = ?";
         int idUbicacion = ubicacionDAO.buscar(Solicitud.getUbicacionBienes()).getID_Ubicacion();
         
         int resultado = 0;
@@ -125,19 +126,20 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
             
             ps.setString(1, Solicitud.getEstado().name());
             ps.setInt(2, idUbicacion);
-            ps.setString(3, Solicitud.getDescripcion());
-            ps.setInt(4, Solicitud.getNumSolicitud());
-            ps.setInt(5, 0);
+            ps.setInt(3, Solicitud.getLegajo());
+            ps.setString(4, Solicitud.getDescripcion());
+            ps.setInt(5, Solicitud.getNumSolicitud());
+            ps.setInt(6, 0);
             
             resultado = ps.executeUpdate();
-        } catch (SQLException ex) {
-            System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        } catch (SQLException ex) { 
+            System.getLogger(SolicitudDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
         return resultado;
     }    
 
     @Override
-    public int eliminar(int id) {
+    public int eliminar(Integer id) {
         String sql = "UPDATE Solicitud SET Eliminado = ? WHERE Num_Solicitud = ? AND Eliminado = ?";
         int resultado = 0;
         try (Connection con = BasedeDatos.getConnection();
@@ -148,8 +150,8 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
             ps.setInt(3, 0);
             
             resultado = ps.executeUpdate();
-        } catch (SQLException ex) {
-            System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        } catch (SQLException ex) { 
+            System.getLogger(SolicitudDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
         return resultado;
     }

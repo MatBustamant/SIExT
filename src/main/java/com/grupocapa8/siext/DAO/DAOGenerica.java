@@ -10,10 +10,10 @@ package com.grupocapa8.siext.DAO;
  */
 import java.util.List;
 
-public interface DAOGenerica<T> {
-    T buscar(int id);
+public interface DAOGenerica<T, E> {
+    T buscar(E id);
     List<T> buscarTodos();
     int insertar(T entidad);
     int actualizar(T entidad);
-    int eliminar(int id);
+    int eliminar(E id);
 }

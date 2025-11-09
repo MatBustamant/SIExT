@@ -13,7 +13,7 @@ import jakarta.ws.rs.Path;
  * @author Matias
  */
 @Path("bien")
-public class BienController extends AbstractController<BienDTO>{
+public class BienController extends AbstractController<BienDTO, Integer>{
 
     public BienController() {
         this.servicio = new BienService(); //BienService

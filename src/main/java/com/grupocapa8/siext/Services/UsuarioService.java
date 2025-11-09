@@ -11,7 +11,7 @@ import org.mindrot.jbcrypt.BCrypt;
  *
  * @author geroj
  */
-public class UsuarioService implements ServiceGenerico<UsuarioDTO> {
+public class UsuarioService implements ServiceGenerico<UsuarioDTO, Integer> {
    private final UsuarioDAOImpl usuarioDAO; //acceso a la BD
    
     private final static String CAMPO_ID_TEXT = "Identificador";
@@ -24,7 +24,7 @@ public class UsuarioService implements ServiceGenerico<UsuarioDTO> {
     }
     
    @Override
-    public UsuarioDTO buscar(int idUsuario) throws NoSuchElementException {
+    public UsuarioDTO buscar(Integer idUsuario) throws NoSuchElementException {
         return this.buscar(idUsuario, true);
     }
     
@@ -62,7 +62,7 @@ public class UsuarioService implements ServiceGenerico<UsuarioDTO> {
     }
     
    @Override
-    public void modificar(UsuarioDTO dto, int id) throws NoSuchElementException {
+    public void modificar(UsuarioDTO dto, Integer id) throws NoSuchElementException {
         this.buscar(id);
         
         String nombre = dto.getNombre();
@@ -82,7 +82,7 @@ public class UsuarioService implements ServiceGenerico<UsuarioDTO> {
     }
     
    @Override
-    public void eliminar(int idUsuario) throws NoSuchElementException {
+    public void eliminar(Integer idUsuario) throws NoSuchElementException {
         this.buscar(idUsuario);
         
         usuarioDAO.eliminar(idUsuario);

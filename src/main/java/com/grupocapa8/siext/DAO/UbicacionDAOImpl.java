@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author oveja
  */
-public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
+public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO, Integer> {
 
     @Override
     public int insertar(UbicacionDTO Ubicacion) {
@@ -60,7 +60,7 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
     }
 
     @Override
-    public UbicacionDTO buscar(int id) {
+    public UbicacionDTO buscar(Integer id) {
 
         UbicacionDTO ubicacionBien = null;
         String sql = "SELECT * FROM Ubicacion WHERE ID_Ubicacion = ?";
@@ -114,7 +114,7 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
     }
 
     @Override
-    public int eliminar(int id) {
+    public int eliminar(Integer id) {
         String sql = "UPDATE Ubicacion SET Eliminado = ? WHERE ID_Ubicacion = ? AND Eliminado = ? AND Es_Editable = ?";
         int resultado = 0;
         

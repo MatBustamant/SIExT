@@ -18,23 +18,25 @@ import java.util.List;
  *
  * @author oveja
  */
-public class Bienes_por_SolicitudDAOImpl implements DAOBienes_Solicitud {
+public class Bienes_por_SolicitudDAOImpl implements DAOGenerica<Bienes_por_SolicitudDTO, ArrayList<Integer>> {
 
     @Override
-    public Bienes_por_SolicitudDTO buscar(int id_cat, int legajo) {
+    public Bienes_por_SolicitudDTO buscar(ArrayList<Integer> claves) {
+        int id_cat = 0;
+        int num_soli = 1;
         Bienes_por_SolicitudDTO bienesSolicitud = null;
-        String sql = "SELECT * FROM Bienes_por_Solicitud WHERE ID_Categoria = ? AND Legajo = ?";
+        String sql = "SELECT * FROM Bienes_por_Solicitud WHERE Num_Solicitud = ? AND ID_Categoria = ?";
         
         try (Connection con = getConnection();
             PreparedStatement ps = con.prepareStatement(sql)) {
             
-            ps.setInt(1, id_cat);
-            ps.setInt(2, legajo);
+            ps.setInt(1, claves.get(num_soli));
+            ps.setInt(2, claves.get(id_cat));
             try (ResultSet rs = ps.executeQuery()){
                 if (rs.next()){
                     bienesSolicitud = new Bienes_por_SolicitudDTO();
                     bienesSolicitud.setID_Categoria(rs.getInt("ID_Categoria"));
-                    bienesSolicitud.setLegajo(rs.getInt("Legajo"));
+                    bienesSolicitud.setNumSolicitud(rs.getInt("Num_Solicitud"));
                     bienesSolicitud.setCantidad(rs.getInt("Cantidad"));
                     
                     bienesSolicitud.setEliminado(rs.getInt("Eliminado") != 0);
@@ -58,7 +60,7 @@ public class Bienes_por_SolicitudDAOImpl implements DAOBienes_Solicitud {
 
             while (rs.next()) {
                 Bienes_por_SolicitudDTO bienesSolicitud = new Bienes_por_SolicitudDTO();
-                bienesSolicitud.setLegajo(rs.getInt("Legajo"));
+                bienesSolicitud.setNumSolicitud(rs.getInt("Num_Solicitud"));
                 bienesSolicitud.setID_Categoria(rs.getInt("ID_Categoria"));
                 bienesSolicitud.setCantidad(rs.getInt("Cantidad"));
                 bienesSolicitud.setEliminado(rs.getInt("Eliminado") != 0);
@@ -82,7 +84,7 @@ public class Bienes_por_SolicitudDAOImpl implements DAOBienes_Solicitud {
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, bienesSolicitud.getID_Categoria());
-            ps.setInt(2, bienesSolicitud.getLegajo());
+            ps.setInt(2, bienesSolicitud.getNumSolicitud());
             ps.setInt(3, bienesSolicitud.getCantidad());
 
             resultado = ps.executeUpdate();
@@ -102,7 +104,7 @@ public class Bienes_por_SolicitudDAOImpl implements DAOBienes_Solicitud {
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, bienesSolicitud.getCantidad());
-            ps.setInt(2, bienesSolicitud.getLegajo());
+            ps.setInt(2, bienesSolicitud.getNumSolicitud());
             ps.setInt(3, bienesSolicitud.getID_Categoria());
             ps.setInt(4, 0);
 
@@ -115,15 +117,17 @@ public class Bienes_por_SolicitudDAOImpl implements DAOBienes_Solicitud {
     }
 
     @Override
-    public int eliminar(int id_cat, int legajo) {
-        String sql = "UPDATE Bienes_por_Solicitud SET Eliminado = ? WHERE Legajo = ? AND ID_Categoria = ? AND Eliminado = ?";
+    public int eliminar(ArrayList<Integer> claves) {
+        String sql = "UPDATE Bienes_por_Solicitud SET Eliminado = ? WHERE Num_Solicitud = ? AND ID_Categoria = ? AND Eliminado = ?";
         int resultado = 0;
+        int id_cat = 0;
+        int numSoli = 1;
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, 1);
-            ps.setInt(2, legajo);
-            ps.setInt(3, id_cat);
+            ps.setInt(2, claves.get(numSoli));
+            ps.setInt(3, claves.get(id_cat));
             ps.setInt(4, 0);
             
             resultado = ps.executeUpdate();
