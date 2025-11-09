@@ -8,6 +8,7 @@ import com.grupocapa8.siext.Enums.TipoEvento;
 import com.grupocapa8.siext.ConexionBD.BasedeDatos;
 import static com.grupocapa8.siext.ConexionBD.BasedeDatos.getConnection;
 import com.grupocapa8.siext.DTO.EventoTrazabilidadDTO;
+import com.grupocapa8.siext.DTO.UbicacionDTO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,11 +26,20 @@ import java.util.List;
  */
 public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidadDTO> {
 
+    private final UbicacionDAOImpl ubicacionDAO;
+
+    public EventoTrazabilidadDAOImpl() {
+        this.ubicacionDAO = new UbicacionDAOImpl();
+    }
+    
     @Override
     public EventoTrazabilidadDTO buscar(int id) {
 
         EventoTrazabilidadDTO evento = null;
-        String sql = "SELECT * FROM EventoTrazabilidad WHERE ID_Evento = ?";
+        String sql = "SELECT e.*, u.Nombre AS UbicacionNombre "
+                   + "FROM EventoTrazabilidad e "
+                   + "LEFT JOIN Ubicacion u ON e.ID_Ubicacion_Destino = u.ID_Ubicacion "
+                   + "WHERE ID_Evento = ?";
         
         try (Connection con = getConnection();
             PreparedStatement ps = con.prepareStatement(sql)) {
@@ -48,20 +58,7 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
                     evento.setFechaEvento(fecha);
                     
                     evento.setDetalle(rs.getString("Detalle"));
-                    
-                    int idOrigen = rs.getInt("ID_Ubicacion_Origen");
-                    if (rs.wasNull()) {
-                        evento.setIdUbicacionOrigen(null);
-                    } else {
-                        evento.setIdUbicacionOrigen(idOrigen);
-                    }
-                    
-                    int idDestino = rs.getInt("ID_Ubicacion_Destino");
-                    if (rs.wasNull()) {
-                        evento.setIdUbicacionDestino(null);
-                    } else {
-                        evento.setIdUbicacionDestino(idDestino);
-                    }
+                    evento.setUbicacionDestino(rs.getString("UbicacionNombre"));
                     
                     evento.setEliminado(rs.getInt("Eliminado") != 0);
                 }
@@ -76,7 +73,9 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
     @Override
     public List<EventoTrazabilidadDTO> buscarTodos() {
         List<EventoTrazabilidadDTO> eventos = new ArrayList<>();
-        String sql = "SELECT * FROM EventoTrazabilidad";
+        String sql = "SELECT e.*, u.Nombre AS UbicacionNombre "
+                   + "FROM EventoTrazabilidad e "
+                   + "LEFT JOIN Ubicacion u ON e.ID_Ubicacion_Destino = u.ID_Ubicacion";
         try (Connection con = getConnection();
             PreparedStatement ps = con.prepareStatement(sql)) {
         
@@ -94,20 +93,7 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
                 evento.setFechaEvento(fecha);
 
                 evento.setDetalle(rs.getString("Detalle"));
-
-                int idOrigen = rs.getInt("ID_Ubicacion_Origen");
-                if (rs.wasNull()) {
-                    evento.setIdUbicacionOrigen(null);
-                } else {
-                    evento.setIdUbicacionOrigen(idOrigen);
-                }
-
-                int idDestino = rs.getInt("ID_Ubicacion_Destino");
-                if (rs.wasNull()) {
-                    evento.setIdUbicacionDestino(null);
-                } else {
-                    evento.setIdUbicacionDestino(idDestino);
-                }
+                evento.setUbicacionDestino(rs.getString("UbicacionNombre"));
 
                 evento.setEliminado(rs.getInt("Eliminado") != 0);
                 
@@ -182,6 +168,42 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
         return evento;
     }
     
+    public EventoTrazabilidadDTO buscarEventoUbicacionMasReciente(int idBienAsociado) {
+        String sql = String.format(
+                "SELECT e.*, u.Nombre AS UbicacionNombre " +
+                "FROM EventoTrazabilidad e " +
+                "LEFT JOIN Ubicacion u ON e.ID_Ubicacion_Destino = u.ID_Ubicacion " +
+                "WHERE e.ID_Bien = ? AND e.Eliminado = ? " +
+                "AND e.TipoEvento IN ('%s', '%s') " +
+                "ORDER BY e.Fecha DESC, e.ID_Evento DESC LIMIT 1",
+                TipoEvento.ENTREGA.name(), TipoEvento.DEVOLUCION.name()
+        );
+        EventoTrazabilidadDTO evento = null;
+        try (Connection con = BasedeDatos.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idBienAsociado);
+            ps.setInt(2, 0);
+            
+            try(ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    evento = new EventoTrazabilidadDTO();
+                    evento.setID_Evento(rs.getInt("ID_Evento"));
+                    evento.setBienAsociado(rs.getInt("ID_Bien"));
+                    evento.setTipoEvento(TipoEvento.valueOf(rs.getString("TipoEvento")));
+                    
+                    String fechaString = rs.getString("Fecha");
+                    Instant fecha = LocalDateTime.parse(fechaString, 
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toInstant(ZoneOffset.UTC);
+                    evento.setFechaEvento(fecha);
+                    evento.setUbicacionDestino(rs.getString("UbicacionNombre"));
+                }
+            }
+        } catch (SQLException ex) {
+            System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+        return evento;
+    }
+    
     public EventoTrazabilidadDTO buscarMasRecienteAbsoluto(int idBienAsociado) {
         String sql = "SELECT * FROM EventoTrazabilidad "
                 + "WHERE ID_Bien = ? AND Eliminado = ? "
@@ -213,9 +235,10 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
 
     @Override
     public int insertar(EventoTrazabilidadDTO Evento) {
-        String sql = "INSERT INTO EventoTrazabilidad (ID_Bien, TipoEvento, Detalle, ID_Ubicacion_Origen, ID_Ubicacion_Destino)"
-                   + "VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO EventoTrazabilidad (ID_Bien, TipoEvento, Detalle, ID_Ubicacion_Destino)"
+                   + "VALUES (?, ?, ?, ?)";
         int resultado = 0;
+        
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
@@ -223,18 +246,16 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
             ps.setString(2, Evento.getTipoEvento().name());
             ps.setString(3, Evento.getDetalle());
             
-            Integer idUbiOr = Evento.getIdUbicacionOrigen();
-            if(idUbiOr != null) {
-                ps.setInt(4, idUbiOr);
+            String nombreUbicacion = Evento.getUbicacionDestino();
+            if (nombreUbicacion != null) {
+                UbicacionDTO ubi = ubicacionDAO.buscar(nombreUbicacion);
+                if (ubi != null) {
+                    ps.setInt(4, ubi.getID_Ubicacion());
+                } else {
+                    ps.setNull(4, java.sql.Types.INTEGER);
+                }
             } else {
                 ps.setNull(4, java.sql.Types.INTEGER);
-            }
-            
-            Integer idUbiDes = Evento.getIdUbicacionDestino();
-            if(idUbiDes != null) {
-                ps.setInt(5, idUbiDes);
-            } else {
-                ps.setNull(5, java.sql.Types.INTEGER);
             }
             
             resultado = ps.executeUpdate();
@@ -246,10 +267,10 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
 
     @Override
     public int actualizar(EventoTrazabilidadDTO Evento) {
-        String sql = "UPDATE EventoTrazabilidad SET ID_Bien = ?, TipoEvento = ?, Detalle = ?, ID_Ubicacion_Origen = ?, ID_Ubicacion_Destino = ?"
+        String sql = "UPDATE EventoTrazabilidad SET ID_Bien = ?, TipoEvento = ?, Detalle = ?, ID_Ubicacion_Destino = ?"
                    + "WHERE ID_Evento = ? AND Eliminado = ?";
         int resultado = 0;
-        
+
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
@@ -257,22 +278,20 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
             ps.setString(2, Evento.getTipoEvento().name());
             ps.setString(3, Evento.getDetalle());
             
-            Integer idUbiOr = Evento.getIdUbicacionOrigen();
-            if(idUbiOr != null) {
-                ps.setInt(4, idUbiOr);
+            String nombreUbicacion = Evento.getUbicacionDestino();
+            if (nombreUbicacion != null) {
+                UbicacionDTO ubi = ubicacionDAO.buscar(nombreUbicacion);
+                if (ubi != null) {
+                    ps.setInt(4, ubi.getID_Ubicacion());
+                } else {
+                    ps.setNull(4, java.sql.Types.INTEGER);
+                }
             } else {
                 ps.setNull(4, java.sql.Types.INTEGER);
             }
             
-            Integer idUbiDes = Evento.getIdUbicacionDestino();
-            if(idUbiDes != null) {
-                ps.setInt(5, idUbiDes);
-            } else {
-                ps.setNull(5, java.sql.Types.INTEGER);
-            }
-            
-            ps.setInt(6, Evento.getID_Evento());
-            ps.setInt(7, 0);
+            ps.setInt(5, Evento.getID_Evento());
+            ps.setInt(6, 0);
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {

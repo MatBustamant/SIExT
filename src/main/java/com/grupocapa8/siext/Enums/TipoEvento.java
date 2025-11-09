@@ -14,7 +14,6 @@ public enum TipoEvento {
     ENTREGA,
     REGISTRO,
     DEVOLUCION,
-    TRASLADO,
     BAJA;
     
     @Override

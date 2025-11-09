@@ -13,21 +13,19 @@ public class EventoTrazabilidadDTO {
     private int BienAsociado;
     private TipoEvento TipoEvento;
     private String detalle;
-    private Integer idUbicacionOrigen;
-    private Integer idUbicacionDestino;
+    private String ubicacionDestino;
     private boolean eliminado;
     
     public EventoTrazabilidadDTO(){
     }
     
     public EventoTrazabilidadDTO(Instant FechaEvento, Integer BienAsociado, TipoEvento TipoEvento, boolean eliminado,
-            String detalle, Integer idUbicacionOrigen, Integer idUbicacionDestino) {
+            String detalle, String ubicacionDestino) {
         this.FechaEvento = FechaEvento;
         this.BienAsociado = BienAsociado;
         this.TipoEvento = TipoEvento;
         this.detalle = detalle;
-        this.idUbicacionOrigen = idUbicacionOrigen;
-        this.idUbicacionDestino = idUbicacionDestino;
+        this.ubicacionDestino = ubicacionDestino;
         this.eliminado = eliminado;
     }
 
@@ -79,20 +77,12 @@ public class EventoTrazabilidadDTO {
         this.detalle = detalle;
     }
 
-    public Integer getIdUbicacionOrigen() {
-        return idUbicacionOrigen;
+    public String getUbicacionDestino() {
+        return ubicacionDestino;
     }
 
-    public void setIdUbicacionOrigen(Integer idUbicacionOrigen) {
-        this.idUbicacionOrigen = idUbicacionOrigen;
-    }
-
-    public Integer getIdUbicacionDestino() {
-        return idUbicacionDestino;
-    }
-
-    public void setIdUbicacionDestino(Integer idUbicacionDestino) {
-        this.idUbicacionDestino = idUbicacionDestino;
+    public void setUbicacionDestino(String ubicacionDestino) {
+        this.ubicacionDestino = ubicacionDestino;
     }
     
 }

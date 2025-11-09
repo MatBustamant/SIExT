@@ -178,6 +178,22 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
             System.getLogger(BienDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
     }
+    
+    public void cambiarUbicacion(BienDTO bien, String nombreUbicacion) {
+        String sql = "UPDATE Bien SET ID_Ubicacion = ? WHERE ID_Bien = ?";
+        int idUbicacion = ubicacionDAO.buscar(nombreUbicacion).getID_Ubicacion();
+        
+        try (Connection con = BasedeDatos.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setInt(1, idUbicacion);
+            ps.setInt(2, bien.getID_Bien());
+            
+            ps.executeUpdate();
+        } catch (SQLException ex) {
+            System.getLogger(BienDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+    }
 
     @Override
     public int eliminar(int id) {

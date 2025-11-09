@@ -2,8 +2,10 @@ package com.grupocapa8.siext.Services;
 
 import com.grupocapa8.siext.Enums.TipoEvento;
 import com.grupocapa8.siext.DAO.EventoTrazabilidadDAOImpl;
+import com.grupocapa8.siext.DAO.UbicacionDAOImpl;
 import com.grupocapa8.siext.DTO.BienDTO;
 import com.grupocapa8.siext.DTO.EventoTrazabilidadDTO;
+import com.grupocapa8.siext.DTO.UbicacionDTO;
 import com.grupocapa8.siext.Util.Validador;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -15,14 +17,18 @@ import java.util.NoSuchElementException;
 public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabilidadDTO>{
     private final EventoTrazabilidadDAOImpl eventoTrazDAO; //acceso a la BD
     private final BienService bienService;
-    private final UbicacionService ubicacionService;
+    private final UbicacionDAOImpl ubiDAO;
     
     private final static String CAMPO_ID_TEXT = "Identificador";
+    private final static String UBICACION_POR_DEFECTO = "SIN ASIGNAR";
+    private final static String CAMPO_UBICACION_TEXT = "Ubicación";
+    private static final int CAMPO_UBICACION_MIN = 3;
+    private static final int CAMPO_UBICACION_MAX = 80;
 
     public EventoTrazabilidadServices() {
         this.eventoTrazDAO = new EventoTrazabilidadDAOImpl();
         this.bienService = new BienService();
-        this.ubicacionService = new UbicacionService();
+        this.ubiDAO = new UbicacionDAOImpl();
     }
     
     @Override
@@ -55,6 +61,8 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
         String detalle = dto.getDetalle();
         if (detalle != null) detalle = detalle.toUpperCase();
         
+        String nombreUbicacion = dto.getUbicacionDestino();
+        
         dto.setTipoEvento(tipo);
         dto.setDetalle(detalle);
         switch(tipo) {
@@ -66,6 +74,18 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
                 break;
             case(TipoEvento.BAJA):
                 bienService.actualizarEstadoEliminado(idBien, true);
+                break;
+            case(TipoEvento.ENTREGA):
+                Validador.validarString(nombreUbicacion, CAMPO_UBICACION_TEXT,CAMPO_UBICACION_MIN,CAMPO_UBICACION_MAX);
+                if (ubiDAO.buscar(nombreUbicacion) == null) {
+                    ubiDAO.insertar(new UbicacionDTO(0, nombreUbicacion, false));
+                }
+                bienService.trasladar(idBien, nombreUbicacion);
+                dto.setUbicacionDestino(nombreUbicacion);
+                break;
+            case(TipoEvento.DEVOLUCION):
+                bienService.trasladar(idBien, UBICACION_POR_DEFECTO);
+                dto.setUbicacionDestino(UBICACION_POR_DEFECTO);
                 break;
             default:
                 break;
@@ -80,6 +100,7 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
         
         int idBienNuevo = dto.getBienAsociado();
         TipoEvento tipoNuevo = dto.getTipoEvento();
+        String nombreUbicacion = dto.getUbicacionDestino();
         
         // Valido que no esté intentando asignar un evento futuro a la baja de un bien.
         if(idBienOriginal != idBienNuevo) {
@@ -107,6 +128,16 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
             } // si tengo el mismo id, estoy intentando cambiar el tipo del último evento a una baja, todo bien
         }
         
+        if (tipoNuevo == TipoEvento.ENTREGA) {
+            Validador.validarString(nombreUbicacion, CAMPO_UBICACION_TEXT,CAMPO_UBICACION_MIN,CAMPO_UBICACION_MAX);
+            if (ubiDAO.buscar(nombreUbicacion) == null) {
+                ubiDAO.insertar(new UbicacionDTO(0, nombreUbicacion, false));
+            }
+            dto.setUbicacionDestino(nombreUbicacion);
+        } else if (tipoNuevo == TipoEvento.DEVOLUCION) {
+            dto.setUbicacionDestino(UBICACION_POR_DEFECTO);
+        }
+        
         // Validamos que el bien nuevo exista
         try {
             bienService.buscar(idBienNuevo, false);
@@ -123,10 +154,12 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
             // Si cambió, tenemos que recalcular el estado del bien anterior
             this.recalcularEstadoDelBien(idBienOriginal);
             this.recalcularExistenciaDelBien(idBienOriginal);
+            this.recalcularUbicacionDelBien(idBienOriginal);
         }
         // Luego recalculamos el estado del bien actual (ya sea que sea el mismo de antes o uno nuevo)
         this.recalcularEstadoDelBien(idBienNuevo);
         this.recalcularExistenciaDelBien(idBienNuevo);
+        this.recalcularUbicacionDelBien(idBienNuevo);
     }
     
     @Override
@@ -148,6 +181,7 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
         
         this.recalcularEstadoDelBien(idBien);
         this.recalcularExistenciaDelBien(idBien);
+        this.recalcularUbicacionDelBien(idBien);
     }
     
     private void recalcularEstadoDelBien(int idBien) {
@@ -184,6 +218,23 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
             if (bien.isEliminado())
             bienService.actualizarEstadoEliminado(idBien, false);
         }
+    }
+    
+    private void recalcularUbicacionDelBien(int idBien) {
+        EventoTrazabilidadDTO ultimoMovimiento = eventoTrazDAO.buscarEventoUbicacionMasReciente(idBien);
+        
+        String nombreUbicacionFinal;
+        if (ultimoMovimiento != null && ultimoMovimiento.getUbicacionDestino() != null) {
+            nombreUbicacionFinal = ultimoMovimiento.getUbicacionDestino();
+        } else {
+            nombreUbicacionFinal = UBICACION_POR_DEFECTO;
+        }
+        
+        if (ubiDAO.buscar(nombreUbicacionFinal) == null) {
+            ubiDAO.insertar(new UbicacionDTO(0, nombreUbicacionFinal, false));
+        }
+        
+        bienService.trasladar(idBien, nombreUbicacionFinal);
     }
     
 }
