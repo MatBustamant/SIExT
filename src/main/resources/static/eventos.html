@@ -55,7 +55,6 @@
                         <label for="tipoEvento">Tipo de evento</label>
                         <select id="tipoEvento" required>
                             <option value="">Seleccionar</option>
-                            <option value="REGISTRO">Registro</option>
                             <option value="ENTREGA">Entrega</option>
                             <option value="DEVOLUCION">Devolución</option>
                             <option value="AVERIO">Averío</option>
@@ -165,7 +164,6 @@
                 <label for="modTipoEvento">Tipo de evento</label>
                 <select id="modTipoEvento" required>
                     <option value="">Seleccionar</option>
-                    <option value="REGISTRO">Registro</option>
                     <option value="ENTREGA">Entrega</option>
                     <option value="DEVOLUCION">Devolución</option>
                     <option value="AVERIO">Averío</option>
@@ -270,12 +268,20 @@
                         <td>#${formatearNroBien(evento.bienAsociado)} — ${bien.nombre}</td>
                         <td>${evento.tipoEvento}</td>
                         <td>${formatearFechaLocalEsp(evento.fechaEvento)}</td>
-                        <td>
+                    `;
+                    if (evento.tipoEvento === "REGISTRO") {
+                        tr.innerHTML += `                        <td>
+                            <button class="btn btn-editar btn-icon-table" title="No se puede editar un REGISTRO" disabled>
+                                <i class="bi bi-pencil-fill"></i>
+                            </button>
+                        </td>`;
+                    } else {
+                        tr.innerHTML += `                        <td>
                             <button class="btn btn-editar btn-icon-table" data-id="${evento.id_Evento}" title="Editar evento">
                                 <i class="bi bi-pencil-fill"></i>
                             </button>
-                        </td>
-                    `;
+                        </td>`;
+                    }
                     tbody.appendChild(tr);
 
                     // Fila oculta de detalles
