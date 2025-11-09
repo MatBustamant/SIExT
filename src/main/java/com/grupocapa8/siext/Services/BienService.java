@@ -91,7 +91,7 @@ public class BienService implements ServiceGenerico<BienDTO> {
     
     @Override
     public void modificar(BienDTO dto, int id) throws NoSuchElementException {
-        this.buscar(id);
+        BienDTO bienOriginal = this.buscar(id);
         
         String nombre = dto.getNombre().toUpperCase();
         Validador.validarString(nombre,CAMPO_NOMBRE_TEXT,CAMPO_NOMBRE_MIN,CAMPO_NOMBRE_MAX);
@@ -119,7 +119,19 @@ public class BienService implements ServiceGenerico<BienDTO> {
             UbicacionDTO nuevaUbicacion = new UbicacionDTO(0, ubicacion, false);
             ubiDAO.insertar(nuevaUbicacion);
         }
-       
+        
+        if (!bienOriginal.getUbicacionBien().equals(ubicacion)) {
+            EventoTrazabilidadDTO eventoMovimiento = new EventoTrazabilidadDTO();
+            eventoMovimiento.setBienAsociado(id);
+            if(ubicacion.equals("SIN ASIGNAR")) {
+                eventoMovimiento.setTipoEvento(TipoEvento.DEVOLUCION);
+            } else {
+                eventoMovimiento.setTipoEvento(TipoEvento.ENTREGA);
+                eventoMovimiento.setUbicacionDestino(ubicacion);
+            }
+            evenDAO.insertar(eventoMovimiento);
+        }
+        
         bienDAO.actualizar(dto);
     }
     
@@ -131,6 +143,11 @@ public class BienService implements ServiceGenerico<BienDTO> {
     void reparar(int id) throws NoSuchElementException {
         this.buscar(id, false);
         bienDAO.cambiarEstado(EstadoBien.EN_CONDICIONES, id);
+    }
+    
+    void trasladar(int idBien, String nombreUbi) throws NoSuchElementException {
+        BienDTO bien = this.buscar(idBien, false);
+        bienDAO.cambiarUbicacion(bien, nombreUbi);
     }
    
     @Override

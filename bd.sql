@@ -30,13 +30,11 @@ CREATE TABLE IF NOT EXISTS "EventoTrazabilidad" (
 	"Fecha"	TEXT NOT NULL DEFAULT (datetime('now')),
 	"TipoEvento"	TEXT NOT NULL,
 	"Detalle"	TEXT,
-	"ID_Ubicacion_Origen"	INTEGER,
 	"ID_Ubicacion_Destino"	INTEGER,
 	"Eliminado" INTEGER NOT NULL DEFAULT 0,
 	PRIMARY KEY("ID_Evento" AUTOINCREMENT),
 	FOREIGN KEY("ID_Bien") REFERENCES "Bien"("ID_Bien"),
-	FOREIGN KEY("ID_Ubicacion_Destino") REFERENCES "Ubicacion"("ID_Ubicacion"),
-	FOREIGN KEY("ID_Ubicacion_Origen") REFERENCES "Ubicacion"("ID_Ubicacion")
+	FOREIGN KEY("ID_Ubicacion_Destino") REFERENCES "Ubicacion"("ID_Ubicacion")
 );
 CREATE TABLE IF NOT EXISTS "Solicitud" (
 	"Num_Solicitud"	INTEGER NOT NULL,
