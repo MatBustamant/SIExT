@@ -14,10 +14,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
+public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO, Integer>{
 
     @Override
-    public UsuarioDTO buscar(int id) {
+    public UsuarioDTO buscar(Integer id) {
         UsuarioDTO usuario = null;
         String sql = "SELECT * FROM Usuario WHERE ID_Usuario = ?";
         
@@ -136,7 +136,7 @@ public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
     }
 
     @Override
-    public int eliminar(int id) {
+    public int eliminar(Integer id) {
         String sql = "UPDATE Usuario SET Eliminado = ? WHERE ID_Usuario = ? AND Eliminado = ?";
         int resultado = 0;
         

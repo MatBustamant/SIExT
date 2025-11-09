@@ -24,7 +24,7 @@ import java.util.List;
  *
  * @author oveja
  */
-public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidadDTO> {
+public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidadDTO, Integer> {
 
     private final UbicacionDAOImpl ubicacionDAO;
 
@@ -33,7 +33,7 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
     }
     
     @Override
-    public EventoTrazabilidadDTO buscar(int id) {
+    public EventoTrazabilidadDTO buscar(Integer id) {
 
         EventoTrazabilidadDTO evento = null;
         String sql = "SELECT e.*, u.Nombre AS UbicacionNombre "
@@ -301,7 +301,7 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
     }
 
     @Override
-    public int eliminar(int id) {
+    public int eliminar(Integer id) {
         String sql = "UPDATE EventoTrazabilidad SET Eliminado = ? WHERE ID_Evento = ? AND Eliminado = ?";
         int resultado = 0;
         try (Connection con = BasedeDatos.getConnection();

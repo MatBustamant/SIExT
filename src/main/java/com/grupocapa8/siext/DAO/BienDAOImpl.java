@@ -20,7 +20,7 @@ import java.util.List;
  *
  * @author oveja
  */
-public class BienDAOImpl implements DAOGenerica<BienDTO> {
+public class BienDAOImpl implements DAOGenerica<BienDTO, Integer> {
 
     private final CategoriaDAOImpl categoriaDAO;
     private final UbicacionDAOImpl ubicacionDAO;
@@ -33,7 +33,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
     }
 
     @Override
-    public BienDTO buscar(int id) {
+    public BienDTO buscar(Integer id) {
 
         BienDTO bien = null;
         String sql = "SELECT b.*, c.Nombre AS CategoriaNombre, u.Nombre AS UbicacionNombre " +
@@ -196,7 +196,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
     }
 
     @Override
-    public int eliminar(int id) {
+    public int eliminar(Integer id) {
         String sql = "UPDATE Bien SET Eliminado = ? WHERE ID_Bien = ? AND Eliminado = ?";
         int resultado = 0;
         

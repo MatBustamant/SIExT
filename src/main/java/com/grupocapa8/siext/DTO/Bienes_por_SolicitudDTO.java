@@ -6,13 +6,13 @@ package com.grupocapa8.siext.DTO;
 
 public class Bienes_por_SolicitudDTO {
     private int ID_Categoria;
-    private int Legajo;
+    private int NumSolicitud;
     private int cantidad;
     private boolean eliminado;
 
-    public Bienes_por_SolicitudDTO(int ID_Categoria, int Legajo, int cantidad, boolean eliminado) {
+    public Bienes_por_SolicitudDTO(int ID_Categoria, int Num_Solicitud, int cantidad, boolean eliminado) {
         this.ID_Categoria = ID_Categoria;
-        this.Legajo = Legajo;
+        this.NumSolicitud = Num_Solicitud;
         this.cantidad = cantidad;
         this.eliminado = eliminado;
     }
@@ -28,12 +28,12 @@ public class Bienes_por_SolicitudDTO {
         this.ID_Categoria = ID_Categoria;
     }
 
-    public int getLegajo() {
-        return Legajo;
+    public int getNumSolicitud() {
+        return NumSolicitud;
     }
 
-    public void setLegajo(int Legajo) {
-        this.Legajo = Legajo;
+    public void setNumSolicitud(int Num_Solicitud) {
+        this.NumSolicitud = Num_Solicitud;
     }
 
     public int getCantidad() {

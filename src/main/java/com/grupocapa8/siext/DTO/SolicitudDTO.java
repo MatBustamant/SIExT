@@ -11,6 +11,7 @@ public class SolicitudDTO {
     private Integer numSolicitud;
     private Instant FechaInicioSolicitud;
     private String UbicacionBienes;
+    private int Legajo;
     private EstadoSolicitud Estado;
     private String Descripcion;
     private boolean eliminado;
@@ -18,14 +19,23 @@ public class SolicitudDTO {
     public SolicitudDTO(){
         
     }
-    public SolicitudDTO(Integer numSolicitud, Instant FechaInicioSolicitud, String UbicacionBienes, EstadoSolicitud Estado, boolean eliminado) {
+    public SolicitudDTO(Integer numSolicitud, Instant FechaInicioSolicitud, String UbicacionBienes, int legajo, EstadoSolicitud Estado, boolean eliminado) {
         this.numSolicitud = numSolicitud;
         this.FechaInicioSolicitud = FechaInicioSolicitud;
         this.UbicacionBienes = UbicacionBienes;
+        this.Legajo = legajo;
         this.Estado = Estado;
         this.eliminado = eliminado;
     }
 
+    public int getLegajo() {
+        return Legajo;
+    }
+
+    public void setLegajo(int Legajo) {
+        this.Legajo = Legajo;
+    }
+    
     public String getDescripcion() {
         return Descripcion;
     }

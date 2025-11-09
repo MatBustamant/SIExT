@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package com.grupocapa8.siext.DAO;
 
 import com.grupocapa8.siext.ConexionBD.BasedeDatos;
@@ -18,10 +15,10 @@ import java.util.List;
  *
  * @author oveja
  */
-public class ResponsableDAOImpl implements DAOGenerica<ResponsableDTO>{
+public class ResponsableDAOImpl implements DAOGenerica<ResponsableDTO, Integer>{
 
     @Override
-    public ResponsableDTO buscar(int id) {
+    public ResponsableDTO buscar(Integer id) {
         ResponsableDTO resposable = null;
         String sql = "SELECT * FROM Responsable WHERE Legajo = ?";
         
@@ -110,7 +107,7 @@ public class ResponsableDAOImpl implements DAOGenerica<ResponsableDTO>{
     }
 
     @Override
-    public int eliminar(int legajo) {
+    public int eliminar(Integer legajo) {
         String sql = "UPDATE Responsable SET Eliminado = ? WHERE Legajo = ? AND Eliminado = ?";
         int resultado = 0;
         try (Connection con = BasedeDatos.getConnection();

@@ -11,14 +11,14 @@ CREATE TABLE IF NOT EXISTS "Bien" (
 	FOREIGN KEY("ID_Categoria") REFERENCES "Categoria"("ID_Categoria"),
 	FOREIGN KEY("ID_Ubicacion") REFERENCES "Ubicacion"("ID_Ubicacion")
 );
-CREATE TABLE IF NOT EXISTS "Bienes_por_Solicitud" (
+CREATE TABLE "Bienes_por_Solicitud" (
 	"ID_Categoria"	INTEGER NOT NULL,
-	"Legajo"	INTEGER NOT NULL,
+	"Num_Solicitud"	INTEGER NOT NULL,
 	"Cantidad"	INTEGER NOT NULL,
 	"Eliminado"	INTEGER NOT NULL,
-	PRIMARY KEY("ID_Categoria","Legajo"),
+	PRIMARY KEY("ID_Categoria","Num_Solicitud"),
 	FOREIGN KEY("ID_Categoria") REFERENCES "Categoria"("ID_Categoria"),
-	FOREIGN KEY("Legajo") REFERENCES "Responsable"("Legajo")
+	FOREIGN KEY("Num_Solicitud") REFERENCES "Solicitud"("Num_Solicitud")
 );
 CREATE TABLE IF NOT EXISTS "Categoria" (
 	"ID_Categoria"	INTEGER NOT NULL,
@@ -33,10 +33,12 @@ CREATE TABLE IF NOT EXISTS "EventoTrazabilidad" (
 	"TipoEvento"	TEXT NOT NULL,
 	"Detalle"	TEXT,
 	"ID_Ubicacion_Destino"	INTEGER,
+	"Legajo"	INTEGER,
 	"Eliminado" INTEGER NOT NULL DEFAULT 0,
 	PRIMARY KEY("ID_Evento" AUTOINCREMENT),
 	FOREIGN KEY("ID_Bien") REFERENCES "Bien"("ID_Bien"),
 	FOREIGN KEY("ID_Ubicacion_Destino") REFERENCES "Ubicacion"("ID_Ubicacion")
+	FOREIGN KEY("Legajo") REFERENCES "Responsable"("Legajo")
 );
 CREATE TABLE IF NOT EXISTS "Responsable" (
 	"Legajo"	INTEGER NOT NULL,
@@ -44,15 +46,17 @@ CREATE TABLE IF NOT EXISTS "Responsable" (
 	"Eliminado"	INTEGER NOT NULL,
 	PRIMARY KEY("Legajo")
 );
-CREATE TABLE IF NOT EXISTS "Solicitud" (
+CREATE TABLE "Solicitud" (
 	"Num_Solicitud"	INTEGER NOT NULL,
 	"Estado"	TEXT NOT NULL,
 	"Destino"	INTEGER NOT NULL,
+	"Legajo"	INTEGER NOT NULL,
 	"Fecha_Solicitud"	TEXT NOT NULL DEFAULT (datetime('now')),
 	"Descripcion"	TEXT NOT NULL,
 	"Eliminado"	INTEGER NOT NULL DEFAULT 0,
 	PRIMARY KEY("Num_Solicitud" AUTOINCREMENT),
-	FOREIGN KEY("Destino") REFERENCES "Ubicacion"("ID_Ubicacion")
+	FOREIGN KEY("Destino") REFERENCES "Ubicacion"("ID_Ubicacion"),
+	FOREIGN KEY("Legajo") REFERENCES "Responsable"("Legajo")
 );
 CREATE TABLE IF NOT EXISTS "Ubicacion" (
 	"ID_Ubicacion"	INTEGER NOT NULL,

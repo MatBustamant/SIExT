@@ -13,7 +13,7 @@ import jakarta.ws.rs.Path;
  * @author Matias
  */
 @Path("evento")
-public class EventoController extends AbstractController<EventoTrazabilidadDTO>{
+public class EventoController extends AbstractController<EventoTrazabilidadDTO, Integer>{
 
     public EventoController() {
         this.servicio = new EventoTrazabilidadServices(); //EventoService

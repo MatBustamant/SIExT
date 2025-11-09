@@ -18,7 +18,7 @@ import java.util.NoSuchElementException;
  * @author Matias
  */
 @Path("usuario")
-public class UsuarioController extends AbstractController<UsuarioDTO>{
+public class UsuarioController extends AbstractController<UsuarioDTO, Integer>{
 
     public UsuarioController() {
         this.servicio = new UsuarioService(); //UsuarioService

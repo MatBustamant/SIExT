@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
  *
  * @author geroj
  */
-public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabilidadDTO>{
+public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabilidadDTO, Integer>{
     private final EventoTrazabilidadDAOImpl eventoTrazDAO; //acceso a la BD
     private final BienService bienService;
     private final UbicacionDAOImpl ubiDAO;
@@ -32,7 +32,7 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
     }
     
     @Override
-    public EventoTrazabilidadDTO buscar(int idEventoTraz) throws NoSuchElementException {
+    public EventoTrazabilidadDTO buscar(Integer idEventoTraz) throws NoSuchElementException {
         return this.buscar(idEventoTraz, true);
     }
     
@@ -97,7 +97,7 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
     }
     
     @Override
-    public void modificar(EventoTrazabilidadDTO dto, int id) throws NoSuchElementException {
+    public void modificar(EventoTrazabilidadDTO dto, Integer id) throws NoSuchElementException {
         EventoTrazabilidadDTO eventoOriginal = this.buscar(id);
         int idBienOriginal = eventoOriginal.getBienAsociado();
         
@@ -166,7 +166,7 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
     }
     
     @Override
-    public void eliminar(int idEventoTraz) throws NoSuchElementException {
+    public void eliminar(Integer idEventoTraz) throws NoSuchElementException {
         EventoTrazabilidadDTO evento = this.buscar(idEventoTraz);
         
         // Verifico existencia (da igual si está eliminado) del bien asociado y sino, se corta todo

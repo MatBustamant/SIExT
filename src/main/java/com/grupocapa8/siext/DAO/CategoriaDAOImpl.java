@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author oveja
  */
-public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
+public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO, Integer> {
 
     @Override
     public int insertar(CategoriaBienDTO Categoria) {
@@ -59,7 +59,7 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
     }
 
     @Override
-    public CategoriaBienDTO buscar(int id) {
+    public CategoriaBienDTO buscar(Integer id) {
 
         CategoriaBienDTO categoriaBien = null;
         String sql = "SELECT * FROM Categoria WHERE ID_Categoria = ?";
@@ -111,7 +111,7 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO> {
     }
 
     @Override
-    public int eliminar(int id) {
+    public int eliminar(Integer id) {
         String sql = "UPDATE Categoria SET Eliminado = ? WHERE ID_Categoria = ? AND Eliminado = ?";
         int resultado = 0;
         

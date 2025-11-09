@@ -11,7 +11,7 @@ import java.util.NoSuchElementException;
  *
  * @author oveja
  */
-public class ResponsableService implements ServiceGenerico<ResponsableDTO> {
+public class ResponsableService implements ServiceGenerico<ResponsableDTO, Integer> {
     
     private final ResponsableDAOImpl responsableDAO; //acceso a la BD
 
@@ -25,7 +25,7 @@ public class ResponsableService implements ServiceGenerico<ResponsableDTO> {
     }
     
     @Override
-    public void eliminar(int legajo) throws NoSuchElementException {
+    public void eliminar(Integer legajo) throws NoSuchElementException {
         this.buscar(legajo);
 
         responsableDAO.eliminar(legajo);    
@@ -46,7 +46,7 @@ public class ResponsableService implements ServiceGenerico<ResponsableDTO> {
     }
 
     @Override
-    public void modificar(ResponsableDTO dto, int legajo) throws NoSuchElementException {
+    public void modificar(ResponsableDTO dto, Integer legajo) throws NoSuchElementException {
         this.buscar(legajo);
 
         String nombre = dto.getNombre_apellido().trim().toUpperCase();
@@ -59,7 +59,7 @@ public class ResponsableService implements ServiceGenerico<ResponsableDTO> {
     }
 
     @Override
-    public ResponsableDTO buscar(int legajo) throws NoSuchElementException {
+    public ResponsableDTO buscar(Integer legajo) throws NoSuchElementException {
         return this.buscar(legajo, true);
     }
     
