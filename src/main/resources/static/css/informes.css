@@ -18,21 +18,78 @@ tr:nth-child(even) {
 }
 
 .informativo {
+  color: var(--gris-oscuro);
   /* margin: 0, 0, 1rem, 0; */
   margin-bottom: 1rem;
   margin-top: 0;
 }
 
+.grupo-radios {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  margin: 1rem 0;
+  display: inline-block;
+}
+
+.grupo-radios legend {
+  font-size: 0.9em;
+  font-weight: bold;
+  padding: 0 0.5rem;
+}
+
+.grupo-radios div {
+  display: inline-block;
+  margin-right: 1rem;
+}
+
+.grupo-radios label {
+  margin-left: 0.5rem;
+  cursor: pointer;
+}
+
+table th:first-child,
+table td:first-child,
+table th:last-child,
+table td:last-child {
+  width: auto;
+  text-align: left;
+}
 
 @media print {
 
   .btn,
-  footer {
+  footer,
+  .grupo-radios {
     display: none !important;
   }
 
   body {
     background: var(--blanco);
     padding: 0;
+    font-size: 12px;
   }
+
+  table {
+    border-radius: 0;
+    box-shadow: none;
+    overflow: auto;
+  }
+
+  table * {
+    color: black !important;
+  }
+
+  th,
+  td {
+    border: 1px solid black !important;
+    font-size: 0.8rem;
+    padding: 0.4rem 0.5rem;
+  }
+
+  th,
+  tfoot td {
+    background-color: darkgray !important;
+  }
+
 }

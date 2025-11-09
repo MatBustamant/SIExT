@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Informe | Eventos por Período</title>
+  <link href="icons/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/tablas.css">
+  <link rel="stylesheet" href="css/informes.css">
+  <link rel="icon" href="images/icon.png">
+</head>
+
+<body>
+
+  <h1 id="tituloInforme">Informe</h1>
+  <div class="informativo">Generado: <span id="fechaActual"></span></div>
+  <div class="informativo">Período: <span id="periodoSeleccionado"></span></div>
+
+  <button class="btn" onclick="window.print()"><i class="bi bi-printer"></i>Imprimir</button>
+  <a href="informes.html" class="btn"><i class="bi bi-arrow-left"></i>Volver a Informes</a>
+
+  <fieldset class="grupo-radios">
+    <legend>Tipo de Informe</legend>
+    <div>
+      <input type="radio" name="tipoReporte" id="tipoResumido" value="resumido" checked>
+      <label for="tipoResumido">Resumido (Agrupado)</label>
+    </div>
+    <div>
+      <input type="radio" name="tipoReporte" id="tipoDetallado" value="detallado">
+      <label for="tipoDetallado">Detallado (Uno por uno)</label>
+    </div>
+  </fieldset>
+
+  <table id="tablaIngresos">
+    <thead>
+      <tr>
+      </tr>
+    </thead>
+    <tbody></tbody>
+    <tfoot></tfoot>
+  </table>
+
+  <footer>SIExT | 2025</footer>
+
+    <script src="js/auth.js"></script>
+    <script>
+        verificarAuth("SUPERVISOR", false);
+    </script>
+    <script src="js/fechas.js"></script>
+    <script src="js/formateo.js"></script>
+    <script>
+  document.getElementById("fechaActual").textContent = obtenerFechaHoraActual();
+
+  const params = new URLSearchParams(window.location.search);
+  const desde = params.get("desde");
+  const hasta = params.get("hasta");
+  const tipoEvento = params.get("tipoEvento");
+  document.getElementById("periodoSeleccionado").textContent = `${formatearFechaDeYankeeAEsp(desde)} a ${formatearFechaDeYankeeAEsp(hasta)}`;
+
+
+  const allBienes = JSON.parse(localStorage.getItem("bienes")) || [];
+  const allEventos = JSON.parse(localStorage.getItem("eventos")) || [];
+  const allUbicaciones = JSON.parse(localStorage.getItem("ubicaciones")) || [];
+
+  const tbody = document.querySelector("#tablaIngresos tbody");
+  const tfoot = document.querySelector("#tablaIngresos tfoot");
+  const thead_tr = document.querySelector("#tablaIngresos thead tr");
+  
+  const configReporte = {
+    "REGISTRO": { titulo: " de Registros", cabecerasDetalle: ["Fecha", "Bien involucrado", "Categoría"] },
+    "ENTREGA": { titulo: " de Entregas", cabecerasDetalle: ["Fecha", "Bien involucrado", "Categoría", "Ubicación Destino"] },
+    "DEVOLUCION": { titulo: " de Devoluciones", cabecerasDetalle: ["Fecha", "Bien involucrado", "Categoría", "Detalle"] },
+    "AVERIO": { titulo: " de Averías", cabecerasDetalle: ["Fecha", "Bien involucrado", "Categoría", "Detalle"] },
+    "REPARACION": { titulo: " de Reparaciones", cabecerasDetalle: ["Fecha", "Bien involucrado", "Categoría", "Detalle"] },
+    "BAJA": { titulo: " de Bajas", cabecerasDetalle: ["Fecha", "Bien involucrado", "Categoría", "Detalle"] },
+    "default": { titulo: " de Eventos", cabecerasDetalle: ["Fecha", "Bien involucrado", "Categoría", "Detalle"] }
+  };
+  const config = configReporte[tipoEvento] || configReporte.default;
+  const tituloInforme = document.getElementById("tituloInforme");
+
+  // --- Filtro base (común a ambos tipos de informes) ---
+  const eventosFiltrados = allEventos
+    .filter(e => e.tipoEvento === tipoEvento && e.eliminado === false)
+    .filter(e => {
+      const fechaEventoLocal = formatearFechaLocal(e.fechaEvento);
+      return fechaEventoLocal >= desde && fechaEventoLocal <= hasta;
+    });
+
+  function renderizarResumido() {
+    thead_tr.innerHTML = `
+      <th>Fecha</th>
+      <th>Nombre</th>
+      <th>Categoría</th>
+      <th>Cantidad</th>
+    `;
+
+    const eventosAgrupados = Object.values(
+      eventosFiltrados.reduce((acc, evento) => {
+        const p = allBienes.find(prod => prod.id_Bien === evento.bienAsociado);
+        const fecha = formatearFechaLocalEsp(evento.fechaEvento);
+        const nombre = p ? p.nombre : "Producto eliminado";
+        const categoria = p ? p.nombreCatBienes : "-";
+
+        const clave = `${fecha}-${nombre}-${categoria}`;
+        if (!acc[clave]) {
+          acc[clave] = { fecha, nombre, categoria, cantidad: 0 };
+        }
+        acc[clave].cantidad += 1;
+        return acc;
+      }, {})
+    ).sort((a, b) => a.fecha.localeCompare(b.fecha));
+
+    if (eventosAgrupados.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:1rem;">No se registraron eventos en ese período.</td></tr>`;
+    } else {
+      eventosAgrupados.forEach(dato => {
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+          <td>${dato.fecha}</td>
+          <td>${dato.nombre}</td>
+          <td>${dato.categoria}</td>
+          <td>${dato.cantidad}</td>
+        `;
+        tbody.appendChild(fila);
+      });
+    }
+
+      // ---- Totales por categoría ----
+      const totalesPorCategoria = eventosAgrupados.reduce((acc, i) => {
+        acc[i.categoria] = (acc[i.categoria] || 0) + i.cantidad;
+        return acc;
+      }, {});
+
+      // ---- Total general ----
+      const totalGeneral = eventosAgrupados.reduce((sum, i) => sum + i.cantidad, 0);
+
+      // Renderizar pie de tabla
+      tfoot.innerHTML = "";
+      Object.entries(totalesPorCategoria).forEach(([cat, total]) => {
+        const filaCat = document.createElement("tr");
+        filaCat.innerHTML = `
+          <td colspan="3" style="text-align:right; font-weight:bold;">TOTAL ${cat}</td>
+          <td style="font-weight:bold;">${total}</td>
+        `;
+        tfoot.appendChild(filaCat);
+      });
+
+      const filaTotal = document.createElement("tr");
+      filaTotal.innerHTML = `
+        <td colspan="3" style="text-align:right; font-weight:bold;">TOTAL GENERAL</td>
+        <td style="font-weight:bold;">${totalGeneral}</td>
+      `;
+      tfoot.appendChild(filaTotal);
+  }
+
+  function renderizarDetallado() {
+    thead_tr.innerHTML = config.cabecerasDetalle.map(c => `<th>${c}</th>`).join("");
+    thead_tr.appendChild(document.createElement("th")).textContent = "Responsable"; //CAMBIAR DE ESTÁTICO A DINÁMICO LUEGO
+    const colSpan = config.cabecerasDetalle.length;
+
+    if (eventosFiltrados.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="${colSpan}" style="text-align:center; padding:1rem;">No se registraron eventos en ese período.</td></tr>`;
+    } else {
+      eventosFiltrados.sort((a, b) => {
+              const comparacionFecha = formatearFechaHora(a.fechaEvento).localeCompare(formatearFechaHora(b.fechaEvento));
+              if (comparacionFecha !== 0) {
+                return comparacionFecha;
+              }
+              return a.bienAsociado - b.bienAsociado; 
+            });
+
+      eventosFiltrados.forEach(evento => {
+        const bien = allBienes.find(b => b.id_Bien === evento.bienAsociado);
+        const ubicacion = allUbicaciones.find(u => u.nombre === evento.ubicacionDestino);
+
+        const fecha = formatearFechaHora(evento.fechaEvento);
+        const nombreBien = bien ? `#${formatearNroBien(evento.bienAsociado)} — ${formatearMayusComoTitulo(bien.nombre)}` : "Producto eliminado";
+        const categoria = bien ? bien.nombreCatBienes : "-";
+        
+        let valorDinamico = evento.detalle || "-";
+        if (tipoEvento === "ENTREGA") {
+          valorDinamico = ubicacion ? ubicacion.nombre : "N/A";
+        }
+        
+        const fila = document.createElement("tr");
+        let filaHTML = `
+          <td>${fecha}</td>
+          <td>${nombreBien}</td>
+          <td>${formatearMayusComoTitulo(categoria)}</td>
+        `;
+        
+        if (config.cabecerasDetalle.length > 3) {
+          let valorDinamico = evento.detalle || "-";
+          
+          if (tipoEvento === "ENTREGA") {
+            const ubicacion = allUbicaciones.find(u => u.nombre === evento.ubicacionDestino);
+            valorDinamico = ubicacion ? ubicacion.nombre : "N/A";
+          }
+          
+          filaHTML += `<td>${formatearMayusComoOracion(valorDinamico)}</td><td>Lic. Otto Durán</td>`; //CAMBIAR DE ESTÁTICO A DINÁMICO LUEGO
+        }
+        
+        fila.innerHTML = filaHTML;
+        
+        tbody.appendChild(fila);
+      });
+    }
+  }
+
+  function generarInforme() {
+    const tipoReporte = document.querySelector('input[name="tipoReporte"]:checked').value;
+    
+    tbody.innerHTML = "";
+    tfoot.innerHTML = "";
+
+    if (tipoReporte === 'resumido') {
+      renderizarResumido();
+      tituloInforme.textContent = "Informe Resumido" + config.titulo;
+    } else {
+      renderizarDetallado();
+      tituloInforme.textContent = "Informe Detallado" + config.titulo;
+    }
+  }
+
+  document.querySelectorAll('input[name="tipoReporte"]').forEach(radio => {
+    radio.addEventListener('change', generarInforme);
+  });
+
+  generarInforme();
+
+</script>
+
+</body>
+
+</html>
