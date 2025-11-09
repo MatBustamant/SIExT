@@ -92,6 +92,12 @@ td:last-child {
     background-color: #c7deff;
 }
 
+.btn.btn-icon-table.btn-editar:disabled {
+    background-color: var(--fondo);
+    color: var(--texto-secundario);
+    cursor: default;
+}
+
 .detalle-contenido {
     padding: 1.2rem 1.5rem;
     font-size: 0.95em;
