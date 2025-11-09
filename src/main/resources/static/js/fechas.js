@@ -1,9 +1,34 @@
+const optionsResumido = {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  };
+
+const optionsDetallado = {
+    weekday: "long",
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false
+  };
+
 function obtenerFechaHoy() {
   return new Date().toLocaleDateString("en-CA");
 }
 
 function obtenerFechaHoraActual() {
-  return new Date().toLocaleString().replace(",", "");
+  return new Date().toLocaleString(undefined, optionsResumido).replace(",", "");
+}
+
+function formatearFechaDeYankeeAEsp(fecha) {
+  const [year, month, day] = fecha.split('-');
+  return `${day}/${month}/${year}`;
 }
 
 function formatearFechaLocal(fecha) {
@@ -15,19 +40,13 @@ function formatearFechaLocalEsp(fecha) {
 }
 
 function formatearFechaLocalLegible(fecha) {
-  fechaFinal = new Date(fecha).toLocaleString("es-AR", {
-    weekday: "long",
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit"
-  });
+  // Esto nos da momento completo legible para detalle
+  fechaFinal = new Date(fecha).toLocaleString("es-AR", optionsDetallado);
   return fechaFinal.charAt(0).toUpperCase() + fechaFinal.slice(1);
 }
 
 function formatearFechaHora(fecha) {
-  return new Date(fecha).toLocaleString().replace(",", "");
+  return new Date(fecha).toLocaleString(undefined, optionsResumido).replace(",", "");
 }
 
 function validarRangoFechas(desde, hasta, hoy) {

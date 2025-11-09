@@ -54,11 +54,21 @@
       <ul class="btn-row" style="flex-direction: column;">
         <li>
           <button class="btn" id="btnIngresos" type="button"><i class="bi bi-box-arrow-in-down-left"></i></i>Total de
-            ingresos
+            eventos
             en
             un
             período</button>
           <form id="formIngresos" class="hidden">
+            <label for="tipoEvento">Tipo de evento</label>
+            <select id="tipoEvento" required>
+                <option value="">Seleccionar</option>
+                <option value="REGISTRO">Registro</option>
+                <option value="ENTREGA">Entrega</option>
+                <option value="DEVOLUCION">Devolución</option>
+                <option value="AVERIO">Averío</option>
+                <option value="REPARACION">Reparación</option>
+                <option value="BAJA">Baja</option>
+            </select>
             <label for="desde">Desde</label>
             <input type="date" id="desde" required>
             <label for="hasta">Hasta</label>
@@ -96,11 +106,12 @@
     // Establecer máximo (hoy) para todos los inputs tipo date
     document.querySelectorAll('input[type="date"]').forEach(input => input.setAttribute("max", hoy));
 
-    // ----- FORMULARIO DE INGRESOS -----
+    // ----- FORMULARIO DE EVENTOS -----
     const btnIngresos = document.getElementById("btnIngresos");
     const formIngresos = document.getElementById("formIngresos");
     const desdeIngresos = document.getElementById("desde");
     const hastaIngresos = document.getElementById("hasta");
+    const tipoEventoSelect = document.getElementById("tipoEvento");
 
     btnIngresos.addEventListener("click", () => {
       formIngresos.classList.toggle("hidden");
@@ -116,11 +127,12 @@
       e.preventDefault();
       const desde = desdeIngresos.value;
       const hasta = hastaIngresos.value;
+      const tipoEvento = tipoEventoSelect.value;
 
       const error = validarRangoFechas(desde, hasta, hoy);
       if (error) return alert(error);
 
-      window.location.href = `informe_ingresos.html?desde=${desde}&hasta=${hasta}`;
+      window.location.href = `informe_eventos.html?desde=${desde}&hasta=${hasta}&tipoEvento=${tipoEvento}`;
     };
   </script>
 
