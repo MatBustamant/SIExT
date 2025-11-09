@@ -8,6 +8,7 @@
     <link href="icons/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/tablas.css">
+    <link rel="stylesheet" href="css/historial.css">
     <link rel="icon" href="images/icon.png">
 </head>
 
@@ -194,6 +195,17 @@
 
     </main>
 
+    <div id="historialModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitulo">Historial del Bien</h2>
+                <button id="modalCerrarBtn" class="modal-close-btn" title="Cerrar">&times;</button>
+            </div>
+            <div id="historialContenido" class="modal-body">
+            </div>
+        </div>
+    </div>
+
     <footer>SIExT | 2025</footer>
 
     <script src="js/auth.js"></script>
@@ -206,6 +218,7 @@
     <script src="js/formateo.js"></script>
     <script src="js/fechas.js"></script>
     <script src="js/forms.js"></script>
+    <script src="js/historial.js"></script>
     <script>
         recargarEventos();
         recargarBienes();
@@ -288,11 +301,16 @@
                     const detalle = document.createElement("tr");
                     detalle.classList.add("detalle-fila", "hidden");
                     detalle.innerHTML = `
-                        <td colspan="6" class="detalle-contenido">
+                        <td colspan="5" class="detalle-contenido">
                             <p><strong>Identificador de evento:</strong> ${evento.id_Evento}</p>
                             <p><strong>Bien asociado:</strong> #${formatearNroBien(evento.bienAsociado)} — ${bien.nombre}</p>
                             <p><strong>Tipo de evento:</strong> ${evento.tipoEvento}</p>
                             <p><strong>Momento en que se registró:</strong> ${formatearFechaLocalLegible(evento.fechaEvento)}</p>
+                        </td>
+                        <td colspan="1" class="detalle-contenido">
+                            <button class="btn btn-historial btn-icon-table" data-id="${evento.bienAsociado}" title="Ver historial">
+                                <i class="bi bi-clock-fill"></i>
+                            </button>
                         </td>`;
                     tbody.appendChild(detalle);
             });
@@ -348,6 +366,14 @@
             const btnToggle = e.target.closest(".btn-toggle");
             if (btnToggle) {
                 toggleDetalles(btnToggle);
+                return;
+            }
+
+            // Buscamos si el clic fue en un botón de historial
+            const btnHistorial = e.target.closest(".btn-historial");
+            if (btnHistorial) {
+                const id = Number(btnHistorial.dataset.id);
+                mostrarHistorial(id);
                 return;
             }
         });

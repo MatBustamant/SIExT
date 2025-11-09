@@ -83,12 +83,12 @@ td:last-child {
     color: var(--azul-profundo);
 }
 
-.btn.btn-icon-table.btn-editar {
+.btn.btn-icon-table.btn-editar, .btn.btn-icon-table.btn-historial {
     background-color: #eef5ff;
     color: var(--azul)
 }
 
-.btn.btn-icon-table.btn-editar:hover {
+.btn.btn-icon-table.btn-editar:hover, .btn.btn-icon-table.btn-historial:hover {
     background-color: #c7deff;
 }
 
