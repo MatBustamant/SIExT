@@ -84,6 +84,9 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
                 dto.setUbicacionDestino(nombreUbicacion);
                 break;
             case(TipoEvento.DEVOLUCION):
+                if (eventoTrazDAO.buscarEventoUbicacionMasReciente(idBien).getTipoEvento().equals(tipo)) {
+                    throw new IllegalArgumentException("No se puede registrar la devolución de un evento que no se encuentra asignado.");
+                }
                 bienService.trasladar(idBien, UBICACION_POR_DEFECTO);
                 dto.setUbicacionDestino(UBICACION_POR_DEFECTO);
                 break;
