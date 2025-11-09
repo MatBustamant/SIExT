@@ -425,6 +425,8 @@
             }
         });
 
+        cargarOpciones("ubicacionesSugeridas", "ubicaciones", false);
+
         document.getElementById("registroEventoForm").addEventListener("submit", async (e) => {
             e.preventDefault();
 
@@ -440,6 +442,11 @@
                 return;
             }
             if (tipoEvento === "BAJA" && !confirm("¿Estás seguro de registrar un evento de BAJA sobre este bien?")) {
+                return;
+            }
+
+            if (tipoEvento === "ENTREGA" && ubicacion === "SIN ASIGNAR") {
+                alert("No puede realizarse una entrega a SIN ASIGNAR");
                 return;
             }
 
@@ -475,6 +482,7 @@
             await recargarEventos();
             await recargarBienes();
 
+            cargarOpciones("ubicacionesSugeridas", "ubicaciones", false);
             renderEventos();
             e.target.reset();
         });
@@ -536,6 +544,11 @@
                 return;
             }
 
+            if (tipoEventoInput === "ENTREGA" && modUbicacionTemp === "SIN ASIGNAR") {
+                alert("No puede realizarse una entrega a SIN ASIGNAR");
+                return;
+            }
+
             const eventoModificado = {
                 tipoEvento: tipoEventoInput,
                 bienAsociado: idInput,
@@ -572,6 +585,7 @@
             await recargarEventos();
             await recargarBienes();
 
+            cargarOpciones("ubicacionesSugeridas", "ubicaciones", false);
             renderEventos();
             document.getElementById("modificarEventoSection").classList.add("hidden");
             e.target.reset();
