@@ -43,8 +43,8 @@
             <form id="solicitanteForm">
                 <div class="form-grid">
                     <div>
-                        <label for="legajo">Legajo</label><!-- QUITAR (capaz, ni idea, a ver cómo manejamos esto) -->
-                        <input type="number" id="legajo" placeholder="23815432" min="1000000" max="99999999" required><!-- QUITAR (capaz, ni idea, a ver cómo manejamos esto) -->
+                        <label for="legajo">Legajo</label>
+                        <input type="number" id="legajo" placeholder="23815432" min="1000000" max="99999999" required>
                     </div>
                     <div>
                         <label for="nombreSolicitante">Nombre de Solicitante</label>
@@ -107,7 +107,7 @@
             <h2>Actualizar solicitante</h2>
             <form id="modificarSolicitanteForm">
                 <label for="modSolId">Legajo</label>
-                <input type="number" id="modSolId" placeholder="23815432" min="1000000" max="99999999" required><!-- QUITAR (capaz, ni idea. Onda, volver a ponerlo disabled y sin required)-->
+                <input type="number" id="modSolId" placeholder="23815432" min="1000000" max="99999999" required>
                 <label for="modNombreSol">Nombre de Solicitante</label>
                 <input type="text" id="modNombreSol" placeholder="DIEGO" required>
                 <div class="btn-row">
@@ -125,28 +125,28 @@
 
     <script src="js/auth.js"></script>
     <script>
-        verificarAuth();
+        verificarAuth("SUPERVISOR");
     </script>
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script src="js/forms.js"></script>
     <script>
         function solicitanteExiste(legajo) {
-            const solicitantes = JSON.parse(localStorage.getItem("mockSolicitantes")) || []; //QUITAR
+            const solicitantes = JSON.parse(localStorage.getItem("solicitantes")) || [];
 
             if (solicitantes.some(s => s.legajo === legajo && !s.eliminado)) {
                 alert("Un solicitante con ese legajo ya existe.");
                 return true;
             }
             return false;
-        } // QUITAR (CREO, porque no hay forma de chequearlo por legajo al momento de la creación, y los nombres de persona pueden repetirse)
+        }
 
         let currentPage = 1;
         let rowsPerPage = parseInt(document.getElementById("rowsPerPageSelect").value, 10);
         let totalPages = 1;
 
         function renderizarSolicitantes() {
-            const solicitantes = JSON.parse(localStorage.getItem("mockSolicitantes")) || []; // QUITAR
+            const solicitantes = JSON.parse(localStorage.getItem("solicitantes")) || [];
             const solicitantesHabilitados = solicitantes.filter(s => !s.eliminado);
 
             const filtroNombre = document.getElementById("filterNombreSol").value.toUpperCase().trim();
@@ -235,55 +235,50 @@
             e.preventDefault();
 
             const nombre = document.getElementById("nombreSolicitante").value.trim().toUpperCase();
-            const legajo = parseInt(document.getElementById("legajo").value); //QUITAR capaz, de nuevo, legajo, idk
-            if (!nombre || !legajo) { //QUITAR legajo
+            const legajo = parseInt(document.getElementById("legajo").value);
+            if (!nombre || !legajo) {
                 alert("Datos incompletos.");
                 return;
             }
 
             const solicitante = {
                 nombre,
-                legajo,//QUITAR
-                eliminado: false//QUITAR
+                legajo
             }
 
-            if (solicitanteExiste(solicitante.legajo)) return; //QUITAR capaz¿? legajo¿?
+            if (solicitanteExiste(solicitante.legajo)) return;
 
-            // try {
-            //     const response = await crearSolicitante(solicitante);
-            //     if (!response.ok) {
-            //         const errorData = await response.json();
-            //         if (response.status == 422) {
-            //             alert(errorData.error);
-            //             return;
-            //         }
-            //         else {
-            //             alert(`El servidor no pudo realizar el registro del solicitante. Código: ${response.status}`);
-            //             return;
-            //         }
-            //     }
-            // } catch (error) {
-            //     alert("No se pudo conectar con el servidor.");
-            //     return;
-            // }
-            // alert("Solicitante registrado.");
-            // await recargarSolicitantes();
-
-            const solicitantes = JSON.parse(localStorage.getItem("mockSolicitantes")) || []; //QUITAR
-            solicitantes.push(solicitante); //QUITAR
-            localStorage.setItem("mockSolicitantes", JSON.stringify(solicitantes)); //QUITAR
+            try {
+                const response = await crearSolicitante(solicitante);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
+                    else {
+                        alert(`El servidor no pudo realizar el registro del solicitante. Código: ${response.status}`);
+                        return;
+                    }
+                }
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
+            alert("Solicitante registrado.");
+            await recargarSolicitantes();
 
             renderizarSolicitantes();
             e.target.reset();
         });
 
         function editarSolicitante(id) {
-            const solicitantes = JSON.parse(localStorage.getItem("mockSolicitantes")) || [];//QUITAR
-            const sol = solicitantes.find(s => s.legajo === id && !s.eliminado); //QUITAR
+            const solicitantes = JSON.parse(localStorage.getItem("solicitantes")) || [];
+            const sol = solicitantes.find(s => s.legajo === id && !s.eliminado);
             if (!sol) return;
             const form = document.getElementById("modificarSolicitanteForm");
             form.dataset.originalNombre = sol.nombre.trim().toUpperCase() || "";
-            form.dataset.originalLegajo = sol.legajo;//QUITAR
+            form.dataset.originalLegajo = sol.legajo;
 
             document.getElementById("modSolId").value = sol.legajo;
             document.getElementById("modNombreSol").value = sol.nombre;
@@ -299,61 +294,57 @@
             const legajo = parseInt(document.getElementById("modSolId").value);
             const form = e.target;
             const originalNombre = form.dataset.originalNombre;
-            const originalLegajo = parseInt(form.dataset.originalLegajo); //QUITAR
+            const originalLegajo = parseInt(form.dataset.originalLegajo);
 
             const nombreInput = document.getElementById("modNombreSol").value.trim().toUpperCase();
 
             if (originalNombre === nombreInput &&
-                originalLegajo === legajo//QUITAR
+                originalLegajo === legajo
             ) {
                 alert("No se detectaron cambios en los datos.");
                 return;
             }
 
-            if (!nombreInput || !legajo) {//QUITAR
+            if (!nombreInput || !legajo) {
                 alert("Datos incompletos.");
                 return;
             }
 
             const solicitanteModificado = {
                 nombre: nombreInput,
-                legajo//QUITAR
+                legajo
             }
-            if (originalLegajo != legajo) {//QUITAR
+            if (originalLegajo != legajo) {
                 if (solicitanteExiste(solicitanteModificado.legajo)) return;
             }
 
-            // try {
-            //     const response = await modificarSolicitante(solicitanteModificado, originalLegajo); // AQUI PUSE originalLegajo por si acaso
-            //     if (!response.ok) {
-            //         const errorData = await response.json();
-            //         if (response.status == 422) {
-            //             alert(errorData.error);
-            //             return;
-            //         }
-            //         if (response.status == 404) {
-            //             alert("Solicitante no encontrado.");
-            //             return;
-            //         }
-            //         if (response.status == 500) {
-            //             alert("El servidor no pudo realizar la modificación del solicitante. Código: 500");
-            //             return;
-            //         } else {
-            //             alert(`El servidor no pudo realizar la modificación del solicitante. Código: ${response.status}`);
-            //             return;
-            //         }
-            //     }
-            // } catch (error) {
-            //     alert("No se pudo conectar con el servidor.");
-            //     return;
-            // }
+            try {
+                const response = await modificarSolicitante(solicitanteModificado, originalLegajo); // AQUI PUSE originalLegajo por si acaso
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
+                    if (response.status == 404) {
+                        alert("Solicitante no encontrado.");
+                        return;
+                    }
+                    if (response.status == 500) {
+                        alert("El servidor no pudo realizar la modificación del solicitante. Código: 500");
+                        return;
+                    } else {
+                        alert(`El servidor no pudo realizar la modificación del solicitante. Código: ${response.status}`);
+                        return;
+                    }
+                }
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
 
-            // alert("Solicitante actualizado.");
-            // await recargarSolicitantes();
-
-            let solicitantes = JSON.parse(localStorage.getItem("mockSolicitantes")) || []; //QUITAR
-            solicitantes = solicitantes.map(sol => sol.legajo == originalLegajo ? {...sol, ...solicitanteModificado} : sol); //QUITAR
-            localStorage.setItem("mockSolicitantes", JSON.stringify(solicitantes)); //QUITAR
+            alert("Solicitante actualizado.");
+            await recargarSolicitantes();
 
             renderizarSolicitantes();
             document.getElementById("modificarSolicitanteSection").classList.add("hidden");
@@ -375,36 +366,32 @@
         document.getElementById("eliminarSolBtn").addEventListener("click", async () => {
             const legajo = +document.getElementById("modSolId").value;
             const form = document.getElementById("modificarSolicitanteForm");
-            const originalLegajo = parseInt(form.dataset.originalLegajo); //QUITAR
+            const originalLegajo = parseInt(form.dataset.originalLegajo);
             if (!confirm("¿Eliminar este solicitante?")) return;
 
-            let solicitantes = JSON.parse(localStorage.getItem("mockSolicitantes")) || []; //QUITAR
-            solicitantes = solicitantes.map(sol => sol.legajo == originalLegajo ? {...sol, eliminado: true} : sol); //QUITAR
-            localStorage.setItem("mockSolicitantes", JSON.stringify(solicitantes)); //QUITAR
-
-            // try {
-            //     const response = await eliminarSolicitante(originalLegajo); //QUITAR puse originalLegajo por si acaso
-            //     if (!response.ok) {
-            //         const errorData = await response.json();
-            //         if (response.status == 422) {
-            //             alert(errorData.error);
-            //             return;
-            //         }
-            //         if (response.status == 500) {
-            //             alert("El servidor no pudo realizar la eliminación del solicitante. Código: 500");
-            //             return;
-            //         }
-            //         else {
-            //             alert(`El servidor no pudo realizar la eliminación del solicitante. Código: ${response.status}`);
-            //             return;
-            //         }
-            //     }
-            // } catch (error) {
-            //     alert("No se pudo conectar con el servidor.");
-            //     return;
-            // }
-            // alert("Solicitante eliminado.");
-            // await recargarSolicitantes();
+            try {
+                const response = await eliminarSolicitante(originalLegajo);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
+                    if (response.status == 500) {
+                        alert("El servidor no pudo realizar la eliminación del solicitante. Código: 500");
+                        return;
+                    }
+                    else {
+                        alert(`El servidor no pudo realizar la eliminación del solicitante. Código: ${response.status}`);
+                        return;
+                    }
+                }
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
+            alert("Solicitante eliminado.");
+            await recargarSolicitantes();
             renderizarSolicitantes();
             document.getElementById("modificarSolicitanteSection").classList.add("hidden");
             document.getElementById("modificarSolicitanteForm").reset();

@@ -88,6 +88,14 @@
         .stat-list li:last-child {
             border-bottom: none;
         }
+
+        #ultimosIngresos {
+            max-height: 200px;
+            overflow-y: auto;
+            
+            padding-right: 0.5rem;
+        }
+
     </style>
 </head>
 
@@ -135,11 +143,11 @@
             <h2>Estadísticas rápidas</h2>
             <section class="stats-section">
                 <article class="stat-card">
-                    <h3>Últimos bienes agregados</h3>
+                    <h3>Alertas</h3>
                     <ul id="ultimosIngresos" class="stat-list"></ul>
                 </article>
                 <article id="statsVariadas" class="stat-card">
-                </article>
+                    </article>
             </section>
         </section>
 
@@ -173,75 +181,78 @@
     </script>
 
     <script>
-        // Obtener productos e ingresos del localStorage
-        const bienes = JSON.parse(localStorage.getItem("bienes")) || [];
-        const eventos = JSON.parse(localStorage.getItem("eventos")) || [];
+        try {
+            const todasSolicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
+            const todosBienes = JSON.parse(localStorage.getItem("bienes")) || [];
 
-        // Ordenar ingresos por fecha descendente
-        const ingresosOrdenados = eventos
-            .slice()
-            .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
-            .filter(e => e.tipoEvento == "ENTREGA");
+            const bienesDisponibles = todosBienes.filter(b =>
+                b.ubicacionBien === "SIN ASIGNAR" && !b.eliminado
+            );
+            
+            const categoriasConStock = new Set(
+                bienesDisponibles.map(b => b.nombreCatBienes)
+            );
 
-        // Generar la lista agrupando consecutivos
-        const ultimosIngresos = [];
-        let i = 0;
+            const solicitudesAprobadas = todasSolicitudes.filter(s =>
+                s.estado === "APROBADA" && !s.eliminado
+            );
 
-        while (i < ingresosOrdenados.length && ultimosIngresos.length < 5) {
-            const ingresoActual = ingresosOrdenados[i];
-            const productoActual = bienes.find(p => p.id === ingresoActual.productoId);
+            const mensajesAlerta = new Set();
 
-            let cantidad = 1;
-            let j = i + 1;
-
-            // Contar ingresos consecutivos con mismo nombre y categoría
-            while (j < ingresosOrdenados.length) {
-                const siguiente = ingresosOrdenados[j];
-                const productoSiguiente = bienes.find(p => p.id === siguiente.productoId);
-
-                if (
-                    productoSiguiente.nombre === productoActual.nombre &&
-                    productoSiguiente.nombreCatBienes === productoActual.nombreCatBienes
-                ) {
-                    cantidad++;
-                    j++;
-                } else {
-                    break; // Se detiene cuando cambia el nombre o categoría
+            for (const solicitud of solicitudesAprobadas) {
+                if (solicitud.bienesPedidos && Array.isArray(solicitud.bienesPedidos)) {
+                    
+                    for (const itemPedido of solicitud.bienesPedidos) {
+                        
+                        if (!itemPedido.eliminado) {
+                            const categoriaPedida = itemPedido.categoria;
+                            
+                            if (!categoriasConStock.has(categoriaPedida)) {
+                                mensajesAlerta.add(
+                                    `Solicitud #${solicitud.numSolicitud} pide '${categoriaPedida}' (Sin stock)`
+                                );
+                            }
+                        }
+                    }
                 }
             }
 
-            ultimosIngresos.push({ nombre: productoActual.nombre, cantidad });
-            i = j; // saltar los ingresos ya contados
+            const ulAlertas = document.getElementById("ultimosIngresos");
+            ulAlertas.innerHTML = "";
+
+            if (mensajesAlerta.size === 0) {
+                const li = document.createElement("li");
+                li.textContent = "No hay alertas de stock.";
+                ulAlertas.appendChild(li);
+            } else {
+                mensajesAlerta.forEach(mensaje => {
+                    const li = document.createElement("li");
+                    li.textContent = mensaje;
+                    li.style.color = "var(--rojo, #B71C1C)";
+                    li.style.fontWeight = "600";
+                    ulAlertas.appendChild(li);
+                });
+            }
+
+        } catch (error) {
+            console.error("Error al generar alertas de stock:", error);
+            const ulAlertas = document.getElementById("ultimosIngresos");
+            ulAlertas.innerHTML = "<li>Error al cargar alertas.</li>";
         }
-
-        // Limitar a 5 filas
-        const ul = document.getElementById("ultimosIngresos");
-        ul.innerHTML = "";
-
-        ultimosIngresos.slice(0, 5).forEach(item => {
-            const li = document.createElement("li");
-            li.textContent = `${item.nombre} x ${item.cantidad}`;
-            ul.appendChild(li);
-        });
     </script>
 
     <script>
-        // Obtener datos del localStorage
-        const solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
+        const solicitudes_Stats = JSON.parse(localStorage.getItem("solicitudes")) || [];
+        const bienes_Stats = JSON.parse(localStorage.getItem("bienes")) || []; 
 
-        // Calcular bienes averiados
-        const bienesAveriados = bienes.filter(p => p.estadoBien === "AVERIADO").length;
+        const bienesAveriados = bienes_Stats.filter(p => p.estadoBien === "AVERIADO" && !p.eliminado).length;
 
-        // Calcular solicitudes pendientes de entrega
-        const solicitudesPendientes = solicitudes.filter(s => s.estado === "APROBADA").length;
+        const solicitudesPendientes = solicitudes_Stats.filter(s => s.estado === "APROBADA" && !s.eliminado).length;
 
-        // Seleccionar el artículo
         const statsVariadas = document.getElementById("statsVariadas");
 
-        // Limpiar contenido previo
         statsVariadas.innerHTML = "";
 
-        // Crear elementos dinámicamente
         const crearStat = (titulo, valor) => {
             const h3 = document.createElement("h3");
             h3.textContent = titulo;
@@ -251,7 +262,6 @@
             statsVariadas.appendChild(p);
         };
 
-        // Aquí agregamos los stats que necesitamos
         crearStat("Solicitudes pendientes de entrega", solicitudesPendientes);
         crearStat("Bienes averiados", bienesAveriados);
     </script>
