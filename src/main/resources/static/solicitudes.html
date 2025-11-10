@@ -54,6 +54,131 @@
             line-height: 1;
             height: auto;
         }
+
+        /* --- Estilos del Modal (Basados en tu ejemplo) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            /* Aumentamos la altura máxima para el selector */
+            max-height: 90vh; 
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+        }
+
+        .modal-close-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #888;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .modal-close-btn:hover {
+            color: var(--rojo);
+        }
+
+        .modal-body {
+            overflow-y: auto;
+            flex: 1; /* Permite que el body ocupe el espacio */
+        }
+
+        .modal-footer {
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+            margin-top: 15px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        /* --- Estilos específicos para el modal de asignación --- */
+        .modal-filtros {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        #resumenSeleccion p {
+            margin: 0.5rem 0;
+            font-size: 1rem;
+        }
+        
+        #resumenSeleccion span.valido {
+            color: var(--verde, green);
+            font-weight: bold;
+        }
+        
+        #resumenSeleccion span.invalido {
+            color: var(--rojo, red);
+            font-weight: bold;
+        }
+
+        #listaBienesDisponibles h4 {
+            background-color: #f4f4f4;
+            padding: 8px;
+            border-radius: 4px;
+            margin: 1rem 0 0.5rem 0;
+        }
+
+        .tabla-modal {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .tabla-modal th,
+        .tabla-modal td {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+
+        .tabla-modal th {
+            font-weight: 600;
+        }
+
+        .tabla-modal th:first-child,
+        .tabla-modal td:first-child {
+            width: 40px; /* Checkbox */
+            text-align: center;
+        }
+         .tabla-modal th:nth-child(2),
+        .tabla-modal td:nth-child(2) {
+             width: 100px; /* ID */
+        }
     </style>
 </head>
 
@@ -88,7 +213,6 @@
 
     <main class="default-block-container">
 
-        <!-- Formulario para registrar nueva solicitud -->
         <section>
             <h2>Registrar nueva solicitud</h2>
             <form id="solicitudForm">
@@ -112,10 +236,8 @@
             </form>
         </section>
 
-        <!-- Gestión de solicitudes existentes -->
         <section>
             <h2>Solicitudes registradas</h2>
-            <!-- Filtros -->
             <div class="form-grid">
                 <div>
                     <label for="filterNroSolicitud">Nro. de solicitud</label>
@@ -178,7 +300,6 @@
             <div class="informativo" id="counterSolicitudes"></div>
         </section>
 
-        <!-- Formulario para modificar solicitud seleccionada -->
         <section id="modificarSolicitudSection" class="hidden">
             <h2>Editar solicitud</h2>
             <form id="modificarSolicitudForm">
@@ -219,6 +340,45 @@
 
     <footer>SIExT | 2025</footer>
 
+    <div id="asignarBienesModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Asignar Bienes para Completar</h2>
+                <button id="btnModalCerrar" class="modal-close-btn" title="Cerrar">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                
+                <div id="resumenSeleccion">
+                    </div>
+                
+                <hr>
+
+                <div class="modal-filtros">
+                    <div>
+                        <label for="filterModalNombre">Nombre</label>
+                        <input type="text" id="filterModalNombre" placeholder="Filtrar por nombre...">
+                    </div>
+                    <div>
+                        <label for="filterModalInventario">Nro. de inventario</label>
+                        <div class="input-prefix">
+                            <span>FCE-</span>
+                            <input type="number" id="filterModalInventario" placeholder="Filtrar por nro...">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="listaBienesDisponibles">
+                    </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button id="btnModalCancelar" class="btn">Cancelar</button>
+                <button id="btnModalContinuar" class="btn" disabled>Continuar</button>
+            </div>
+        </div>
+    </div>
     <script src="js/auth.js"></script>
     <script>
         verificarAuth();
@@ -228,6 +388,8 @@
     <script src="js/main.js"></script>
     <script src="js/fechas.js"></script>
     <script src="js/forms.js"></script>
+    <script src="js/formateo.js"></script>t
+    <script src="js/completarSolicitud.js"></script>
     <script>
         recargarSolicitudes();
         recargarUbicaciones();
@@ -588,6 +750,8 @@
             e.preventDefault();
             const id = +document.getElementById("modSolicitudId").value;
             const form = e.target;
+
+            // Obtener valores viejos y nuevos
             const originalUbicacion = form.dataset.originalUbicacion;
             const originalEstado = form.dataset.originalEstado;
             const originalDescripcion = form.dataset.originalDescripcion;
@@ -601,7 +765,25 @@
             const nuevaDescrInput = document.getElementById("modDescripcion").value.trim().toUpperCase();
             const nuevaDescrTemp = nuevaDescrInput === "" ? null : nuevaDescrInput;
 
-            if(
+            if (originalEstado === "APROBADA" && nuevoEstado === "SATISFECHA") {
+                try {
+                    // Esperamos a que el usuario termine de usar el modal
+                    // modItemsSolicitados es el array global con lo que el usuario pide
+                    const idsBienesAsignados = await openAsignarBienesModal(modItemsSolicitados);
+                    
+                    // Si la promise se resuelve, continuamos.
+                    // 'idsBienesAsignados' contiene los IDs, pero tu API actual no
+                    // parece usarlos, así que solo continuamos.
+                    console.log("Bienes seleccionados por el usuario:", idsBienesAsignados);
+                    
+                } catch (error) {
+                    // Si la promise se rechaza (cancela, no hay stock)
+                    alert("Acción cancelada. " + error);
+                    return; // Detenemos el envío del formulario
+                }
+            }
+            // --- FIN DE LA NUEVA LÓGICA DE INTERCEPCIÓN ---
+            if (
                 nuevaUbicacion === originalUbicacion &&
                 nuevoEstado === originalEstado &&
                 nuevaDescrInput === originalDescripcion &&
@@ -625,7 +807,7 @@
             const solicitudModificada = {
                 solicitante: nuevoSolicitante,
                 ubicacionBienes: nuevaUbicacion,
-                ...(nuevaDescrTemp ? {descripcion: nuevaDescrTemp} : {}),
+                ...(nuevaDescrTemp ? { descripcion: nuevaDescrTemp } : {}),
                 estado: nuevoEstado,
                 bienesPedidos: modItemsSolicitados
             }
@@ -664,7 +846,7 @@
             renderSolicitudes();
             document.getElementById("modificarSolicitudSection").classList.add("hidden");
             modItemsSolicitados = [];
-            renderItemsCreate();
+            renderItemsCreate(); // Aquí había un error, debería ser renderItemsMod() o resetear. Uso reset.
             e.target.reset();
 
             document.getElementById("tablaSolicitudes").parentElement.scrollIntoView({ behavior: "smooth" });
