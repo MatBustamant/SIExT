@@ -580,11 +580,20 @@
                         <td>${sol.solicitante}</td>
                         <td>${sol.ubicacionBienes}</td>
                         <td>${(sol.estado).replace(/_/g, " ")}</td>
-                        <td>
+                        `;
+                    if (sol.estado === "SATISFECHA") {
+                        fila.innerHTML += `<td>
+                            <button class="btn btn-editar btn-icon-table" title="No se puede editar una solicitud COMPLETADA" disabled>
+                                <i class="bi bi-pencil-fill"></i>
+                            </button>
+                        </td>`;
+                    } else {
+                        fila.innerHTML += `<td>
                             <button class="btn btn-editar btn-icon-table" data-id="${sol.numSolicitud}" title="Editar solicitud">
                                 <i class="bi bi-pencil-fill"></i>
                             </button>
                         </td>`;
+                    }
                     tbody.appendChild(fila);
 
                     // Fila oculta de detalles
