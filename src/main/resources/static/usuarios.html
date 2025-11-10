@@ -260,6 +260,7 @@
 
         document.getElementById("formNuevoUsuario").addEventListener("submit", async (e) => {
             e.preventDefault();
+            if (!confirm("¿Crear este usuario?")) return;
 
             const nombre = document.getElementById("nuevoUsuario").value.trim().toUpperCase();
             const contraseña = document.getElementById("nuevoPassword").value.trim();
@@ -321,6 +322,8 @@
 
         document.getElementById("formModificarUsuario").addEventListener("submit", async (e) => {
             e.preventDefault();
+            if (!confirm("¿Modificar este usuario?")) return;
+
             const id = +document.getElementById("modUsuarioId").value;
             const form = e.target;
             const originalNombre = form.dataset.originalNombre;

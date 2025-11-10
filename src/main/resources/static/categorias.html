@@ -225,6 +225,7 @@
 
         document.getElementById("categoriaForm").addEventListener("submit", async (e) => {
             e.preventDefault();
+            if (!confirm("¿Crear esta categoría?")) return;
 
             const nombre = document.getElementById("nombreCategoria").value.trim().toUpperCase();
             if (!nombre) {
@@ -282,6 +283,8 @@
 
         document.getElementById("modificarCategoriaForm").addEventListener("submit", async (e) => {
             e.preventDefault();
+            if (!confirm("¿Modificar esta categoría?")) return;
+
             const id = +document.getElementById("modCategoriaId").value;
             const form = e.target;
             const originalNombre = form.dataset.originalNombre;
