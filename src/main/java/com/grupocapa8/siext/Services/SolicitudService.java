@@ -175,6 +175,7 @@ public class SolicitudService implements ServiceGenerico<SolicitudDTO> {
                     eventoEntrega.setNumSolicitud(id);
                     eventoEntrega.setUbicacionDestino(ubicacion);
                     eventoService.crearEntrega(eventoEntrega, con);
+                    solicitudDAO.actualizar(dto, con);
                 }
             } catch (SQLException ex) {
                 System.getLogger(SolicitudService.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
