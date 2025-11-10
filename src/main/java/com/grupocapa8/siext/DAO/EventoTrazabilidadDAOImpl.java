@@ -307,8 +307,8 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
             if (numSol != null) ps.setInt(5, numSol);
             else ps.setNull(5, java.sql.Types.INTEGER);
             
-            ps.setInt(5, Evento.getID_Evento());
-            ps.setInt(6, 0);
+            ps.setInt(6, Evento.getID_Evento());
+            ps.setInt(7, 0);
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
