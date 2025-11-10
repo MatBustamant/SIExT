@@ -19,7 +19,7 @@ public class ResponsableDAOImpl implements DAOGenerica<ResponsableDTO, Integer>{
 
     @Override
     public ResponsableDTO buscar(Integer id) {
-        ResponsableDTO resposable = null;
+        ResponsableDTO responsable = null;
         String sql = "SELECT * FROM Responsable WHERE Legajo = ?";
         
         try (Connection con = getConnection();
@@ -28,16 +28,16 @@ public class ResponsableDAOImpl implements DAOGenerica<ResponsableDTO, Integer>{
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()){
                 if (rs.next()){
-                    resposable = new ResponsableDTO();
-                    resposable.setLegajo(rs.getInt("Legajo"));
-                    resposable.setNombre("Nombre_Apellido");
-                    resposable.setEliminado(rs.getInt("Eliminado") != 0);
+                    responsable = new ResponsableDTO();
+                    responsable.setLegajo(rs.getInt("Legajo"));
+                    responsable.setNombre(rs.getString("Nombre_Apellido"));
+                    responsable.setEliminado(rs.getInt("Eliminado") != 0);
                 }
             } 
         } catch (SQLException ex) {
             System.getLogger(ResponsableDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
-            return resposable;
+            return responsable;
     
     }
 
@@ -45,7 +45,7 @@ public class ResponsableDAOImpl implements DAOGenerica<ResponsableDTO, Integer>{
     public List<ResponsableDTO> buscarTodos() {
         List<ResponsableDTO> lista_responsables = new ArrayList<>();
 
-        String sql = "SELECT * FROM Categoria";
+        String sql = "SELECT * FROM Responsable";
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
         
@@ -54,7 +54,7 @@ public class ResponsableDAOImpl implements DAOGenerica<ResponsableDTO, Integer>{
             while (rs.next()) {
                 ResponsableDTO responsable = new ResponsableDTO();
                 responsable.setLegajo(rs.getInt("Legajo"));
-                responsable.setNombre("Nombre_Apellido");
+                responsable.setNombre(rs.getString("Nombre_Apellido"));
                 responsable.setEliminado(rs.getInt("Eliminado") != 0);
 
                 lista_responsables.add(responsable);
@@ -86,9 +86,8 @@ public class ResponsableDAOImpl implements DAOGenerica<ResponsableDTO, Integer>{
         return resultado;
     }
 
-    @Override
-    public int actualizar(ResponsableDTO responsable) {
-        String sql = "UPDATE Responsable SET Nombre_Apellido = ? WHERE Legajo = ? AND Eliminado = ?";
+    public int actualizar(ResponsableDTO responsable, int legajoOriginal) {
+        String sql = "UPDATE Responsable SET Nombre_Apellido = ?, Legajo = ? WHERE Legajo = ? AND Eliminado = ?";
         int resultado = 0;
 
         try (Connection con = BasedeDatos.getConnection();
@@ -96,7 +95,8 @@ public class ResponsableDAOImpl implements DAOGenerica<ResponsableDTO, Integer>{
             
             ps.setString(1, responsable.getNombre());
             ps.setInt(2, responsable.getLegajo());
-            ps.setInt(3, 0);
+            ps.setInt(3, legajoOriginal);
+            ps.setInt(4, 0);
 
             resultado = ps.executeUpdate();
         } catch (SQLException ex) { 
@@ -104,6 +104,12 @@ public class ResponsableDAOImpl implements DAOGenerica<ResponsableDTO, Integer>{
         }
         
         return resultado;
+    }
+    
+    @Override
+    public int actualizar(ResponsableDTO responsable) {
+        // no hace nada
+        return 0;
     }
 
     @Override

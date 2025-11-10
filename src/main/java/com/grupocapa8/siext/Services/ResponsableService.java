@@ -35,27 +35,28 @@ public class ResponsableService implements ServiceGenerico<ResponsableDTO> {
     public void crear(ResponsableDTO dto) {
         String nombre = dto.getNombre().trim().toUpperCase();
         Validador.validarString(nombre, CAMPO_NOMBRE_TEXT, CAMPO_NOMBRE_MIN, CAMPO_NOMBRE_MAX);
-        
-        dto.setNombre(nombre);
-        
-        if (responsableDAO.buscar(dto.getLegajo()) != null) {
-            throw new IllegalArgumentException("Ya existe un responsable con el legajo " + dto.getLegajo());
+        if (this.existe(dto.getLegajo()) != null) {
+            throw new IllegalArgumentException("Ya existe un responsable con ese legajo.");
         }
+        dto.setNombre(nombre);
         
         responsableDAO.insertar(dto);
     }
 
     @Override
-    public void modificar(ResponsableDTO dto, int legajo) throws NoSuchElementException {
-        this.buscar(legajo);
+    public void modificar(ResponsableDTO dto, int legajoOriginal) throws NoSuchElementException {
+        this.buscar(legajoOriginal);
 
         String nombre = dto.getNombre().trim().toUpperCase();
         Validador.validarString(nombre, CAMPO_NOMBRE_TEXT, CAMPO_NOMBRE_MIN, CAMPO_NOMBRE_MAX);
+        int legajoNuevo = dto.getLegajo();
+        if ((legajoOriginal != legajoNuevo) && this.existe(legajoNuevo) != null) {
+            throw new IllegalArgumentException("Ya existe un responsable con ese legajo.");
+        }
 
         dto.setNombre(nombre);
-        dto.setLegajo(legajo);
 
-        responsableDAO.actualizar(dto);
+        responsableDAO.actualizar(dto, legajoOriginal);
     }
 
     @Override
@@ -79,4 +80,11 @@ public class ResponsableService implements ServiceGenerico<ResponsableDTO> {
         return responsableDAO.buscarTodos();
     }
     
+    private ResponsableDTO existe(int legajo) {
+        try {
+            return this.buscar(legajo);
+        } catch (NoSuchElementException e) {
+            return null;
+        }
+    }
 }
