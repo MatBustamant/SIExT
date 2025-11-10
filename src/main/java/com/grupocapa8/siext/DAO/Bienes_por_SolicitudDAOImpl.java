@@ -104,8 +104,7 @@ public class Bienes_por_SolicitudDAOImpl implements DAOGenerica<Bienes_por_Solic
     
     @Override
     public int insertar(Bienes_por_SolicitudDTO bienesSolicitud) {
-        try {
-            Connection con = BasedeDatos.getConnection();
+        try (Connection con = BasedeDatos.getConnection()) {
             return this.insertar(bienesSolicitud, con);
         } catch (SQLException ex) { 
             System.getLogger(Bienes_por_SolicitudDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
@@ -171,8 +170,7 @@ public class Bienes_por_SolicitudDAOImpl implements DAOGenerica<Bienes_por_Solic
     }
     
     public int eliminarPorSolicitud(int numSolicitud) {
-        try {
-            Connection con = BasedeDatos.getConnection();
+        try (Connection con = BasedeDatos.getConnection()) {
             return eliminarPorSolicitud(numSolicitud, con);
         } catch (SQLException ex) { 
             System.getLogger(Bienes_por_SolicitudDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);

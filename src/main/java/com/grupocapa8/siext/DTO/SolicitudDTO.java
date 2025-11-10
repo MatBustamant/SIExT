@@ -17,12 +17,14 @@ public class SolicitudDTO {
     private EstadoSolicitud Estado;
     private String Descripcion;
     private List<Bienes_por_SolicitudDTO> bienesPedidos;
+    private List<Integer> nroInventarioDeBienesAEntregar;
     private boolean eliminado;
     
     public SolicitudDTO(){
         
     }
-    public SolicitudDTO(Integer numSolicitud, Instant FechaInicioSolicitud, String UbicacionBienes, int legajo, EstadoSolicitud Estado, ArrayList<Bienes_por_SolicitudDTO> bienesPedidos, boolean eliminado) {
+    public SolicitudDTO(Integer numSolicitud, Instant FechaInicioSolicitud, String UbicacionBienes, int legajo, EstadoSolicitud Estado, ArrayList<Bienes_por_SolicitudDTO> bienesPedidos, boolean eliminado,
+            List<Integer> nroInventarioDeBienesAEntregar) {
         this.numSolicitud = numSolicitud;
         this.FechaInicioSolicitud = FechaInicioSolicitud;
         this.UbicacionBienes = UbicacionBienes;
@@ -30,6 +32,7 @@ public class SolicitudDTO {
         this.Estado = Estado;
         this.bienesPedidos = bienesPedidos;
         this.eliminado = eliminado;
+        this.nroInventarioDeBienesAEntregar = nroInventarioDeBienesAEntregar;
     }
 
     public int getSolicitante() {
@@ -95,7 +98,13 @@ public class SolicitudDTO {
     public void setBienesPedidos(List<Bienes_por_SolicitudDTO> bienesPedidos) {
         this.bienesPedidos = bienesPedidos;
     }
-    
-    
+
+    public List<Integer> getNroInventarioDeBienesAEntregar() {
+        return nroInventarioDeBienesAEntregar;
+    }
+
+    public void setNroInventarioDeBienesAEntregar(List<Integer> nroInventarioDeBienesAEntregar) {
+        this.nroInventarioDeBienesAEntregar = nroInventarioDeBienesAEntregar;
+    }
     
 }

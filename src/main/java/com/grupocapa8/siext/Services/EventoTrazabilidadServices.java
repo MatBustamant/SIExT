@@ -7,6 +7,7 @@ import com.grupocapa8.siext.DTO.BienDTO;
 import com.grupocapa8.siext.DTO.EventoTrazabilidadDTO;
 import com.grupocapa8.siext.DTO.UbicacionDTO;
 import com.grupocapa8.siext.Util.Validador;
+import java.sql.Connection;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -54,7 +55,13 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
     public void crear(EventoTrazabilidadDTO dto){
         // Valido el id y verifico la existencia del bien y sino, se corta todo
         int idBien = dto.getBienAsociado();
-        bienService.buscar(idBien);
+        try {
+            bienService.buscar(idBien, false);
+        } catch (NoSuchElementException e) {
+            throw new IllegalArgumentException(
+                    String.format("El bien con id %d no existe.", idBien)
+            );
+        }
         
         // Obtengo datos, valido y formateo
         TipoEvento tipo = dto.getTipoEvento();
@@ -94,6 +101,21 @@ public class EventoTrazabilidadServices implements ServiceGenerico<EventoTrazabi
                 break;
         }
         eventoTrazDAO.insertar(dto);
+    }
+    
+    void crearEntrega(EventoTrazabilidadDTO dto, Connection con) {
+        int idBien = dto.getBienAsociado();
+        try {
+            bienService.buscar(idBien, false, con);
+        } catch (NoSuchElementException e) {
+            throw new IllegalArgumentException(
+                    String.format("El bien con id %d no existe.", idBien)
+            );
+        }
+        String nombreUbicacion = dto.getUbicacionDestino();
+        bienService.trasladar(idBien, nombreUbicacion, con);
+        dto.setUbicacionDestino(nombreUbicacion);
+        eventoTrazDAO.insertar(dto, con);
     }
     
     @Override

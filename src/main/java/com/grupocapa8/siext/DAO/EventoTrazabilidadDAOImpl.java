@@ -235,14 +235,12 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
         return evento;
     }
 
-    @Override
-    public int insertar(EventoTrazabilidadDTO Evento) {
+    public int insertar(EventoTrazabilidadDTO Evento, Connection con) {
         String sql = "INSERT INTO EventoTrazabilidad (ID_Bien, TipoEvento, Detalle, ID_Ubicacion_Destino, Num_Solicitud)"
                    + "VALUES (?, ?, ?, ?, ?)";
         int resultado = 0;
         
-        try (Connection con = BasedeDatos.getConnection();
-                PreparedStatement ps = con.prepareStatement(sql)) {
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, Evento.getBienAsociado());
             ps.setString(2, Evento.getTipoEvento().name());
@@ -268,6 +266,16 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
             System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
         return resultado;
+    }
+    
+    @Override
+    public int insertar(EventoTrazabilidadDTO Evento) {
+        try (Connection con = BasedeDatos.getConnection()) {
+            return this.insertar(Evento, con);
+        } catch (SQLException ex) {
+            System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+        return 0;
     }
 
     @Override
