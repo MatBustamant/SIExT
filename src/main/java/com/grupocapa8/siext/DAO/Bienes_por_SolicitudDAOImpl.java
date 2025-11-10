@@ -22,23 +22,22 @@ public class Bienes_por_SolicitudDAOImpl implements DAOGenerica<Bienes_por_Solic
 
     @Override
     public Bienes_por_SolicitudDTO buscar(ArrayList<Integer> claves) {
-        int id_cat = 0;
-        int num_soli = 1;
+        int id_cat = claves.get(0);
+        int num_soli = claves.get(1);
         Bienes_por_SolicitudDTO bienesSolicitud = null;
         String sql = "SELECT * FROM Bienes_por_Solicitud WHERE Num_Solicitud = ? AND ID_Categoria = ?";
         
         try (Connection con = getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
+             PreparedStatement ps = con.prepareStatement(sql)) {
             
-            ps.setInt(1, claves.get(num_soli));
-            ps.setInt(2, claves.get(id_cat));
+            ps.setInt(1, id_cat);
+            ps.setInt(2, num_soli);
             try (ResultSet rs = ps.executeQuery()){
                 if (rs.next()){
                     bienesSolicitud = new Bienes_por_SolicitudDTO();
                     bienesSolicitud.setID_Categoria(rs.getInt("ID_Categoria"));
                     bienesSolicitud.setNumSolicitud(rs.getInt("Num_Solicitud"));
                     bienesSolicitud.setCantidad(rs.getInt("Cantidad"));
-                    
                     bienesSolicitud.setEliminado(rs.getInt("Eliminado") != 0);
                 }
             } 
@@ -77,7 +76,7 @@ public class Bienes_por_SolicitudDAOImpl implements DAOGenerica<Bienes_por_Solic
 
     @Override
     public int insertar(Bienes_por_SolicitudDTO bienesSolicitud) {
-        String sql = "INSERT INTO Bienes_por_Solicitud(ID_Categoria, Legajo, Cantidad) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Bienes_por_Solicitud(ID_Categoria, Num_Solicitud, Cantidad) VALUES (?, ?, ?)";
         int resultado = 0;
         
         try (Connection con = BasedeDatos.getConnection();
@@ -91,13 +90,12 @@ public class Bienes_por_SolicitudDAOImpl implements DAOGenerica<Bienes_por_Solic
         } catch (SQLException ex) { 
             System.getLogger(Bienes_por_SolicitudDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
-
         return resultado;
     }
 
     @Override
     public int actualizar(Bienes_por_SolicitudDTO bienesSolicitud) {
-        String sql = "UPDATE Bienes_por_Solicitud SET Cantidad = ? WHERE Legajo = ? AND ID_Categoria = ? AND Eliminado = ?";
+        String sql = "UPDATE Bienes_por_Solicitud SET Cantidad = ? WHERE Num_Solicitud = ? AND ID_Categoria = ? AND Eliminado = ?";
         int resultado = 0;
 
         try (Connection con = BasedeDatos.getConnection();
@@ -120,14 +118,14 @@ public class Bienes_por_SolicitudDAOImpl implements DAOGenerica<Bienes_por_Solic
     public int eliminar(ArrayList<Integer> claves) {
         String sql = "UPDATE Bienes_por_Solicitud SET Eliminado = ? WHERE Num_Solicitud = ? AND ID_Categoria = ? AND Eliminado = ?";
         int resultado = 0;
-        int id_cat = 0;
-        int numSoli = 1;
+        int id_cat = claves.get(0);
+        int numSoli = claves.get(1);
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, 1);
-            ps.setInt(2, claves.get(numSoli));
-            ps.setInt(3, claves.get(id_cat));
+            ps.setInt(2, numSoli);
+            ps.setInt(3, id_cat);
             ps.setInt(4, 0);
             
             resultado = ps.executeUpdate();
@@ -136,5 +134,40 @@ public class Bienes_por_SolicitudDAOImpl implements DAOGenerica<Bienes_por_Solic
         }
         return resultado;
     }
+    
+    // Este me lo tiró Gemini, lo dejo porque podría ser útil.
+    public int eliminarPorSolicitud(int numSolicitud, Connection con) throws SQLException {
+        String sql = "UPDATE Bienes_por_Solicitud SET Eliminado = 1 WHERE Num_Solicitud = ? AND Eliminado = 0";
+        int resultado = 0;
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, numSolicitud);
+            resultado = ps.executeUpdate();
+        }
+        return resultado;
+    }
+    
+    public List<Bienes_por_SolicitudDTO> buscarPorSolicitud(int numSolicitud) {
+        List<Bienes_por_SolicitudDTO> lista_bienesSoli = new ArrayList<>();
+        String sql = "SELECT * FROM Bienes_por_Solicitud WHERE Num_Solicitud = ?";
+        try (Connection con = BasedeDatos.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setInt(1, numSolicitud);
+            try(ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Bienes_por_SolicitudDTO bienesSolicitud = new Bienes_por_SolicitudDTO();
+                    bienesSolicitud.setNumSolicitud(rs.getInt("Num_Solicitud"));
+                    bienesSolicitud.setID_Categoria(rs.getInt("ID_Categoria"));
+                    bienesSolicitud.setCantidad(rs.getInt("Cantidad"));
+                    bienesSolicitud.setEliminado(rs.getInt("Eliminado") != 0);
+                    lista_bienesSoli.add(bienesSolicitud);
+                }
+            }
+        } catch (SQLException ex) { 
+            System.getLogger(Bienes_por_SolicitudDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+        return lista_bienesSoli;
+    }
+
     
 }

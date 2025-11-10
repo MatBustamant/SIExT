@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package com.grupocapa8.siext.DAO;
 
 import com.grupocapa8.siext.Enums.EstadoSolicitud;
@@ -22,9 +19,11 @@ import java.util.List;
 public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO, Integer>{
     
     private final UbicacionDAOImpl ubicacionDAO;
+    private final Bienes_por_SolicitudDAOImpl bienesDAO;
 
     public SolicitudDAOImpl() {
         this.ubicacionDAO = new UbicacionDAOImpl();
+        this.bienesDAO = new Bienes_por_SolicitudDAOImpl();
     }
 
     @Override
@@ -51,6 +50,10 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO, Integer>{
                     soli.setEstado(EstadoSolicitud.valueOf(rs.getString("Estado")));
                     soli.setDescripcion(rs.getString("Descripcion"));
                     soli.setEliminado(rs.getInt("Eliminado") != 0);
+                    
+                    if (!soli.isEliminado()) {
+                        soli.setBienesPedidos(bienesDAO.buscarPorSolicitud(id));
+                    }
                 }
             }
         } catch (SQLException ex) { 
@@ -84,6 +87,10 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO, Integer>{
                 soli.setDescripcion(rs.getString("Descripcion"));
                 soli.setEliminado(rs.getInt("Eliminado") != 0);
                 
+                if (!soli.isEliminado()) {
+                        soli.setBienesPedidos(bienesDAO.buscarPorSolicitud(soli.getNumSolicitud()));
+                }
+                
                 solicitudes.add(soli);
             }
             }
@@ -108,6 +115,12 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO, Integer>{
             ps.setString(4, Solicitud.getDescripcion());
             
             resultado = ps.executeUpdate();
+            // Recuperar el ID generado
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1); // Devuelve el nuevo Num_Solicitud
+                }
+            }
         } catch (SQLException ex) { 
             System.getLogger(SolicitudDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
