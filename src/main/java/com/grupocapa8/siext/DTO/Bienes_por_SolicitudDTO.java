@@ -4,36 +4,31 @@
  */
 package com.grupocapa8.siext.DTO;
 
+import java.util.Objects;
+
 public class Bienes_por_SolicitudDTO {
-    private int ID_Categoria;
-    private int NumSolicitud;
+
+    private Integer numSolicitud;
+    private String categoria;
     private int cantidad;
     private boolean eliminado;
 
-    public Bienes_por_SolicitudDTO(int ID_Categoria, int Num_Solicitud, int cantidad, boolean eliminado) {
-        this.ID_Categoria = ID_Categoria;
-        this.NumSolicitud = Num_Solicitud;
+    public Bienes_por_SolicitudDTO(String categoria, int cantidad, boolean eliminado, Integer numSolicitud) {
+        this.categoria = categoria;
         this.cantidad = cantidad;
         this.eliminado = eliminado;
+        this.numSolicitud = numSolicitud;
     }
 
     public Bienes_por_SolicitudDTO() {
     }
 
-    public int getID_Categoria() {
-        return ID_Categoria;
+    public String getCategoria() {
+        return categoria;
     }
 
-    public void setID_Categoria(int ID_Categoria) {
-        this.ID_Categoria = ID_Categoria;
-    }
-
-    public int getNumSolicitud() {
-        return NumSolicitud;
-    }
-
-    public void setNumSolicitud(int Num_Solicitud) {
-        this.NumSolicitud = Num_Solicitud;
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
     }
 
     public int getCantidad() {
@@ -50,6 +45,40 @@ public class Bienes_por_SolicitudDTO {
 
     public void setEliminado(boolean eliminado) {
         this.eliminado = eliminado;
+    }
+
+    public Integer getNumSolicitud() {
+        return numSolicitud;
+    }
+
+    public void setNumSolicitud(Integer numSolicitud) {
+        this.numSolicitud = numSolicitud;
+    }
+    
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + Objects.hashCode(this.categoria);
+        hash = 97 * hash + this.cantidad;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Bienes_por_SolicitudDTO other = (Bienes_por_SolicitudDTO) obj;
+        if (this.cantidad != other.cantidad) {
+            return false;
+        }
+        return Objects.equals(this.categoria, other.categoria);
     }
     
 }

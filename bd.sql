@@ -33,12 +33,12 @@ CREATE TABLE IF NOT EXISTS "EventoTrazabilidad" (
 	"TipoEvento"	TEXT NOT NULL,
 	"Detalle"	TEXT,
 	"ID_Ubicacion_Destino"	INTEGER,
-	"Legajo"	INTEGER,
+	"Num_Solicitud"	INTEGER,
 	"Eliminado" INTEGER NOT NULL DEFAULT 0,
 	PRIMARY KEY("ID_Evento" AUTOINCREMENT),
 	FOREIGN KEY("ID_Bien") REFERENCES "Bien"("ID_Bien"),
 	FOREIGN KEY("ID_Ubicacion_Destino") REFERENCES "Ubicacion"("ID_Ubicacion")
-	FOREIGN KEY("Legajo") REFERENCES "Responsable"("Legajo")
+	FOREIGN KEY("Num_Solicitud") REFERENCES "Solicitud"("Num_Solicitud")
 );
 CREATE TABLE IF NOT EXISTS "Responsable" (
 	"Legajo"	INTEGER NOT NULL,

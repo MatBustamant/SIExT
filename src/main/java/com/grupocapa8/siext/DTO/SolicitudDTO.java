@@ -13,7 +13,7 @@ public class SolicitudDTO {
     private Integer numSolicitud;
     private Instant FechaInicioSolicitud;
     private String UbicacionBienes;
-    private int Legajo;
+    private int solicitante;
     private EstadoSolicitud Estado;
     private String Descripcion;
     private List<Bienes_por_SolicitudDTO> bienesPedidos;
@@ -26,18 +26,18 @@ public class SolicitudDTO {
         this.numSolicitud = numSolicitud;
         this.FechaInicioSolicitud = FechaInicioSolicitud;
         this.UbicacionBienes = UbicacionBienes;
-        this.Legajo = legajo;
+        this.solicitante = legajo;
         this.Estado = Estado;
         this.bienesPedidos = bienesPedidos;
         this.eliminado = eliminado;
     }
 
-    public int getLegajo() {
-        return Legajo;
+    public int getSolicitante() {
+        return solicitante;
     }
 
-    public void setLegajo(int Legajo) {
-        this.Legajo = Legajo;
+    public void setSolicitante(int solicitante) {
+        this.solicitante = solicitante;
     }
     
     public String getDescripcion() {

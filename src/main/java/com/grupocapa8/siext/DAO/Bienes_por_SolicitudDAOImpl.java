@@ -19,13 +19,22 @@ import java.util.List;
  * @author oveja
  */
 public class Bienes_por_SolicitudDAOImpl implements DAOGenerica<Bienes_por_SolicitudDTO, ArrayList<Integer>> {
+    
+    private final CategoriaDAOImpl categoriaDAO;
+    
+    public Bienes_por_SolicitudDAOImpl() {
+        categoriaDAO = new CategoriaDAOImpl();
+    }
 
     @Override
     public Bienes_por_SolicitudDTO buscar(ArrayList<Integer> claves) {
         int id_cat = claves.get(0);
         int num_soli = claves.get(1);
         Bienes_por_SolicitudDTO bienesSolicitud = null;
-        String sql = "SELECT * FROM Bienes_por_Solicitud WHERE Num_Solicitud = ? AND ID_Categoria = ?";
+        String sql = "SELECT bs.*, c.Nombre AS CategoriaNombre "
+                   + "FROM Bienes_por_Solicitud bs "
+                   + "JOIN Categoria c ON bs.ID_Categoria = c.ID_Categoria "
+                   + "WHERE bs.Num_Solicitud = ? AND bs.ID_Categoria = ?";
         
         try (Connection con = getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -35,8 +44,7 @@ public class Bienes_por_SolicitudDAOImpl implements DAOGenerica<Bienes_por_Solic
             try (ResultSet rs = ps.executeQuery()){
                 if (rs.next()){
                     bienesSolicitud = new Bienes_por_SolicitudDTO();
-                    bienesSolicitud.setID_Categoria(rs.getInt("ID_Categoria"));
-                    bienesSolicitud.setNumSolicitud(rs.getInt("Num_Solicitud"));
+                    bienesSolicitud.setCategoria(rs.getString("CategoriaNombre"));
                     bienesSolicitud.setCantidad(rs.getInt("Cantidad"));
                     bienesSolicitud.setEliminado(rs.getInt("Eliminado") != 0);
                 }
@@ -51,7 +59,10 @@ public class Bienes_por_SolicitudDAOImpl implements DAOGenerica<Bienes_por_Solic
     public List<Bienes_por_SolicitudDTO> buscarTodos() {
         List<Bienes_por_SolicitudDTO> lista_bienesSoli = new ArrayList<>();
 
-        String sql = "SELECT * FROM Bienes_por_Solicitud";
+        String sql = "SELECT bs.*, c.Nombre AS CategoriaNombre "
+                   + "FROM Bienes_por_Solicitud bs "
+                   + "JOIN Categoria c ON bs.ID_Categoria = c.ID_Categoria ";
+        
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
         
@@ -59,8 +70,7 @@ public class Bienes_por_SolicitudDAOImpl implements DAOGenerica<Bienes_por_Solic
 
             while (rs.next()) {
                 Bienes_por_SolicitudDTO bienesSolicitud = new Bienes_por_SolicitudDTO();
-                bienesSolicitud.setNumSolicitud(rs.getInt("Num_Solicitud"));
-                bienesSolicitud.setID_Categoria(rs.getInt("ID_Categoria"));
+                bienesSolicitud.setCategoria(rs.getString("CategoriaNombre"));
                 bienesSolicitud.setCantidad(rs.getInt("Cantidad"));
                 bienesSolicitud.setEliminado(rs.getInt("Eliminado") != 0);
 
@@ -74,15 +84,14 @@ public class Bienes_por_SolicitudDAOImpl implements DAOGenerica<Bienes_por_Solic
         return lista_bienesSoli;
     }
 
-    @Override
-    public int insertar(Bienes_por_SolicitudDTO bienesSolicitud) {
+    public int insertar(Bienes_por_SolicitudDTO bienesSolicitud, Connection con) {
         String sql = "INSERT INTO Bienes_por_Solicitud(ID_Categoria, Num_Solicitud, Cantidad) VALUES (?, ?, ?)";
         int resultado = 0;
+        int idCategoria = categoriaDAO.buscar(bienesSolicitud.getCategoria()).getID_Categoria();
         
-        try (Connection con = BasedeDatos.getConnection();
-                PreparedStatement ps = con.prepareStatement(sql)) {
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
             
-            ps.setInt(1, bienesSolicitud.getID_Categoria());
+            ps.setInt(1, idCategoria);
             ps.setInt(2, bienesSolicitud.getNumSolicitud());
             ps.setInt(3, bienesSolicitud.getCantidad());
 
@@ -92,18 +101,30 @@ public class Bienes_por_SolicitudDAOImpl implements DAOGenerica<Bienes_por_Solic
         }
         return resultado;
     }
+    
+    @Override
+    public int insertar(Bienes_por_SolicitudDTO bienesSolicitud) {
+        try {
+            Connection con = BasedeDatos.getConnection();
+            return this.insertar(bienesSolicitud, con);
+        } catch (SQLException ex) { 
+            System.getLogger(Bienes_por_SolicitudDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+        return 0;
+    }
 
     @Override
     public int actualizar(Bienes_por_SolicitudDTO bienesSolicitud) {
         String sql = "UPDATE Bienes_por_Solicitud SET Cantidad = ? WHERE Num_Solicitud = ? AND ID_Categoria = ? AND Eliminado = ?";
         int resultado = 0;
+        int idCategoria = categoriaDAO.buscar(bienesSolicitud.getCategoria()).getID_Categoria();
 
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, bienesSolicitud.getCantidad());
             ps.setInt(2, bienesSolicitud.getNumSolicitud());
-            ps.setInt(3, bienesSolicitud.getID_Categoria());
+            ps.setInt(3, idCategoria);
             ps.setInt(4, 0);
 
             resultado = ps.executeUpdate();
@@ -116,17 +137,15 @@ public class Bienes_por_SolicitudDAOImpl implements DAOGenerica<Bienes_por_Solic
 
     @Override
     public int eliminar(ArrayList<Integer> claves) {
-        String sql = "UPDATE Bienes_por_Solicitud SET Eliminado = ? WHERE Num_Solicitud = ? AND ID_Categoria = ? AND Eliminado = ?";
+        String sql = "DELETE FROM Bienes_por_Solicitud WHERE Num_Solicitud = ? AND ID_Categoria = ?";
         int resultado = 0;
         int id_cat = claves.get(0);
         int numSoli = claves.get(1);
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
-            ps.setInt(1, 1);
-            ps.setInt(2, numSoli);
-            ps.setInt(3, id_cat);
-            ps.setInt(4, 0);
+            ps.setInt(1, numSoli);
+            ps.setInt(2, id_cat);
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) { 
@@ -136,19 +155,59 @@ public class Bienes_por_SolicitudDAOImpl implements DAOGenerica<Bienes_por_Solic
     }
     
     // Este me lo tiró Gemini, lo dejo porque podría ser útil.
-    public int eliminarPorSolicitud(int numSolicitud, Connection con) throws SQLException {
-        String sql = "UPDATE Bienes_por_Solicitud SET Eliminado = 1 WHERE Num_Solicitud = ? AND Eliminado = 0";
+    public int eliminarPorSolicitud(int numSolicitud, Connection con) {
+        String sql = "DELETE FROM Bienes_por_Solicitud WHERE Num_Solicitud = ?";
         int resultado = 0;
+        
         try (PreparedStatement ps = con.prepareStatement(sql)) {
+            
             ps.setInt(1, numSolicitud);
+            
             resultado = ps.executeUpdate();
+        } catch (SQLException ex) { 
+            System.getLogger(Bienes_por_SolicitudDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
         return resultado;
     }
     
+    public int eliminarPorSolicitud(int numSolicitud) {
+        try {
+            Connection con = BasedeDatos.getConnection();
+            return eliminarPorSolicitud(numSolicitud, con);
+        } catch (SQLException ex) { 
+            System.getLogger(Bienes_por_SolicitudDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+        return 0;
+    }
+    
+    public List<Integer> reemplazarPorSolicitud(int numSolicitud, List<Bienes_por_SolicitudDTO> bienesNuevos, Connection con) {
+        // primero eliminamos todos de la solicitud
+        List<Integer> listaResultado = new ArrayList<>();
+        int resultado1 = this.eliminarPorSolicitud(numSolicitud, con);
+        listaResultado.add(resultado1);
+        
+        int resultado2 = 0;
+        int resultadoError = 0;
+        
+        // luego recorremos uno a uno y los insertamos
+        for (Bienes_por_SolicitudDTO bien : bienesNuevos) {
+            bien.setNumSolicitud(numSolicitud);
+            int resultadoInsert = this.insertar(bien, con);
+            if (resultadoInsert > 0) resultado2++;
+            else resultadoError++;
+        }
+        listaResultado.add(resultado2);
+        listaResultado.add(resultadoError);
+        
+        return listaResultado;
+    }
+    
     public List<Bienes_por_SolicitudDTO> buscarPorSolicitud(int numSolicitud) {
         List<Bienes_por_SolicitudDTO> lista_bienesSoli = new ArrayList<>();
-        String sql = "SELECT * FROM Bienes_por_Solicitud WHERE Num_Solicitud = ?";
+        String sql = "SELECT bs.*, c.Nombre AS CategoriaNombre "
+           + "FROM Bienes_por_Solicitud bs "
+           + "JOIN Categoria c ON bs.ID_Categoria = c.ID_Categoria "
+           + "WHERE bs.Num_Solicitud = ? AND bs.Eliminado = 0";
         try (Connection con = BasedeDatos.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             
@@ -156,8 +215,7 @@ public class Bienes_por_SolicitudDAOImpl implements DAOGenerica<Bienes_por_Solic
             try(ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Bienes_por_SolicitudDTO bienesSolicitud = new Bienes_por_SolicitudDTO();
-                    bienesSolicitud.setNumSolicitud(rs.getInt("Num_Solicitud"));
-                    bienesSolicitud.setID_Categoria(rs.getInt("ID_Categoria"));
+                    bienesSolicitud.setCategoria(rs.getString("CategoriaNombre"));
                     bienesSolicitud.setCantidad(rs.getInt("Cantidad"));
                     bienesSolicitud.setEliminado(rs.getInt("Eliminado") != 0);
                     lista_bienesSoli.add(bienesSolicitud);
