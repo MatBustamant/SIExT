@@ -125,7 +125,7 @@
         function categoriaExiste(nombre) {
             const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
 
-            if (categorias.some(c => c.nombre === nombre)) {
+            if (categorias.some(c => c.nombre === nombre && !c.eliminado)) {
                 alert("Esa categoría ya existe.");
                 return true;
             }

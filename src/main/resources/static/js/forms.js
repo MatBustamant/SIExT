@@ -1,8 +1,9 @@
-function cargarOpciones(idlist, nombreLista) {
+function cargarOpciones(idlist, nombreLista, incluirUbiEspecial = true) {
     const datalist = document.getElementById(idlist);
     datalist.innerHTML = "";
-    const registros = JSON.parse(localStorage.getItem(nombreLista)) || [];
-    if (nombreLista === "ubicaciones") {
+    const listaPrelim = JSON.parse(localStorage.getItem(nombreLista)) || [];
+    const registros = listaPrelim.filter(item => !item.eliminado);
+    if (nombreLista === "ubicaciones" && incluirUbiEspecial) {
         registros.unshift({ nombre: "SIN ASIGNAR" });
     }
     if (registros.length === 0) {
