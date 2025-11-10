@@ -300,11 +300,6 @@
                 detalle.classList.add("detalle-fila", "hidden");
                 detalle.innerHTML = `
                     <td colspan="6" class="detalle-contenido">
-                        <p><strong>Número de inventario:</strong> ${formatearNroBien(prod.id_Bien)}</p>
-                        <p><strong>Nombre de bien:</strong> ${prod.nombre}</p>
-                        <p><strong>Categoría:</strong> ${prod.nombreCatBienes}</p>
-                        <p><strong>Estado:</strong> ${(prod.estadoBien).replace(/_/g, " ")}</p>
-                        <p><strong>Ubicación actual:</strong> ${prod.ubicacionBien || "(Sin ubicación asignada)"}</p>
                         <p><strong>Detalle:</strong> ${prod.detalle || "(Sin detalle adicional)"}</p>
                     </td>
                     <td colspan="1" class="detalle-contenido">
