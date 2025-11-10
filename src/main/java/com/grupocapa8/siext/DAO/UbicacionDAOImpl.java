@@ -137,7 +137,7 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO, Integer> {
     public UbicacionDTO buscar(String nombre) {
 
         UbicacionDTO ubicacion = null;
-        String sql = "SELECT * FROM Ubicacion WHERE Nombre = ?";
+        String sql = "SELECT * FROM Ubicacion WHERE Nombre = ? AND Eliminado = 0";
 
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {

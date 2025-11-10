@@ -56,6 +56,7 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
                     Instant fecha = LocalDateTime.parse(fechaString, 
                     DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toInstant(ZoneOffset.UTC);
                     evento.setFechaEvento(fecha);
+                    evento.setNumSolicitud(rs.getInt("Num_Solicitud"));
                     
                     evento.setDetalle(rs.getString("Detalle"));
                     evento.setUbicacionDestino(rs.getString("UbicacionNombre"));
@@ -91,6 +92,7 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
                 Instant fecha = LocalDateTime.parse(fechaString,
                 DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toInstant(ZoneOffset.UTC);
                 evento.setFechaEvento(fecha);
+                evento.setNumSolicitud(rs.getInt("Num_Solicitud"));
 
                 evento.setDetalle(rs.getString("Detalle"));
                 evento.setUbicacionDestino(rs.getString("UbicacionNombre"));
@@ -235,8 +237,8 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
 
     @Override
     public int insertar(EventoTrazabilidadDTO Evento) {
-        String sql = "INSERT INTO EventoTrazabilidad (ID_Bien, TipoEvento, Detalle, ID_Ubicacion_Destino)"
-                   + "VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO EventoTrazabilidad (ID_Bien, TipoEvento, Detalle, ID_Ubicacion_Destino, Num_Solicitud)"
+                   + "VALUES (?, ?, ?, ?, ?)";
         int resultado = 0;
         
         try (Connection con = BasedeDatos.getConnection();
@@ -257,6 +259,9 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
             } else {
                 ps.setNull(4, java.sql.Types.INTEGER);
             }
+            Integer numSol = Evento.getNumSolicitud();
+            if (numSol != null) ps.setInt(5, numSol);
+            else ps.setNull(5, java.sql.Types.INTEGER);
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
@@ -267,7 +272,7 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
 
     @Override
     public int actualizar(EventoTrazabilidadDTO Evento) {
-        String sql = "UPDATE EventoTrazabilidad SET ID_Bien = ?, TipoEvento = ?, Detalle = ?, ID_Ubicacion_Destino = ?"
+        String sql = "UPDATE EventoTrazabilidad SET ID_Bien = ?, TipoEvento = ?, Detalle = ?, ID_Ubicacion_Destino = ?, Num_Solicitud = ?"
                    + "WHERE ID_Evento = ? AND Eliminado = ?";
         int resultado = 0;
 
@@ -289,6 +294,10 @@ public class EventoTrazabilidadDAOImpl implements DAOGenerica<EventoTrazabilidad
             } else {
                 ps.setNull(4, java.sql.Types.INTEGER);
             }
+            
+            Integer numSol = Evento.getNumSolicitud();
+            if (numSol != null) ps.setInt(5, numSol);
+            else ps.setNull(5, java.sql.Types.INTEGER);
             
             ps.setInt(5, Evento.getID_Evento());
             ps.setInt(6, 0);

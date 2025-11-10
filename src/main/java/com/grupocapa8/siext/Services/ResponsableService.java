@@ -33,10 +33,10 @@ public class ResponsableService implements ServiceGenerico<ResponsableDTO> {
 
     @Override
     public void crear(ResponsableDTO dto) {
-        String nombre = dto.getNombre_apellido().trim().toUpperCase();
+        String nombre = dto.getNombre().trim().toUpperCase();
         Validador.validarString(nombre, CAMPO_NOMBRE_TEXT, CAMPO_NOMBRE_MIN, CAMPO_NOMBRE_MAX);
         
-        dto.setNombre_apellido(nombre);
+        dto.setNombre(nombre);
         
         if (responsableDAO.buscar(dto.getLegajo()) != null) {
             throw new IllegalArgumentException("Ya existe un responsable con el legajo " + dto.getLegajo());
@@ -49,10 +49,10 @@ public class ResponsableService implements ServiceGenerico<ResponsableDTO> {
     public void modificar(ResponsableDTO dto, int legajo) throws NoSuchElementException {
         this.buscar(legajo);
 
-        String nombre = dto.getNombre_apellido().trim().toUpperCase();
+        String nombre = dto.getNombre().trim().toUpperCase();
         Validador.validarString(nombre, CAMPO_NOMBRE_TEXT, CAMPO_NOMBRE_MIN, CAMPO_NOMBRE_MAX);
 
-        dto.setNombre_apellido(nombre);
+        dto.setNombre(nombre);
         dto.setLegajo(legajo);
 
         responsableDAO.actualizar(dto);

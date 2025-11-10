@@ -133,7 +133,7 @@ public class CategoriaDAOImpl implements DAOGenerica<CategoriaBienDTO, Integer> 
     public CategoriaBienDTO buscar(String nombre) {
 
         CategoriaBienDTO categoriaBien = null;
-        String sql = "SELECT * FROM Categoria WHERE Nombre = ?";
+        String sql = "SELECT * FROM Categoria WHERE Nombre = ? AND Eliminado = 0";
 
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {

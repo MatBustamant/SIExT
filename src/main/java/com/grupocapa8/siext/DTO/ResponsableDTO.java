@@ -7,12 +7,12 @@ package com.grupocapa8.siext.DTO;
 
 public class ResponsableDTO {
     private int legajo;
-    private String nombre_apellido;
+    private String nombre;
     private boolean eliminado;
 
     public ResponsableDTO(int legajo, String nombre_apellido, boolean eliminado) {
         this.legajo = legajo;
-        this.nombre_apellido = nombre_apellido;
+        this.nombre = nombre_apellido;
         this.eliminado = eliminado;
     }
 
@@ -27,12 +27,12 @@ public class ResponsableDTO {
         this.legajo = legajo;
     }
 
-    public String getNombre_apellido() {
-        return nombre_apellido;
+    public String getNombre() {
+        return nombre;
     }
 
-    public void setNombre_apellido(String nombre_apellido) {
-        this.nombre_apellido = nombre_apellido;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
     
     public boolean isEliminado() {
