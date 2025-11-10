@@ -227,6 +227,7 @@
 
         document.getElementById("ubicacionForm").addEventListener("submit", async (e) => {
             e.preventDefault();
+            if (!confirm("¿Crear esta ubicación?")) return;
 
             const nombre = document.getElementById("nombreUbicacion").value.trim().toUpperCase();
             if (!nombre) {
@@ -284,6 +285,8 @@
 
         document.getElementById("modificarUbicacionForm").addEventListener("submit", async (e) => {
             e.preventDefault();
+            if (!confirm("¿Modificar esta ubicación?")) return;
+            
             const id = +document.getElementById("modUbicacionId").value;
             const form = e.target;
             const originalNombre = form.dataset.originalNombre;

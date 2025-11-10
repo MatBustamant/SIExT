@@ -393,6 +393,7 @@
 
         document.getElementById("productoForm").onsubmit = async (e) => {
             e.preventDefault();
+            if (!confirm("¿Crear este bien?")) return;
             const nombre = document.getElementById("nombreProducto").value.trim().toUpperCase();
             const categoria = categoriaProducto.value.toUpperCase();
             const cantBienes = +document.getElementById("stockInicial").value;
@@ -468,6 +469,7 @@
 
         document.getElementById("modificarBienForm").addEventListener("submit", async (e) => {
             e.preventDefault();
+            if (!confirm("¿Modificar este bien?")) return;
             const id = modBienId.value;
             const form = e.target;
             const originalNombre = form.dataset.originalNombre;

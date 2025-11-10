@@ -233,6 +233,7 @@
 
         document.getElementById("solicitanteForm").addEventListener("submit", async (e) => {
             e.preventDefault();
+            if (!confirm("¿Crear este solicitante?")) return;
 
             const nombre = document.getElementById("nombreSolicitante").value.trim().toUpperCase();
             const legajo = parseInt(document.getElementById("legajo").value);
@@ -291,6 +292,8 @@
 
         document.getElementById("modificarSolicitanteForm").addEventListener("submit", async (e) => {
             e.preventDefault();
+            if (!confirm("¿Modificar este solicitante?")) return;
+            
             const legajo = parseInt(document.getElementById("modSolId").value);
             const form = e.target;
             const originalNombre = form.dataset.originalNombre;

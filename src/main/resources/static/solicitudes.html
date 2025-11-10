@@ -668,6 +668,7 @@
 
         document.getElementById("solicitudForm").addEventListener("submit", async (e) => {
             e.preventDefault();
+            if (!confirm("¿Crear esta solicitud?")) return;
 
             const ubicacion = document.getElementById("ubicacion").value.trim().toUpperCase();
             const solicitante = +document.getElementById("solicitante").value;
@@ -748,6 +749,7 @@
 
         document.getElementById("modificarSolicitudForm").addEventListener("submit", async (e) => {
             e.preventDefault();
+            if (!confirm("¿Modificar esta solicitud?")) return;
             const id = +document.getElementById("modSolicitudId").value;
             const form = e.target;
 

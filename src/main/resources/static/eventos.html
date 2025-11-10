@@ -428,6 +428,7 @@
 
         document.getElementById("registroEventoForm").addEventListener("submit", async (e) => {
             e.preventDefault();
+            if (!confirm("¿Crear este evento?")) return;
 
             const tipoEvento = document.getElementById("tipoEvento").value.toUpperCase();
             const bienAsociado = document.getElementById("bienAsociado").value;
@@ -515,6 +516,7 @@
 
         document.getElementById("modificarEventoForm").addEventListener("submit", async (e) => {
             e.preventDefault();
+            if (!confirm("¿Modificar este evento?")) return;
             const id = +document.getElementById("modEventoId").value;
             const form = e.target;
             const originalBienId = form.dataset.originalBienId;
