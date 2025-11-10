@@ -59,14 +59,12 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO, Integer> {
         return resultado;
     }
 
-    @Override
-    public UbicacionDTO buscar(Integer id) {
+    public UbicacionDTO buscar(Integer id, Connection con) {
 
         UbicacionDTO ubicacionBien = null;
         String sql = "SELECT * FROM Ubicacion WHERE ID_Ubicacion = ?";
         
-        try (Connection con = BasedeDatos.getConnection();
-                PreparedStatement ps = con.prepareStatement(sql)) {
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
@@ -83,6 +81,16 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO, Integer> {
         }
         
         return ubicacionBien;
+    }
+    
+    @Override
+    public UbicacionDTO buscar(Integer id) {
+        try (Connection con = BasedeDatos.getConnection()) {
+            return this.buscar(id, con);
+        } catch (SQLException ex) {
+            System.getLogger(UbicacionDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+        return null;
     }
 
     @Override
@@ -134,13 +142,12 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO, Integer> {
         return resultado;
     }
     
-    public UbicacionDTO buscar(String nombre) {
+    public UbicacionDTO buscar(String nombre, Connection con) {
 
         UbicacionDTO ubicacion = null;
         String sql = "SELECT * FROM Ubicacion WHERE Nombre = ? AND Eliminado = 0";
 
-        try (Connection con = BasedeDatos.getConnection();
-                PreparedStatement ps = con.prepareStatement(sql)) {
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setString(1, nombre);
             try (ResultSet rs = ps.executeQuery()) {
@@ -157,6 +164,15 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO, Integer> {
         }
         
         return ubicacion;
+    }
+    
+    public UbicacionDTO buscar(String nombre) {
+        try (Connection con = BasedeDatos.getConnection()) {
+            return this.buscar(nombre, con);
+        } catch (SQLException ex) {
+            System.getLogger(UbicacionDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+        return null;
     }
 
 }

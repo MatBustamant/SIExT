@@ -9,8 +9,10 @@ import com.grupocapa8.siext.DAO.SolicitudDAOImpl;
 import com.grupocapa8.siext.DAO.UbicacionDAOImpl;
 import com.grupocapa8.siext.DTO.Bienes_por_SolicitudDTO;
 import com.grupocapa8.siext.DTO.CategoriaBienDTO;
+import com.grupocapa8.siext.DTO.EventoTrazabilidadDTO;
 import com.grupocapa8.siext.DTO.SolicitudDTO;
 import com.grupocapa8.siext.DTO.UbicacionDTO;
+import com.grupocapa8.siext.Enums.TipoEvento;
 import com.grupocapa8.siext.Util.Validador;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -25,6 +27,7 @@ public class SolicitudService implements ServiceGenerico<SolicitudDTO> {
     private final ResponsableDAOImpl responsableDAO;
     private final ResponsableService responsableService;
     private final Bienes_por_SolicitudDAOImpl bienesDAO;
+    private final EventoTrazabilidadServices eventoService;
 
     private final static String CAMPO_ID_TEXT = "Número de solicitud";
     private final static String CAMPO_UBICACION_TEXT = "Ubicación";
@@ -41,6 +44,7 @@ public class SolicitudService implements ServiceGenerico<SolicitudDTO> {
         this.bienesDAO = new Bienes_por_SolicitudDAOImpl();
         this.responsableService = new ResponsableService();
         this.catDAO = new CategoriaDAOImpl();
+        this.eventoService = new EventoTrazabilidadServices();
     }
 
     @Override
@@ -73,7 +77,6 @@ public class SolicitudService implements ServiceGenerico<SolicitudDTO> {
         } catch (NoSuchElementException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
-        
 
         if (ubiDAO.buscar(ubicacion) == null) {
             UbicacionDTO nuevaUbicacion = new UbicacionDTO(0, ubicacion, false);
@@ -120,10 +123,13 @@ public class SolicitudService implements ServiceGenerico<SolicitudDTO> {
             Validador.validarId(bien.getCantidad(), CAMPO_CANTIDAD_TEXT); // Asumimos > 0
         }
 
+        if (estadoActual == EstadoSolicitud.SATISFECHA) {
+            throw new IllegalArgumentException("No se pueden modificar los datos de una solicitud ya completada.");
+        }
         // si está desaprobada o satisfecha, no se pueden cambiar los datos. Solo el estado.
-        if ((estadoActual == EstadoSolicitud.DESAPROBADA || estadoActual == EstadoSolicitud.SATISFECHA) && estadoActual == estadoNuevo) {
-            throw new IllegalArgumentException("No se puede modificar los datos de una solicitud ya " + estadoActual.name());
-        } else if ((estadoActual == EstadoSolicitud.DESAPROBADA || estadoActual == EstadoSolicitud.SATISFECHA) && estadoNuevo != EstadoSolicitud.POR_REVISAR) {
+        if ((estadoActual == EstadoSolicitud.DESAPROBADA) && estadoActual == estadoNuevo) {
+            throw new IllegalArgumentException("No se puede modificar el contenido de una solicitud ya desaprobada.");
+        } else if ((estadoActual == EstadoSolicitud.DESAPROBADA) && estadoNuevo != EstadoSolicitud.POR_REVISAR) {
             throw new IllegalArgumentException("La solicitud solo puede volver a revisión.");
         }
         // si el estado es aprobada, sólo puede cambiar a satisfecha o volver a revisión
@@ -152,40 +158,79 @@ public class SolicitudService implements ServiceGenerico<SolicitudDTO> {
             UbicacionDTO nuevaUbicacion = new UbicacionDTO(0, ubicacion, false);
             ubiDAO.insertar(nuevaUbicacion);
         }
-
-        // si las lista de bienes no son iguales se elimina y recrea
-        List<Bienes_por_SolicitudDTO> bienesActuales = bienesDAO.buscarPorSolicitud(id);
-        List<Bienes_por_SolicitudDTO> bienesNuevos = dto.getBienesPedidos();
         Connection con = null;
-        try {
-            con = BasedeDatos.getConnection();
-            con.setAutoCommit(false); // <-- INICIO DE TRANSACCIÓN
 
-            if (bienesActuales.size() != bienesNuevos.size() || !bienesActuales.containsAll(bienesNuevos)) {
-                bienesDAO.reemplazarPorSolicitud(id, bienesNuevos, con);
+        if (estadoActual == EstadoSolicitud.APROBADA && estadoNuevo == EstadoSolicitud.SATISFECHA) {
+            List<Integer> listaDeNrosDeInv = dto.getNroInventarioDeBienesAEntregar();
+            if (listaDeNrosDeInv == null || listaDeNrosDeInv.isEmpty()) {
+                throw new IllegalArgumentException("No se puede completar una solicitud sin entregar los bienes.");
             }
-            solicitudDAO.actualizar(dto, con);
+            try {
+                con = BasedeDatos.getConnection();
+                con.setAutoCommit(false);
+                for (Integer nro : listaDeNrosDeInv) {
+                    EventoTrazabilidadDTO eventoEntrega = new EventoTrazabilidadDTO();
+                    eventoEntrega.setBienAsociado(nro);
+                    eventoEntrega.setTipoEvento(TipoEvento.ENTREGA);
+                    eventoEntrega.setNumSolicitud(id);
+                    eventoEntrega.setUbicacionDestino(ubicacion);
+                    eventoService.crearEntrega(eventoEntrega, con);
+                }
+            } catch (SQLException ex) {
+                System.getLogger(SolicitudService.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+                try {
+                    if (con != null) {
+                        con.rollback(); // <-- DESHACER CAMBIOS (FALLO)
+                    }
+                } catch (SQLException eRollback) {
+                    System.getLogger(SolicitudService.class.getName()).log(System.Logger.Level.ERROR, "Error al hacer rollback", eRollback);
+                }
+            } finally {
+                // --- MANEJO DE CONEXIÓN CORREGIDO ---
+                // Esto es CRÍTICO para no bloquear la base de datos.
+                try {
+                    if (con != null) {
+                        con.setAutoCommit(true); // Restaurar estado original
+                        con.close();             // Liberar la conexión
+                    }
+                } catch (SQLException eClose) {
+                    System.getLogger(SolicitudService.class.getName()).log(System.Logger.Level.ERROR, "Error al cerrar la conexión", eClose);
+                }
+            }
+        } else {
+            // si las lista de bienes no son iguales se elimina y recrea
+            List<Bienes_por_SolicitudDTO> bienesActuales = bienesDAO.buscarPorSolicitud(id);
+            List<Bienes_por_SolicitudDTO> bienesNuevos = dto.getBienesPedidos();
+            try {
+                con = BasedeDatos.getConnection();
+                con.setAutoCommit(false); // <-- INICIO DE TRANSACCIÓN
 
-            con.commit(); // <-- FIN DE TRANSACCIÓN
-        } catch (SQLException ex) {
-            System.getLogger(SolicitudService.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
-            try {
-                if (con != null) {
-                    con.rollback(); // <-- DESHACER CAMBIOS (FALLO)
+                if (bienesActuales.size() != bienesNuevos.size() || !bienesActuales.containsAll(bienesNuevos)) {
+                    bienesDAO.reemplazarPorSolicitud(id, bienesNuevos, con);
                 }
-            } catch (SQLException eRollback) {
-                System.getLogger(SolicitudService.class.getName()).log(System.Logger.Level.ERROR, "Error al hacer rollback", eRollback);
-            }
-        } finally {
-            // --- MANEJO DE CONEXIÓN CORREGIDO ---
-            // Esto es CRÍTICO para no bloquear la base de datos.
-            try {
-                if (con != null) {
-                    con.setAutoCommit(true); // Restaurar estado original
-                    con.close();             // Liberar la conexión
+                solicitudDAO.actualizar(dto, con);
+
+                con.commit(); // <-- FIN DE TRANSACCIÓN
+            } catch (SQLException ex) {
+                System.getLogger(SolicitudService.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+                try {
+                    if (con != null) {
+                        con.rollback(); // <-- DESHACER CAMBIOS (FALLO)
+                    }
+                } catch (SQLException eRollback) {
+                    System.getLogger(SolicitudService.class.getName()).log(System.Logger.Level.ERROR, "Error al hacer rollback", eRollback);
                 }
-            } catch (SQLException eClose) {
-                System.getLogger(SolicitudService.class.getName()).log(System.Logger.Level.ERROR, "Error al cerrar la conexión", eClose);
+            } finally {
+                // --- MANEJO DE CONEXIÓN CORREGIDO ---
+                // Esto es CRÍTICO para no bloquear la base de datos.
+                try {
+                    if (con != null) {
+                        con.setAutoCommit(true); // Restaurar estado original
+                        con.close();             // Liberar la conexión
+                    }
+                } catch (SQLException eClose) {
+                    System.getLogger(SolicitudService.class.getName()).log(System.Logger.Level.ERROR, "Error al cerrar la conexión", eClose);
+                }
             }
         }
     }

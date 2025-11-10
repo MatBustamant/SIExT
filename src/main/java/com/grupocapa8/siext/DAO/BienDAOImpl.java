@@ -32,8 +32,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO, Integer> {
         this.ubicacionDAO = new UbicacionDAOImpl();
     }
 
-    @Override
-    public BienDTO buscar(Integer id) {
+    public BienDTO buscar(Integer id, Connection con) {
 
         BienDTO bien = null;
         String sql = "SELECT b.*, c.Nombre AS CategoriaNombre, u.Nombre AS UbicacionNombre " +
@@ -42,8 +41,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO, Integer> {
                      "JOIN Ubicacion u ON b.ID_Ubicacion = u.ID_Ubicacion " +
                      "WHERE b.ID_Bien = ?";
 
-        try (Connection con = BasedeDatos.getConnection();
-                PreparedStatement ps = con.prepareStatement(sql)) {
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
@@ -65,6 +63,16 @@ public class BienDAOImpl implements DAOGenerica<BienDTO, Integer> {
         }
 
         return bien;
+    }
+    
+    @Override
+    public BienDTO buscar(Integer id) {
+        try (Connection con = BasedeDatos.getConnection()) {
+            return buscar(id, con);
+        } catch (SQLException ex) {
+            System.getLogger(BienDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+        return null;
     }
 
     @Override
@@ -179,17 +187,24 @@ public class BienDAOImpl implements DAOGenerica<BienDTO, Integer> {
         }
     }
     
-    public void cambiarUbicacion(BienDTO bien, String nombreUbicacion) {
+    public void cambiarUbicacion(BienDTO bien, String nombreUbicacion, Connection con) {
         String sql = "UPDATE Bien SET ID_Ubicacion = ? WHERE ID_Bien = ?";
-        int idUbicacion = ubicacionDAO.buscar(nombreUbicacion).getID_Ubicacion();
+        int idUbicacion = ubicacionDAO.buscar(nombreUbicacion, con).getID_Ubicacion();
         
-        try (Connection con = BasedeDatos.getConnection();
-                PreparedStatement ps = con.prepareStatement(sql)) {
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, idUbicacion);
             ps.setInt(2, bien.getID_Bien());
             
             ps.executeUpdate();
+        } catch (SQLException ex) {
+            System.getLogger(BienDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+    }
+    
+    public void cambiarUbicacion(BienDTO bien, String nombreUbicacion) {
+        try (Connection con = BasedeDatos.getConnection()) {
+            this.cambiarUbicacion(bien, nombreUbicacion, con);
         } catch (SQLException ex) {
             System.getLogger(BienDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }

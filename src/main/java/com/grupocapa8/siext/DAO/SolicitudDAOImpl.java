@@ -157,8 +157,7 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO, Integer> {
 
     @Override
     public int actualizar(SolicitudDTO Solicitud) {
-        try {
-            Connection con = BasedeDatos.getConnection();
+        try (Connection con = BasedeDatos.getConnection()) {
             return this.actualizar(Solicitud, con);
         } catch (SQLException ex) {
             System.getLogger(SolicitudDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
@@ -184,8 +183,7 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO, Integer> {
 
     @Override
     public int eliminar(Integer id) {
-        try {
-            Connection con = BasedeDatos.getConnection();
+        try (Connection con = BasedeDatos.getConnection()) {
             return this.eliminar(id, con);
         } catch (SQLException ex) {
             System.getLogger(SolicitudDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
