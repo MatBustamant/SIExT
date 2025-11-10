@@ -68,7 +68,12 @@ public class SolicitudService implements ServiceGenerico<SolicitudDTO> {
         Validador.validarString(ubicacion, CAMPO_UBICACION_TEXT, CAMPO_UBICACION_MIN, CAMPO_UBICACION_MAX);
         Validador.validarDestinoSolicitud(ubicacion, CAMPO_UBICACION_TEXT);
 
-        responsableService.buscar(dto.getSolicitante());
+        try {
+            responsableService.buscar(dto.getSolicitante());
+        } catch (NoSuchElementException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
+        
 
         if (ubiDAO.buscar(ubicacion) == null) {
             UbicacionDTO nuevaUbicacion = new UbicacionDTO(0, ubicacion, false);
@@ -137,7 +142,11 @@ public class SolicitudService implements ServiceGenerico<SolicitudDTO> {
         dto.setUbicacionBienes(ubicacion);
         dto.setNumSolicitud(id);
 
-        responsableService.buscar(dto.getSolicitante());
+        try {
+            responsableService.buscar(dto.getSolicitante());
+        } catch (NoSuchElementException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
 
         if (ubiDAO.buscar(ubicacion) == null) {
             UbicacionDTO nuevaUbicacion = new UbicacionDTO(0, ubicacion, false);
