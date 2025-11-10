@@ -19,7 +19,7 @@ function generarDetalleEvento(evento) {
     switch (evento.tipoEvento) {
         case "ENTREGA":
             claseDetalle = "entrega";
-            detalleHtml = `<p>Se destina a la ubicación <strong>${evento.ubicacionDestino || "N/A"}</strong></p>${evento.detalle ? `<p>Detalle adicionales: ${evento.detalle}</p>` : ""}`;
+            detalleHtml = `<p>Se destina a la ubicación <strong>${evento.ubicacionDestino || "N/A"}</strong>${evento.numSolicitud ? ` por solicitud Nro ${evento.numSolicitud}`:''}</p>${evento.detalle ? `<p>Detalle adicionales: ${evento.detalle}</p>` : ""}`;
             break;
         case "DEVOLUCION":
             claseDetalle = "devolucion";
