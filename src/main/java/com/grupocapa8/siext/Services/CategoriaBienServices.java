@@ -10,7 +10,7 @@ import java.util.NoSuchElementException;
  *
  * @author geroj
  */
-public class CategoriaBienServices implements ServiceGenerico<CategoriaBienDTO, Integer>{
+public class CategoriaBienServices implements ServiceGenerico<CategoriaBienDTO>{
     private final CategoriaDAOImpl categoriaBienDAO; //acceso a la BD
     
     private final static String CAMPO_ID_TEXT = "Identificador";
@@ -23,7 +23,7 @@ public class CategoriaBienServices implements ServiceGenerico<CategoriaBienDTO, 
     }
     
     @Override
-    public CategoriaBienDTO buscar(Integer idCategoriaBien) throws NoSuchElementException {
+    public CategoriaBienDTO buscar(int idCategoriaBien) throws NoSuchElementException {
         return this.buscar(idCategoriaBien, true);
     }
     
@@ -53,7 +53,7 @@ public class CategoriaBienServices implements ServiceGenerico<CategoriaBienDTO, 
     } 
     
     @Override
-    public void modificar(CategoriaBienDTO dto, Integer id) throws NoSuchElementException {
+    public void modificar(CategoriaBienDTO dto, int id) throws NoSuchElementException {
         this.buscar(id);
         
         String nombre = dto.getNombre().trim().toUpperCase();
@@ -66,7 +66,7 @@ public class CategoriaBienServices implements ServiceGenerico<CategoriaBienDTO, 
     } 
    
     @Override
-    public void eliminar(Integer idCategoriaBien) throws NoSuchElementException {
+    public void eliminar(int idCategoriaBien) throws NoSuchElementException {
         this.buscar(idCategoriaBien);
         categoriaBienDAO.eliminar(idCategoriaBien);
     }

@@ -13,7 +13,7 @@ import jakarta.ws.rs.Path;
  * @author oveja
  */
 @Path("responsable")
-public class ResponsableController  extends AbstractController<ResponsableDTO, Integer> {
+public class ResponsableController  extends AbstractController<ResponsableDTO> {
     
     public ResponsableController(){
         this.servicio = new ResponsableService();

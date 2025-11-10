@@ -22,9 +22,9 @@ import java.util.NoSuchElementException;
  *
  * @author Matias
  */
-public abstract class AbstractController<E, Q> {
+public abstract class AbstractController<E> {
     
-    protected ServiceGenerico<E, Q> servicio;
+    protected ServiceGenerico<E> servicio;
     
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -45,7 +45,7 @@ public abstract class AbstractController<E, Q> {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("leer/{id}")
-    public Response buscarPorId(@PathParam("id") Q id) {
+    public Response buscarPorId(@PathParam("id") int id) {
         try {
             E entidad = servicio.buscar(id);
             return Response.ok(entidad).build();
@@ -71,7 +71,7 @@ public abstract class AbstractController<E, Q> {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("modificar/{id}")
-    public Response modificar(E entidad, @PathParam("id") Q id) {
+    public Response modificar(E entidad, @PathParam("id") int id) {
         try {
             servicio.modificar(entidad, id);
             return Response.ok().build();
@@ -86,7 +86,7 @@ public abstract class AbstractController<E, Q> {
     
     @DELETE
     @Path("eliminar/{id}")
-    public Response eliminar(@PathParam("id") Q id) {
+    public Response eliminar(@PathParam("id") int id) {
         try {
             servicio.eliminar(id);
             return Response.ok().build();

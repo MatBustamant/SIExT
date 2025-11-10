@@ -13,7 +13,7 @@ import jakarta.ws.rs.Path;
  * @author Matias
  */
 @Path("ubicacion")
-public class UbicacionController extends AbstractController<UbicacionDTO, Integer>{
+public class UbicacionController extends AbstractController<UbicacionDTO>{
 
     public UbicacionController() {
         this.servicio = new UbicacionService();

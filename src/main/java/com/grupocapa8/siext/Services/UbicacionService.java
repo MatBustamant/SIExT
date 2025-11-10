@@ -10,7 +10,7 @@ import java.util.NoSuchElementException;
  *
  * @author geroj
  */
-public class UbicacionService implements ServiceGenerico<UbicacionDTO, Integer>{
+public class UbicacionService implements ServiceGenerico<UbicacionDTO>{
     private final UbicacionDAOImpl ubicacionDAO; //acceso a la BD
     
     private final static String CAMPO_ID_TEXT = "Identificador";
@@ -23,7 +23,7 @@ public class UbicacionService implements ServiceGenerico<UbicacionDTO, Integer>{
     }
     
     @Override
-    public UbicacionDTO buscar(Integer idUbicacion) throws NoSuchElementException {
+    public UbicacionDTO buscar(int idUbicacion) throws NoSuchElementException {
         return this.buscar(idUbicacion, true);
     }
     
@@ -52,7 +52,7 @@ public class UbicacionService implements ServiceGenerico<UbicacionDTO, Integer>{
     } 
     
     @Override
-    public void modificar(UbicacionDTO dto, Integer id) throws NoSuchElementException {
+    public void modificar(UbicacionDTO dto, int id) throws NoSuchElementException {
         this.buscar(id);
         
         String nombre = dto.getNombre().trim().toUpperCase();
@@ -65,7 +65,7 @@ public class UbicacionService implements ServiceGenerico<UbicacionDTO, Integer>{
     } 
    
     @Override
-    public void eliminar(Integer idUbicacion) throws NoSuchElementException {
+    public void eliminar(int idUbicacion) throws NoSuchElementException {
         this.buscar(idUbicacion);
         
         ubicacionDAO.eliminar(idUbicacion);

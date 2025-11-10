@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-public class SolicitudService implements ServiceGenerico<SolicitudDTO, Integer> {
+public class SolicitudService implements ServiceGenerico<SolicitudDTO> {
     private final SolicitudDAOImpl solicitudDAO; //acceso a la BD
     private final UbicacionDAOImpl ubiDAO;
     private final ResponsableDAOImpl responsableDAO;
@@ -37,7 +37,7 @@ public class SolicitudService implements ServiceGenerico<SolicitudDTO, Integer> 
     }
     
     @Override
-    public SolicitudDTO buscar(Integer numSolicitud) throws NoSuchElementException {
+    public SolicitudDTO buscar(int numSolicitud) throws NoSuchElementException {
         return this.buscar(numSolicitud, true);
     }
     
@@ -96,7 +96,7 @@ public class SolicitudService implements ServiceGenerico<SolicitudDTO, Integer> 
     } 
     
     @Override
-    public void modificar(SolicitudDTO dto, Integer id) throws NoSuchElementException {
+    public void modificar(SolicitudDTO dto, int id) throws NoSuchElementException {
         
         SolicitudDTO solicitudActual = this.buscar(id);
         EstadoSolicitud estadoActual = solicitudActual.getEstado();
@@ -146,7 +146,7 @@ public class SolicitudService implements ServiceGenerico<SolicitudDTO, Integer> 
     }
     
     @Override
-    public void eliminar(Integer numSolicitud) throws NoSuchElementException {
+    public void eliminar(int numSolicitud) throws NoSuchElementException {
         this.buscar(numSolicitud);
         Connection con = null;
         try {
