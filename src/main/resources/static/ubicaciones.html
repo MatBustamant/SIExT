@@ -127,7 +127,7 @@
         function ubicacionExiste(nombre) {
             const ubicaciones = JSON.parse(localStorage.getItem("ubicaciones")) || [];
 
-            if (ubicaciones.some(c => c.nombre === nombre) || nombre === "SIN ASIGNAR") {
+            if (ubicaciones.some(c => c.nombre === nombre && !c.eliminado) || nombre === "SIN ASIGNAR") {
                 alert("Esa ubicación ya existe.");
                 return true;
             }
