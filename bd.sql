@@ -15,7 +15,7 @@ CREATE TABLE "Bienes_por_Solicitud" (
 	"ID_Categoria"	INTEGER NOT NULL,
 	"Num_Solicitud"	INTEGER NOT NULL,
 	"Cantidad"	INTEGER NOT NULL,
-	"Eliminado"	INTEGER NOT NULL,
+	"Eliminado"	INTEGER NOT NULL DEFAULT 0,
 	PRIMARY KEY("ID_Categoria","Num_Solicitud"),
 	FOREIGN KEY("ID_Categoria") REFERENCES "Categoria"("ID_Categoria"),
 	FOREIGN KEY("Num_Solicitud") REFERENCES "Solicitud"("Num_Solicitud")
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS "EventoTrazabilidad" (
 CREATE TABLE IF NOT EXISTS "Responsable" (
 	"Legajo"	INTEGER NOT NULL,
 	"Nombre_Apellido"	TEXT NOT NULL,
-	"Eliminado"	INTEGER NOT NULL,
+	"Eliminado"	INTEGER NOT NULL DEFAULT 0,
 	PRIMARY KEY("Legajo")
 );
 CREATE TABLE "Solicitud" (
@@ -52,7 +52,7 @@ CREATE TABLE "Solicitud" (
 	"Destino"	INTEGER NOT NULL,
 	"Legajo"	INTEGER NOT NULL,
 	"Fecha_Solicitud"	TEXT NOT NULL DEFAULT (datetime('now')),
-	"Descripcion"	TEXT NOT NULL,
+	"Descripcion"	TEXT,
 	"Eliminado"	INTEGER NOT NULL DEFAULT 0,
 	PRIMARY KEY("Num_Solicitud" AUTOINCREMENT),
 	FOREIGN KEY("Destino") REFERENCES "Ubicacion"("ID_Ubicacion"),
@@ -61,6 +61,7 @@ CREATE TABLE "Solicitud" (
 CREATE TABLE IF NOT EXISTS "Ubicacion" (
 	"ID_Ubicacion"	INTEGER NOT NULL,
 	"Nombre"	TEXT NOT NULL,
+	"Es_Editable"	INTEGER NOT NULL DEFAULT 1,
 	"Eliminado"	INTEGER NOT NULL DEFAULT 0,
 	PRIMARY KEY("ID_Ubicacion" AUTOINCREMENT)
 );
