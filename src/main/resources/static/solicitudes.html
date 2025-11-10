@@ -223,7 +223,8 @@
                 <datalist id="ubicacionesSugeridas"></datalist>
                 <label>Items solicitados</label>
                 <div class="input-group-agregar">
-                    <input type="text" id="itemCategoria" placeholder="COMPUTADORAS" style="margin-bottom: 0;" />
+                    <input list="categoriasSugeridas" type="text" id="itemCategoria" placeholder="COMPUTADORAS" style="margin-bottom: 0;" />
+                    <datalist id="categoriasSugeridas"></datalist>
                     <input type="number" id="itemCantidad" placeholder="Cant." min="1" style="margin-bottom: 0;" />
                     <button type="button" id="btnAgregarItem" class="btn" style="margin-bottom: 0;">Agregar</button>
                 </div>
@@ -318,7 +319,7 @@
                 </select>
                 <label>Items solicitados</label>
                 <div class="input-group-agregar">
-                    <input type="text" id="modItemCategoria" placeholder="Ej: IMPRESORA" style="margin-bottom: 0;" />
+                    <input list="categoriasSugeridas" type="text" id="modItemCategoria" placeholder="Ej: IMPRESORA" style="margin-bottom: 0;" />
                     <input type="number" id="modItemCantidad" placeholder="Cant." min="1" style="margin-bottom: 0;" />
                     <button type="button" id="btnModAgregarItem" class="btn" style="margin-bottom: 0;">Agregar</button>
                 </div>
@@ -665,6 +666,7 @@
         });
 
         cargarOpciones("ubicacionesSugeridas", "ubicaciones", false);
+        cargarOpciones("categoriasSugeridas", "categorias");
 
         document.getElementById("solicitudForm").addEventListener("submit", async (e) => {
             e.preventDefault();
@@ -715,6 +717,7 @@
             await recargarCategorias();
 
             cargarOpciones("ubicacionesSugeridas", "ubicaciones", false);
+            cargarOpciones("categoriasSugeridas", "categorias");
             renderSolicitudes();
             itemsSolicitados = [];
             renderItemsCreate();
@@ -766,12 +769,13 @@
             const nuevosItemsString = JSON.stringify(modItemsSolicitados);
             const nuevaDescrInput = document.getElementById("modDescripcion").value.trim().toUpperCase();
             const nuevaDescrTemp = nuevaDescrInput === "" ? null : nuevaDescrInput;
+            let idsBienesAsignados;
 
             if (originalEstado === "APROBADA" && nuevoEstado === "SATISFECHA") {
                 try {
                     // Esperamos a que el usuario termine de usar el modal
                     // modItemsSolicitados es el array global con lo que el usuario pide
-                    const idsBienesAsignados = await openAsignarBienesModal(modItemsSolicitados);
+                    idsBienesAsignados = await openAsignarBienesModal(modItemsSolicitados);
                     
                     // Si la promise se resuelve, continuamos.
                     // 'idsBienesAsignados' contiene los IDs, pero tu API actual no
@@ -811,7 +815,8 @@
                 ubicacionBienes: nuevaUbicacion,
                 ...(nuevaDescrTemp ? { descripcion: nuevaDescrTemp } : {}),
                 estado: nuevoEstado,
-                bienesPedidos: modItemsSolicitados
+                bienesPedidos: modItemsSolicitados,
+                ...(idsBienesAsignados ? {nroInventarioDeBienesAEntregar: idsBienesAsignados} : {})
             }
 
             try {
@@ -845,6 +850,7 @@
             await recargarCategorias();
 
             cargarOpciones("ubicacionesSugeridas", "ubicaciones", false);
+            cargarOpciones("categoriasSugeridas", "categorias");
             renderSolicitudes();
             document.getElementById("modificarSolicitudSection").classList.add("hidden");
             modItemsSolicitados = [];
