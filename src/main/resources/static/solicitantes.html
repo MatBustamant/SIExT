@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Editar solicitantes - SIExT</title>
+    <link href="icons/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/tablas.css">
+    <link rel="icon" href="images/icon.png">
+</head>
+
+<body>
+    <header>
+        <span>SIExT | Editar solicitantes</span>
+        <div id="userInfo" class="user-info">
+            <span id="username"></span>
+            <i class="bi bi-person-circle"></i>
+            <div id="userMenu" class="user-menu hidden">
+                <p id="userRole"><i id="rolIcon" class="bi bi-person-circle"></i></p>
+                <button id="logoutBtn" class="btn btn-danger">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="default-block-container">
+        <nav>
+            <h2>Acciones rápidas</h2>
+            <ul>
+                <li><a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver a Panel</a></li>
+                <li><a href="solicitudes.html" class="btn"><i class="bi bi-card-checklist"></i>Gestionar Solicitudes</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main class="default-block-container">
+        <!-- Formulario para agregar nuevo solicitante -->
+        <section>
+            <h2>Agregar nuevo solicitante</h2>
+            <form id="solicitanteForm">
+                <div class="form-grid">
+                    <div>
+                        <label for="legajo">Legajo</label><!-- QUITAR (capaz, ni idea, a ver cómo manejamos esto) -->
+                        <input type="number" id="legajo" placeholder="23815432" min="1000000" max="99999999" required><!-- QUITAR (capaz, ni idea, a ver cómo manejamos esto) -->
+                    </div>
+                    <div>
+                        <label for="nombreSolicitante">Nombre de Solicitante</label>
+                        <input type="text" id="nombreSolicitante" placeholder="DIEGO" required>
+                    </div>
+                </div>
+                <div>
+                    <button type="submit" class="btn"><i class="bi bi-plus-circle"></i>Registrar</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Gestión de solicitantes -->
+        <section>
+            <h2>Solicitantes registrados</h2>
+            <!-- Filtros -->
+            <div class="form-grid">
+                <div>
+                    <label for="filterIdSol">Legajo</label>
+                    <input type="number" id="filterIdSol" placeholder="Filtrar por legajo...">
+                </div>
+                <div>
+                    <label for="filterNombreSol">Nombre</label>
+                    <input type="text" id="filterNombreSol" placeholder="Filtrar por nombre...">
+                </div>
+            </div>
+
+            <table id="tablaSolicitantes">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Legajo</th>
+                        <th>Nombre</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <div class="pagination-controls">
+                <button id="prevPage" class="btn"><i class="bi bi-chevron-left"></i> Anterior</button>
+                <span id="pageInfo">Página 1 de 1</span>
+                <button id="nextPage" class="btn">Siguiente <i class="bi bi-chevron-right"></i></button>
+                <select id="rowsPerPageSelect">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="15" selected>15</option>
+                    <option value="20">20</option>
+                    <option value="25">25</option>
+                    <option value="30">30</option>
+                </select>
+                <label for="rowsPerPageSelect">por página</label>
+            </div>
+            
+            <div class="informativo" id="contadorSolicitantes"></div>
+        </section>
+
+        <!-- Formulario para modificar solicitante seleccionado -->
+        <section id="modificarSolicitanteSection" class="hidden">
+            <h2>Actualizar solicitante</h2>
+            <form id="modificarSolicitanteForm">
+                <label for="modSolId">Legajo</label>
+                <input type="number" id="modSolId" placeholder="23815432" min="1000000" max="99999999" required><!-- QUITAR (capaz, ni idea. Onda, volver a ponerlo disabled y sin required)-->
+                <label for="modNombreSol">Nombre de Solicitante</label>
+                <input type="text" id="modNombreSol" placeholder="DIEGO" required>
+                <div class="btn-row">
+                    <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
+                    <button type="button" class="btn" id="cancelarBtn"><i class="bi bi-x-circle"></i>Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="eliminarSolBtn"><i
+                            class="bi bi-trash"></i>Eliminar</button>
+                </div>
+            </form>
+        </section>
+
+    </main>
+
+    <footer>SIExT | 2025</footer>
+
+    <script src="js/auth.js"></script>
+    <script>
+        verificarAuth();
+    </script>
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/forms.js"></script>
+    <script>
+        function solicitanteExiste(legajo) {
+            const solicitantes = JSON.parse(localStorage.getItem("mockSolicitantes")) || []; //QUITAR
+
+            if (solicitantes.some(s => s.legajo === legajo && !s.eliminado)) {
+                alert("Un solicitante con ese legajo ya existe.");
+                return true;
+            }
+            return false;
+        } // QUITAR (CREO, porque no hay forma de chequearlo por legajo al momento de la creación, y los nombres de persona pueden repetirse)
+
+        let currentPage = 1;
+        let rowsPerPage = parseInt(document.getElementById("rowsPerPageSelect").value, 10);
+        let totalPages = 1;
+
+        function renderizarSolicitantes() {
+            const solicitantes = JSON.parse(localStorage.getItem("mockSolicitantes")) || []; // QUITAR
+            const solicitantesHabilitados = solicitantes.filter(s => !s.eliminado);
+
+            const filtroNombre = document.getElementById("filterNombreSol").value.toUpperCase().trim();
+            const filtroId = document.getElementById("filterIdSol").value;
+            const tbody = document.querySelector("#tablaSolicitantes tbody");
+            tbody.innerHTML = "";
+
+            // Filtrado
+            const filtradas = solicitantesHabilitados.filter(sol =>
+                matchTexto(sol.nombre, filtroNombre) && matchNumero(sol.legajo, filtroId)
+            );
+
+            // Paginación
+            const totalRows = filtradas.length;
+            totalPages = Math.ceil(totalRows / rowsPerPage);
+            if (currentPage > totalPages) currentPage = totalPages || 1;
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const paginadas = filtradas.slice(startIndex, endIndex);
+
+            if (paginadas.length === 0) {
+                const filaVacia = document.createElement("tr");
+                filaVacia.innerHTML = `<td colspan="4" class="text-center">(No hay resultados que coincidan)</td>`;
+                tbody.appendChild(filaVacia);
+            }
+
+            paginadas.forEach(sol => {
+                    const fila = document.createElement("tr");
+                    fila.innerHTML = `
+                    <td></td>
+                    <td>${sol.legajo}</td>
+                    <td>${sol.nombre}</td>
+                    <td>
+                        <button class="btn btn-editar btn-icon-table" data-id="${sol.legajo}" title="Editar solicitante">
+                            <i class='bi bi-pencil-fill'></i>
+                        </button>
+                    </td>`;
+                    tbody.appendChild(fila);
+            });
+            document.getElementById("contadorSolicitantes").textContent = `Mostrando ${paginadas.length} de ${totalRows} solicitante(s).`;
+            document.getElementById("pageInfo").textContent = `Página ${currentPage} de ${totalPages || 1}`;
+
+            document.getElementById("prevPage").disabled = (currentPage === 1);
+            document.getElementById("nextPage").disabled = (currentPage === totalPages || totalPages === 0);
+        }
+        recargarSolicitantes();
+        renderizarSolicitantes();
+
+        // Controles de paginación
+        document.getElementById("prevPage").addEventListener("click", () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderizarSolicitantes();
+        }
+        });
+        document.getElementById("nextPage").addEventListener("click", () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderizarSolicitantes();
+            }
+        });
+        document.getElementById("rowsPerPageSelect").addEventListener("change", (e) => {
+            rowsPerPage = parseInt(e.target.value);
+            currentPage = 1;
+            renderizarSolicitantes();
+        });
+
+        document.querySelector("#tablaSolicitantes tbody").addEventListener("click", (e) => {
+            // Buscamos si el clic fue en un botón de editar
+            const btnEditar = e.target.closest(".btn-editar");
+            if (btnEditar) {
+                const id = Number(btnEditar.dataset.id);
+                editarSolicitante(id);
+                return;
+            }
+        });
+        document.querySelectorAll("#filterIdSol, #filterNombreSol").forEach(input => {
+            const eventType = (input.tagName === "SELECT" || input.type === "date") ? "change" : "input";
+            input.addEventListener(eventType, () => {
+                currentPage = 1;
+                renderizarSolicitantes();
+            });
+        });
+
+        document.getElementById("solicitanteForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const nombre = document.getElementById("nombreSolicitante").value.trim().toUpperCase();
+            const legajo = parseInt(document.getElementById("legajo").value); //QUITAR capaz, de nuevo, legajo, idk
+            if (!nombre || !legajo) { //QUITAR legajo
+                alert("Datos incompletos.");
+                return;
+            }
+
+            const solicitante = {
+                nombre,
+                legajo,//QUITAR
+                eliminado: false//QUITAR
+            }
+
+            if (solicitanteExiste(solicitante.legajo)) return; //QUITAR capaz¿? legajo¿?
+
+            // try {
+            //     const response = await crearSolicitante(solicitante);
+            //     if (!response.ok) {
+            //         const errorData = await response.json();
+            //         if (response.status == 422) {
+            //             alert(errorData.error);
+            //             return;
+            //         }
+            //         else {
+            //             alert(`El servidor no pudo realizar el registro del solicitante. Código: ${response.status}`);
+            //             return;
+            //         }
+            //     }
+            // } catch (error) {
+            //     alert("No se pudo conectar con el servidor.");
+            //     return;
+            // }
+            // alert("Solicitante registrado.");
+            // await recargarSolicitantes();
+
+            const solicitantes = JSON.parse(localStorage.getItem("mockSolicitantes")) || []; //QUITAR
+            solicitantes.push(solicitante); //QUITAR
+            localStorage.setItem("mockSolicitantes", JSON.stringify(solicitantes)); //QUITAR
+
+            renderizarSolicitantes();
+            e.target.reset();
+        });
+
+        function editarSolicitante(id) {
+            const solicitantes = JSON.parse(localStorage.getItem("mockSolicitantes")) || [];//QUITAR
+            const sol = solicitantes.find(s => s.legajo === id && !s.eliminado); //QUITAR
+            if (!sol) return;
+            const form = document.getElementById("modificarSolicitanteForm");
+            form.dataset.originalNombre = sol.nombre.trim().toUpperCase() || "";
+            form.dataset.originalLegajo = sol.legajo;//QUITAR
+
+            document.getElementById("modSolId").value = sol.legajo;
+            document.getElementById("modNombreSol").value = sol.nombre;
+
+            document.getElementById("modificarSolicitanteSection").classList.remove("hidden");
+
+            document.getElementById("modificarSolicitanteSection").scrollIntoView({ behavior: "smooth" });
+            document.getElementById("modNombreSol").focus({ preventScroll: true });
+        }
+
+        document.getElementById("modificarSolicitanteForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const legajo = parseInt(document.getElementById("modSolId").value);
+            const form = e.target;
+            const originalNombre = form.dataset.originalNombre;
+            const originalLegajo = parseInt(form.dataset.originalLegajo); //QUITAR
+
+            const nombreInput = document.getElementById("modNombreSol").value.trim().toUpperCase();
+
+            if (originalNombre === nombreInput &&
+                originalLegajo === legajo//QUITAR
+            ) {
+                alert("No se detectaron cambios en los datos.");
+                return;
+            }
+
+            if (!nombreInput || !legajo) {//QUITAR
+                alert("Datos incompletos.");
+                return;
+            }
+
+            const solicitanteModificado = {
+                nombre: nombreInput,
+                legajo//QUITAR
+            }
+            if (originalLegajo != legajo) {//QUITAR
+                if (solicitanteExiste(solicitanteModificado.legajo)) return;
+            }
+
+            // try {
+            //     const response = await modificarSolicitante(solicitanteModificado, originalLegajo); // AQUI PUSE originalLegajo por si acaso
+            //     if (!response.ok) {
+            //         const errorData = await response.json();
+            //         if (response.status == 422) {
+            //             alert(errorData.error);
+            //             return;
+            //         }
+            //         if (response.status == 404) {
+            //             alert("Solicitante no encontrado.");
+            //             return;
+            //         }
+            //         if (response.status == 500) {
+            //             alert("El servidor no pudo realizar la modificación del solicitante. Código: 500");
+            //             return;
+            //         } else {
+            //             alert(`El servidor no pudo realizar la modificación del solicitante. Código: ${response.status}`);
+            //             return;
+            //         }
+            //     }
+            // } catch (error) {
+            //     alert("No se pudo conectar con el servidor.");
+            //     return;
+            // }
+
+            // alert("Solicitante actualizado.");
+            // await recargarSolicitantes();
+
+            let solicitantes = JSON.parse(localStorage.getItem("mockSolicitantes")) || []; //QUITAR
+            solicitantes = solicitantes.map(sol => sol.legajo == originalLegajo ? {...sol, ...solicitanteModificado} : sol); //QUITAR
+            localStorage.setItem("mockSolicitantes", JSON.stringify(solicitantes)); //QUITAR
+
+            renderizarSolicitantes();
+            document.getElementById("modificarSolicitanteSection").classList.add("hidden");
+            e.target.reset();
+
+            document.getElementById("tablaSolicitantes").parentElement.scrollIntoView({ behavior: "smooth" });
+        });
+
+        // Cancelar edición de datos
+        document.getElementById("cancelarBtn").onclick = () => {
+            if (confirm("¿Deseás cancelar la edición? Se perderán los cambios no guardados.")) {
+                document.getElementById("modificarSolicitanteSection").classList.add("hidden");
+                document.getElementById("modificarSolicitanteForm").reset();
+
+                document.getElementById("tablaSolicitantes").parentElement.scrollIntoView({ behavior: "smooth" });
+            }
+        };
+
+        document.getElementById("eliminarSolBtn").addEventListener("click", async () => {
+            const legajo = +document.getElementById("modSolId").value;
+            const form = document.getElementById("modificarSolicitanteForm");
+            const originalLegajo = parseInt(form.dataset.originalLegajo); //QUITAR
+            if (!confirm("¿Eliminar este solicitante?")) return;
+
+            let solicitantes = JSON.parse(localStorage.getItem("mockSolicitantes")) || []; //QUITAR
+            solicitantes = solicitantes.map(sol => sol.legajo == originalLegajo ? {...sol, eliminado: true} : sol); //QUITAR
+            localStorage.setItem("mockSolicitantes", JSON.stringify(solicitantes)); //QUITAR
+
+            // try {
+            //     const response = await eliminarSolicitante(originalLegajo); //QUITAR puse originalLegajo por si acaso
+            //     if (!response.ok) {
+            //         const errorData = await response.json();
+            //         if (response.status == 422) {
+            //             alert(errorData.error);
+            //             return;
+            //         }
+            //         if (response.status == 500) {
+            //             alert("El servidor no pudo realizar la eliminación del solicitante. Código: 500");
+            //             return;
+            //         }
+            //         else {
+            //             alert(`El servidor no pudo realizar la eliminación del solicitante. Código: ${response.status}`);
+            //             return;
+            //         }
+            //     }
+            // } catch (error) {
+            //     alert("No se pudo conectar con el servidor.");
+            //     return;
+            // }
+            // alert("Solicitante eliminado.");
+            // await recargarSolicitantes();
+            renderizarSolicitantes();
+            document.getElementById("modificarSolicitanteSection").classList.add("hidden");
+            document.getElementById("modificarSolicitanteForm").reset();
+
+            document.getElementById("tablaSolicitantes").parentElement.scrollIntoView({ behavior: "smooth" });
+        });
+
+        renderizarSolicitantes();
+    </script>
+
+</body>
+
+</html>

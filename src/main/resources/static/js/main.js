@@ -34,6 +34,12 @@ async function recargarUbicaciones() {
     localStorage.setItem('ubicaciones', JSON.stringify(ubicaciones));
 }
 
+async function recargarSolicitantes() {
+    const response = await leerSolicitantes();
+    const solicitantes = await response.json();
+    localStorage.setItem('solicitantes', JSON.stringify(solicitantes));
+}
+
 function recargarTodo() {
     recargarBienes();
     recargarSolicitudes();
@@ -41,4 +47,5 @@ function recargarTodo() {
     recargarUsuarios();
     recargarEventos();
     recargarUbicaciones();
+    recargarSolicitantes()
 }

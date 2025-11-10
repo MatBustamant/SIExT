@@ -9,6 +9,52 @@
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/tablas.css">
     <link rel="icon" href="images/icon.png">
+    <style>
+        .lista-items-agregados {
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .item-agregado {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .item-agregado:last-child {
+            border-bottom: none;
+        }
+
+        .item-agregado span {
+            font-weight: 500;
+        }
+
+        .input-group-agregar {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .input-group-agregar input[type="number"] {
+            width: 90px;
+            min-width: 70px;
+            flex: 0 1 90px;
+        }
+
+        .btn-sm-quitar {
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+            line-height: 1;
+            height: auto;
+        }
+    </style>
 </head>
 
 <body>
@@ -32,6 +78,7 @@
             <ul>
                 <li><a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver al Panel</a></li>
                 <li><a href="ubicaciones.html" class="btn"><i class="bi bi-geo-alt"></i>Editar Ubicaciones</a></li>
+                <li><a href="solicitantes.html" class="btn"><i class="bi bi-person-badge"></i></i>Editar Solicitantes</a></li>
                 <li><a href="bienes.html" class="btn"><i class="bi bi-box-seam"></i>Gestionar Bienes</a></li>
                 <li id="supervisor-only-accion" class="hidden"><a href="informes.html" class="btn"><i
                             class="bi bi-file-earmark-text"></i>Generar Informes</a></li>
@@ -45,18 +92,22 @@
         <section>
             <h2>Registrar nueva solicitud</h2>
             <form id="solicitudForm">
+                <label for="solicitante">Legajo de solicitante</label>
+                <input type="number" id="solicitante" placeholder="23815432" min="1000000" max="99999999" required>
                 <label for="ubicacion">Ubicación destino</label>
                 <input list="ubicacionesSugeridas" type="text" id="ubicacion" placeholder="BEDELÍA" required>
                 <datalist id="ubicacionesSugeridas"></datalist>
-                <label for="estado">Estado</label>
-                <select id="estado" required>
-                    <option value="POR_REVISAR">Pendiente de aprobación</option>
-                    <option value="APROBADA">Aprobada</option>
-                    <option value="DESAPROBADA">No aprobada</option>
-                    <option value="SATISFECHA">Completada</option>
-                </select>
+                <label>Items solicitados</label>
+                <div class="input-group-agregar">
+                    <input type="text" id="itemCategoria" placeholder="COMPUTADORAS" style="margin-bottom: 0;" />
+                    <input type="number" id="itemCantidad" placeholder="Cant." min="1" style="margin-bottom: 0;" />
+                    <button type="button" id="btnAgregarItem" class="btn" style="margin-bottom: 0;">Agregar</button>
+                </div>
+                <div id="listaItemsSolicitados" class="lista-items-agregados">
+                    <small>No hay items agregados.</small>
+                </div>
                 <label for="descripcion">Descripción</label>
-                <textarea id="descripcion" rows="4" placeholder="Detalles extra opcionales..." required></textarea>
+                <textarea id="descripcion" rows="4" placeholder="Detalles extra opcionales..."></textarea>
                 <button type="submit" class="btn"><i class="bi bi-plus-circle"></i>Registrar</button>
             </form>
         </section>
@@ -69,6 +120,10 @@
                 <div>
                     <label for="filterNroSolicitud">Nro. de solicitud</label>
                     <input type="number" id="filterNroSolicitud" placeholder="Filtrar por nro de solicitud...">
+                </div>
+                <div>
+                    <label for="filterSolicitante">Legajo de solicitante</label>
+                    <input type="number" id="filterSolicitante" placeholder="Filtrar por solicitante...">
                 </div>
                 <div>
                     <label for="filterUbicacion">Ubicación</label>
@@ -96,6 +151,7 @@
                         <th></th>
                         <th>N° Solicitud</th>
                         <th>Fecha</th>
+                        <th>Solicitante</th>
                         <th>Ubicación</th>
                         <th>Estado</th>
                         <th>Acciones</th>
@@ -128,17 +184,28 @@
             <form id="modificarSolicitudForm">
                 <label for="modSolicitudId">Nro. de solicitud</label>
                 <input type="number" id="modSolicitudId" disabled>
+                <label for="modSolicitante">Legajo de solicitante</label>
+                <input type="number" id="modSolicitante" placeholder="23815432" min="1000000" max="99999999" required>
                 <label for="modUbicacion">Ubicación destino</label>
                 <input list="ubicacionesSugeridas" type="text" id="modUbicacion" placeholder="BEDELÍA" required>
                 <label for="modEstado">Estado</label>
                 <select id="modEstado" required>
-                    <option value="POR_REVISAR">Pendiente de aprobación</option>
+                    <option value="POR_REVISAR" disabled>Pendiente de aprobación</option>
                     <option value="APROBADA">Aprobada</option>
                     <option value="DESAPROBADA">No aprobada</option>
                     <option value="SATISFECHA">Completada</option>
                 </select>
+                <label>Items solicitados</label>
+                <div class="input-group-agregar">
+                    <input type="text" id="modItemCategoria" placeholder="Ej: IMPRESORA" style="margin-bottom: 0;" />
+                    <input type="number" id="modItemCantidad" placeholder="Cant." min="1" style="margin-bottom: 0;" />
+                    <button type="button" id="btnModAgregarItem" class="btn" style="margin-bottom: 0;">Agregar</button>
+                </div>
+                <div id="modListaItemsSolicitados" class="lista-items-agregados">
+                    <small>No hay items agregados.</small>
+                </div>
                 <label for="modDescripcion">Descripción</label>
-                <textarea id="modDescripcion" rows="4" required placeholder="Detalles extra opcionales..."></textarea>
+                <textarea id="modDescripcion" rows="4" placeholder="Detalles extra opcionales..."></textarea>
                 <div class="btn-row">
                     <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
                     <button type="button" class="btn" id="cancelarBtn"><i class="bi bi-x-circle"></i>Cancelar</button>
@@ -165,18 +232,149 @@
         recargarSolicitudes();
         recargarUbicaciones();
 
+        let itemsSolicitados = [];
+        let modItemsSolicitados = [];
+
+        /**
+         * Renderiza la lista de items para el formulario de CREAR.
+         */
+        function renderItemsCreate() {
+            const cont = document.getElementById("listaItemsSolicitados");
+            cont.innerHTML = ""; // Limpiar
+            if (itemsSolicitados.length === 0) {
+                cont.innerHTML = "<small>No hay items agregados.</small>";
+                return;
+            }
+
+            itemsSolicitados.forEach((item, index) => {
+                const div = document.createElement("div");
+                div.className = "item-agregado";
+                div.innerHTML = `
+                    <span>${item.cantidad} &times; ${item.categoria.toUpperCase()}</span>
+                    <button type="button" class="btn btn-danger btn-sm-quitar" data-index="${index}" title="Quitar">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                `;
+                // Listener para el botón de quitar
+                div.querySelector("button").addEventListener("click", () => {
+                    itemsSolicitados.splice(index, 1); // Quitar del array
+                    renderItemsCreate(); // Re-renderizar
+                });
+                cont.appendChild(div);
+            });
+        }
+
+        /**
+         * Renderiza la lista de items para el formulario de MODIFICAR.
+         */
+        function renderItemsMod() {
+            const cont = document.getElementById("modListaItemsSolicitados");
+            cont.innerHTML = ""; // Limpiar
+            if (modItemsSolicitados.length === 0) {
+                cont.innerHTML = "<small>No hay items agregados.</small>";
+                return;
+            }
+
+            modItemsSolicitados.forEach((item, index) => {
+                const div = document.createElement("div");
+                div.className = "item-agregado";
+                div.innerHTML = `
+                    <span>${item.cantidad} &times; ${item.categoria.toUpperCase()}</span>
+                    <button type="button" class="btn btn-danger btn-sm-quitar" data-index="${index}" title="Quitar">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                `;
+                // Listener para el botón de quitar
+                div.querySelector("button").addEventListener("click", () => {
+                    modItemsSolicitados.splice(index, 1); // Quitar del array
+                    renderItemsMod(); // Re-renderizar
+                });
+                cont.appendChild(div);
+            });
+        }
+
+        document.getElementById("btnAgregarItem").addEventListener("click", () => {
+            const categoriaInput = document.getElementById("itemCategoria");
+            const cantidadInput = document.getElementById("itemCantidad");
+
+            const categoria = categoriaInput.value.trim().toUpperCase();
+            const cantidad = parseInt(cantidadInput.value);
+
+            if (!categoria) {
+                alert("Ingresá el nombre de la categoría o item.");
+                categoriaInput.focus();
+                return;
+            }
+            if (isNaN(cantidad) || cantidad < 1) {
+                alert("Ingresá una cantidad válida (mayor a 0).");
+                cantidadInput.focus();
+                return;
+            }
+
+            // Opcional: chequear duplicados
+            if (itemsSolicitados.find(item => item.categoria === categoria)) {
+                alert("Esa categoría ya fue agregada. Podés borrarla y volver a agregarla con otra cantidad.");
+                return;
+            }
+
+            itemsSolicitados.push({ categoria: categoria, cantidad: cantidad });
+            renderItemsCreate();
+
+            // Limpiar inputs
+            categoriaInput.value = "";
+            cantidadInput.value = "";
+            categoriaInput.focus();
+        });
+
+        // Listener para el botón "Agregar" del formulario de MODIFICACIÓN
+        document.getElementById("btnModAgregarItem").addEventListener("click", () => {
+            const categoriaInput = document.getElementById("modItemCategoria");
+            const cantidadInput = document.getElementById("modItemCantidad");
+
+            const categoria = categoriaInput.value.trim().toUpperCase();
+            const cantidad = parseInt(cantidadInput.value);
+
+            if (!categoria) {
+                alert("Ingresá el nombre de la categoría o item.");
+                categoriaInput.focus();
+                return;
+            }
+            if (isNaN(cantidad) || cantidad < 1) {
+                alert("Ingresá una cantidad válida (mayor a 0).");
+                cantidadInput.focus();
+                return;
+            }
+
+            // Opcional: chequear duplicados
+            if (modItemsSolicitados.find(item => item.categoria === categoria)) {
+                alert("Esa categoría ya fue agregada. Podés borrarla y volver a agregarla con otra cantidad.");
+                return;
+            }
+
+            modItemsSolicitados.push({ categoria: categoria, cantidad: cantidad });
+            renderItemsMod();
+
+            // Limpiar inputs
+            categoriaInput.value = "";
+            cantidadInput.value = "";
+            categoriaInput.focus();
+        });
+
         let currentPage = 1;
         let rowsPerPage = parseInt(document.getElementById("rowsPerPageSelect").value, 10);
         let totalPages = 1;
 
         function renderSolicitudes() {
-            const solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
+            const solicitudes = JSON.parse(localStorage.getItem("mockSolicitudes")) || []; //QUITAR
             const solicitudesHabilitadas = solicitudes.filter(s => !s.eliminado);
+
+            const solicitantes = JSON.parse(localStorage.getItem("mockSolicitantes")) || []; //QUITAR
 
             const filterNroSolicitud = document.getElementById("filterNroSolicitud").value;
             const filterUbicacion = document.getElementById("filterUbicacion").value.toUpperCase().trim();
             const filterEstado = document.getElementById("filterEstado").value;
             const filterFecha = document.getElementById("filterFecha").value;
+            const filterLegajo = document.getElementById("filterSolicitante").value;
 
             const tbody = document.querySelector("#tablaSolicitudes tbody");
             tbody.innerHTML = "";
@@ -187,6 +385,7 @@
                 && matchTexto(sol.ubicacionBienes, filterUbicacion)
                 && matchValor(sol.estado, filterEstado)
                 && matchFecha(sol.fechaInicioSolicitud, filterFecha)
+                && matchNumero(sol.solicitante, filterLegajo)
             ));
 
             // Paginación
@@ -199,11 +398,12 @@
 
             if (paginadas.length === 0) {
                 const filaVacia = document.createElement("tr");
-                filaVacia.innerHTML = `<td colspan="6" class="text-center">(No hay resultados que coincidan)</td>`;
+                filaVacia.innerHTML = `<td colspan="7" class="text-center">(No hay resultados que coincidan)</td>`;
                 tbody.appendChild(filaVacia);
             }
 
             paginadas.forEach(sol => {
+                    const solicitante = solicitantes.find(persona => persona.legajo === sol.solicitante);
                     const fila = document.createElement("tr");
                     fila.innerHTML = `
                         <td>
@@ -213,6 +413,7 @@
                         </td>
                         <td>${sol.numSolicitud}</td>
                         <td>${formatearFechaLocalEsp(sol.fechaInicioSolicitud)}</td>
+                        <td>${sol.solicitante}</td>
                         <td>${sol.ubicacionBienes}</td>
                         <td>${(sol.estado).replace(/_/g, " ")}</td>
                         <td>
@@ -226,11 +427,11 @@
                     const detalle = document.createElement("tr");
                     detalle.classList.add("detalle-fila", "hidden");
                     detalle.innerHTML = `
-                        <td colspan="6" class="detalle-contenido">
-                            <p><strong>Descripción:</strong> ${sol.descripcion || "(Sin descripción)"}</p>
+                        <td colspan="7" class="detalle-contenido">
                             <p><strong>Momento en que se registró:</strong> ${formatearFechaLocalLegible(sol.fechaInicioSolicitud)}</p>
-                            <p><strong>Estado actual de la solicitud:</strong> ${(sol.estado).replace(/_/g, " ")}</p>
-                            <p><strong>Ubicación destino:</strong> ${sol.ubicacionBienes}</p>
+                            <p><strong>Nombre de solicitante:</strong> ${solicitante ? solicitante.nombre : "N/A"}</p>
+                            <p><strong>Bienes pedidos:</strong> ${(sol.bienesPedidos).map(item => `${item.cantidad}x ${item.categoria}`).join(", ")}</p>
+                            <p><strong>Detalle:</strong> ${sol.descripcion || "(Sin descripción)"}</p>
                         </td>
                     `;
                     tbody.appendChild(detalle);
@@ -291,7 +492,7 @@
             }
         });
         // Filtros
-        document.querySelectorAll("#filterNroSolicitud, #filterUbicacion, #filterEstado, #filterFecha")
+        document.querySelectorAll("#filterNroSolicitud, #filterUbicacion, #filterEstado, #filterFecha, #filterSolicitante")
             .forEach(input => {
                 const eventType = (input.tagName === "SELECT" || input.type === "date") ? "change" : "input";
                 input.addEventListener(eventType, () => {
@@ -300,65 +501,88 @@
                 });
         });
 
-        cargarOpciones("ubicacionesSugeridas", "ubicaciones");
+        cargarOpciones("ubicacionesSugeridas", "ubicaciones", false);
 
         document.getElementById("solicitudForm").addEventListener("submit", async (e) => {
             e.preventDefault();
 
             const ubicacion = document.getElementById("ubicacion").value.trim().toUpperCase();
-            const estado = document.getElementById("estado").value;
-            const descripcion = document.getElementById("descripcion").value.trim();
-            if (!ubicacion || !estado || !descripcion) {
+            const solicitante = +document.getElementById("solicitante").value;
+            const descripcionInput = document.getElementById("descripcion").value.trim().toUpperCase();
+            const descripcion = descripcionInput === "" ? null : descripcionInput;
+
+            if (!ubicacion || !solicitante || itemsSolicitados.length == 0) {
                 alert("Datos incompletos.");
                 return;
             }
 
-            const solicitud = {
-                ubicacionBienes: ubicacion,
-                estado: estado,
-                descripcion: descripcion,
-            }
-
-            try {
-                const response = await crearSolicitud(solicitud);
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    if (response.status == 422) {
-                        alert(errorData.error);
-                        return;
-                    }
-                    else {
-                        alert(`El servidor no pudo realizar el registro de la solicitud. Código: ${response.status}`);
-                        return;
-                    }
-                }
-            } catch (error) {
-                alert("No se pudo conectar con el servidor.");
+            if (ubicacion === "SIN ASIGNAR") {
+                alert("No puede solicitarse una entrega a SIN ASIGNAR");
                 return;
             }
-            alert("Solicitud registrada.");
-            await recargarSolicitudes();
-            await recargarUbicaciones();
 
-            cargarOpciones("ubicacionesSugeridas", "ubicaciones");
+            const solicitud = {
+                solicitante,
+                ubicacionBienes: ubicacion,
+                bienesPedidos: itemsSolicitados,
+                ...(descripcion ? {descripcion} : {}),
+                numSolicitud: Date.now(), //QUITAR
+                fechaInicioSolicitud: new Date(Math.floor(Math.random() * Date.now())), //QUITAR
+                estado: "POR_REVISAR", //QUITAR
+                eliminado: false //QUITAR
+            }
+
+            // try {
+            //     const response = await crearSolicitud(solicitud);
+            //     if (!response.ok) {
+            //         const errorData = await response.json();
+            //         if (response.status == 422) {
+            //             alert(errorData.error);
+            //             return;
+            //         }
+            //         else {
+            //             alert(`El servidor no pudo realizar el registro de la solicitud. Código: ${response.status}`);
+            //             return;
+            //         }
+            //     }
+            // } catch (error) {
+            //     alert("No se pudo conectar con el servidor.");
+            //     return;
+            // }
+            // alert("Solicitud registrada.");
+            // await recargarSolicitudes();
+            // await recargarUbicaciones();
+
+            const solicitudes = JSON.parse(localStorage.getItem("mockSolicitudes")) || []; //QUITAR
+            solicitudes.push(solicitud); //QUITAR
+            localStorage.setItem("mockSolicitudes", JSON.stringify(solicitudes)); //QUITAR
+
+            cargarOpciones("ubicacionesSugeridas", "ubicaciones", false);
             renderSolicitudes();
+            itemsSolicitados = [];
+            renderItemsCreate();
             e.target.reset();
         });
 
         function editarSolicitud(id) {
-            const solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
+            const solicitudes = JSON.parse(localStorage.getItem("mockSolicitudes")) || []; //QUITAR
             const sol = solicitudes.find(s => s.numSolicitud === id);
             if (!sol) return;
 
             const form = document.getElementById("modificarSolicitudForm");
+            form.dataset.originalSolicitante = sol.solicitante || "";
             form.dataset.originalUbicacion = sol.ubicacionBienes.trim().toUpperCase() || "";
             form.dataset.originalEstado = sol.estado.toUpperCase() || "";
-            form.dataset.originalDescripcion = sol.descripcion.trim().toUpperCase() || "";
+            form.dataset.originalDescripcion = sol.descripcion ? sol.descripcion.trim().toUpperCase() : "";
+            modItemsSolicitados = sol.bienesPedidos ? JSON.parse(JSON.stringify(sol.bienesPedidos)) : [];
+            form.dataset.originalItems = JSON.stringify(modItemsSolicitados);
 
             document.getElementById("modSolicitudId").value = sol.numSolicitud;
             document.getElementById("modUbicacion").value = sol.ubicacionBienes;
             document.getElementById("modEstado").value = sol.estado;
-            document.getElementById("modDescripcion").value = sol.descripcion;
+            document.getElementById("modDescripcion").value = sol.descripcion ? sol.descripcion.trim().toUpperCase() : "";
+            document.getElementById("modSolicitante").value = sol.solicitante;
+            renderItemsMod(); // Dibujar los items en la lista
 
             document.getElementById("modificarSolicitudSection").classList.remove("hidden");
 
@@ -373,63 +597,83 @@
             const originalUbicacion = form.dataset.originalUbicacion;
             const originalEstado = form.dataset.originalEstado;
             const originalDescripcion = form.dataset.originalDescripcion;
+            const originalSolicitante = form.dataset.originalSolicitante;
+            const originalItems = form.dataset.originalItems || "[]";
 
             const nuevaUbicacion = document.getElementById("modUbicacion").value.trim().toUpperCase();
             const nuevoEstado = document.getElementById("modEstado").value.toUpperCase();
-            const nuevaDescripcion = document.getElementById("modDescripcion").value.trim().toUpperCase();
+            const nuevoSolicitante = +document.getElementById("modSolicitante").value;
+            const nuevosItemsString = JSON.stringify(modItemsSolicitados);
+            const nuevaDescrInput = document.getElementById("modDescripcion").value.trim().toUpperCase();
+            const nuevaDescrTemp = nuevaDescrInput === "" ? null : nuevaDescrInput;
 
             if(
                 nuevaUbicacion === originalUbicacion &&
                 nuevoEstado === originalEstado &&
-                nuevaDescripcion === originalDescripcion
+                nuevaDescrInput === originalDescripcion &&
+                nuevosItemsString === originalItems &&
+                nuevoSolicitante == originalSolicitante
             ) {
                 alert("No se detectaron cambios en los datos.");
                 return;
             }
 
-            if (!nuevaUbicacion || !nuevoEstado || !nuevaDescripcion) {
+            if (!nuevaUbicacion || !nuevoEstado || !nuevoSolicitante || modItemsSolicitados.length == 0) {
                 alert("Datos incompletos.");
                 return;
             }
 
-            const solicitudModificada = {
-                ubicacionBienes: nuevaUbicacion,
-                estado: nuevoEstado,
-                descripcion: nuevaDescripcion,
-            }
-
-            try {
-                const response = await modificarSolicitud(solicitudModificada, id);
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    if (response.status == 422) {
-                        alert(errorData.error);
-                        return;
-                    }
-                    if (response.status == 404) {
-                        alert("Solicitud no encontrada.");
-                        return;
-                    }
-                    if (response.status == 500) {
-                        alert("El servidor no pudo realizar la modificación de la solicitud. Código: 500");
-                        return;
-                    } else {
-                        alert(`El servidor no pudo realizar la modificación de la solicitud. Código: ${response.status}`);
-                        return;
-                    }
-                }
-            } catch (error) {
-                alert("No se pudo conectar con el servidor.");
+            if (nuevaUbicacion === "SIN ASIGNAR") {
+                alert("No puede solicitarse una entrega a SIN ASIGNAR");
                 return;
             }
 
-            alert("Solicitud actualizada.");
-            await recargarSolicitudes();
-            await recargarUbicaciones();
+            const solicitudModificada = {
+                solicitante: nuevoSolicitante,
+                ubicacionBienes: nuevaUbicacion,
+                ...(nuevaDescrTemp ? {descripcion: nuevaDescrTemp} : {}),
+                estado: nuevoEstado,
+                bienesPedidos: modItemsSolicitados
+            }
 
-            cargarOpciones("ubicacionesSugeridas", "ubicaciones");
+            // try {
+            //     const response = await modificarSolicitud(solicitudModificada, id);
+            //     if (!response.ok) {
+            //         const errorData = await response.json();
+            //         if (response.status == 422) {
+            //             alert(errorData.error);
+            //             return;
+            //         }
+            //         if (response.status == 404) {
+            //             alert("Solicitud no encontrada.");
+            //             return;
+            //         }
+            //         if (response.status == 500) {
+            //             alert("El servidor no pudo realizar la modificación de la solicitud. Código: 500");
+            //             return;
+            //         } else {
+            //             alert(`El servidor no pudo realizar la modificación de la solicitud. Código: ${response.status}`);
+            //             return;
+            //         }
+            //     }
+            // } catch (error) {
+            //     alert("No se pudo conectar con el servidor.");
+            //     return;
+            // }
+
+            // alert("Solicitud actualizada.");
+            // await recargarSolicitudes();
+            // await recargarUbicaciones();
+
+            let solicitudes = JSON.parse(localStorage.getItem("mockSolicitudes")) || []; //QUITAR
+            solicitudes = solicitudes.map(sol => sol.numSolicitud == id ? {...sol, ...solicitudModificada} : sol); //QUITAR
+            localStorage.setItem("mockSolicitudes", JSON.stringify(solicitudes)); //QUITAR
+
+            cargarOpciones("ubicacionesSugeridas", "ubicaciones", false);
             renderSolicitudes();
             document.getElementById("modificarSolicitudSection").classList.add("hidden");
+            modItemsSolicitados = [];
+            renderItemsCreate();
             e.target.reset();
 
             document.getElementById("tablaSolicitudes").parentElement.scrollIntoView({ behavior: "smooth" });
@@ -439,29 +683,33 @@
             const id = +document.getElementById("modSolicitudId").value;
             if (!confirm("¿Eliminar esta solicitud?")) return;
 
-            try {
-                const response = await eliminarSolicitud(id);
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    if (response.status == 422) {
-                        alert(errorData.error);
-                        return;
-                    }
-                    if (response.status == 500) {
-                        alert("El servidor no pudo realizar la eliminación de la solicitud. Código: 500");
-                        return;
-                    }
-                    else {
-                        alert(`El servidor no pudo realizar la eliminación de la solicitud. Código: ${response.status}`);
-                        return;
-                    }
-                }
-            } catch (error) {
-                alert("No se pudo conectar con el servidor.");
-                return;
-            }
-            alert("Solicitud eliminada.");
-            await recargarSolicitudes();
+            let solicitudes = JSON.parse(localStorage.getItem("mockSolicitudes")) || []; //QUITAR
+            solicitudes = solicitudes.map(sol => sol.numSolicitud == id ? {...sol, eliminado: true} : sol); //QUITAR
+            localStorage.setItem("mockSolicitudes", JSON.stringify(solicitudes)); //QUITAR
+
+            // try {
+            //     const response = await eliminarSolicitud(id);
+            //     if (!response.ok) {
+            //         const errorData = await response.json();
+            //         if (response.status == 422) {
+            //             alert(errorData.error);
+            //             return;
+            //         }
+            //         if (response.status == 500) {
+            //             alert("El servidor no pudo realizar la eliminación de la solicitud. Código: 500");
+            //             return;
+            //         }
+            //         else {
+            //             alert(`El servidor no pudo realizar la eliminación de la solicitud. Código: ${response.status}`);
+            //             return;
+            //         }
+            //     }
+            // } catch (error) {
+            //     alert("No se pudo conectar con el servidor.");
+            //     return;
+            // }
+            // alert("Solicitud eliminada.");
+            // await recargarSolicitudes();
             renderSolicitudes();
             document.getElementById("modificarSolicitudSection").classList.add("hidden");
             document.getElementById("modificarSolicitudForm").reset();
@@ -474,6 +722,9 @@
             if (confirm("¿Deseás cancelar la edición? Se perderán los cambios no guardados.")) {
                 document.getElementById("modificarSolicitudSection").classList.add("hidden");
                 document.getElementById("modificarSolicitudForm").reset();
+
+                modItemsSolicitados = []; // Limpiar array
+                renderItemsMod();       // Limpiar lista visual
 
                 document.getElementById("tablaSolicitudes").parentElement.scrollIntoView({ behavior: "smooth" });
             }
