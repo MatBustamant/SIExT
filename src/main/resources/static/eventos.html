@@ -302,10 +302,9 @@
                     detalle.classList.add("detalle-fila", "hidden");
                     detalle.innerHTML = `
                         <td colspan="5" class="detalle-contenido">
-                            <p><strong>Identificador de evento:</strong> ${evento.id_Evento}</p>
-                            <p><strong>Bien asociado:</strong> #${formatearNroBien(evento.bienAsociado)} — ${bien.nombre}</p>
-                            <p><strong>Tipo de evento:</strong> ${evento.tipoEvento}</p>
                             <p><strong>Momento en que se registró:</strong> ${formatearFechaLocalLegible(evento.fechaEvento)}</p>
+                            ${evento.tipoEvento == "ENTREGA" ? `<p><strong>Ubicación a la que se destinó:</strong> ${evento.ubicacionDestino}</p>`:``}
+                            <p><strong>Detalle:</strong> ${evento.detalle || "(Sin detalle adicional)"}</p>
                         </td>
                         <td colspan="1" class="detalle-contenido">
                             <button class="btn btn-historial btn-icon-table" data-id="${evento.bienAsociado}" title="Ver historial">

@@ -431,7 +431,7 @@
                             <p><strong>Momento en que se registró:</strong> ${formatearFechaLocalLegible(sol.fechaInicioSolicitud)}</p>
                             <p><strong>Nombre de solicitante:</strong> ${solicitante ? solicitante.nombre : "N/A"}</p>
                             <p><strong>Bienes pedidos:</strong> ${(sol.bienesPedidos).map(item => `${item.cantidad}x ${item.categoria}`).join(", ")}</p>
-                            <p><strong>Detalle:</strong> ${sol.descripcion || "(Sin descripción)"}</p>
+                            <p><strong>Detalle:</strong> ${sol.descripcion || "(Sin detalle adicional)"}</p>
                         </td>
                     `;
                     tbody.appendChild(detalle);
