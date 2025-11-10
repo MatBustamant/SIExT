@@ -2,6 +2,8 @@ package com.grupocapa8.siext.DTO;
 
 import com.grupocapa8.siext.Enums.EstadoSolicitud;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -14,17 +16,19 @@ public class SolicitudDTO {
     private int Legajo;
     private EstadoSolicitud Estado;
     private String Descripcion;
+    private List<Bienes_por_SolicitudDTO> bienesPedidos;
     private boolean eliminado;
     
     public SolicitudDTO(){
         
     }
-    public SolicitudDTO(Integer numSolicitud, Instant FechaInicioSolicitud, String UbicacionBienes, int legajo, EstadoSolicitud Estado, boolean eliminado) {
+    public SolicitudDTO(Integer numSolicitud, Instant FechaInicioSolicitud, String UbicacionBienes, int legajo, EstadoSolicitud Estado, ArrayList<Bienes_por_SolicitudDTO> bienesPedidos, boolean eliminado) {
         this.numSolicitud = numSolicitud;
         this.FechaInicioSolicitud = FechaInicioSolicitud;
         this.UbicacionBienes = UbicacionBienes;
         this.Legajo = legajo;
         this.Estado = Estado;
+        this.bienesPedidos = bienesPedidos;
         this.eliminado = eliminado;
     }
 
@@ -83,5 +87,15 @@ public class SolicitudDTO {
     public void setEliminado(boolean eliminado) {
         this.eliminado = eliminado;
     }
+
+    public List<Bienes_por_SolicitudDTO> getBienesPedidos() {
+        return bienesPedidos;
+    }
+
+    public void setBienesPedidos(List<Bienes_por_SolicitudDTO> bienesPedidos) {
+        this.bienesPedidos = bienesPedidos;
+    }
+    
+    
     
 }
