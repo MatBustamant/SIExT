@@ -157,7 +157,7 @@
 
   function renderizarDetallado() {
     thead_tr.innerHTML = config.cabecerasDetalle.map(c => `<th>${c}</th>`).join("");
-    thead_tr.appendChild(document.createElement("th")).textContent = "Responsable"; //CAMBIAR DE ESTÁTICO A DINÁMICO LUEGO
+    if (tipoEvento === "ENTREGA") thead_tr.appendChild(document.createElement("th")).textContent = "Nro. solicitud";
     const colSpan = config.cabecerasDetalle.length;
 
     if (eventosFiltrados.length === 0) {
@@ -199,7 +199,8 @@
             valorDinamico = ubicacion ? ubicacion.nombre : "N/A";
           }
           
-          filaHTML += `<td>${formatearMayusComoOracion(valorDinamico)}</td><td>Lic. Otto Durán</td>`; //CAMBIAR DE ESTÁTICO A DINÁMICO LUEGO
+          filaHTML += `<td>${formatearMayusComoOracion(valorDinamico)}</td>`;
+          if(tipoEvento === "ENTREGA") filaHTML += `<td>${evento.numSolicitud ? evento.numSolicitud : '-'}</td>`
         }
         
         fila.innerHTML = filaHTML;

@@ -304,6 +304,7 @@
                         <td colspan="5" class="detalle-contenido">
                             <p><strong>Momento en que se registró:</strong> ${formatearFechaLocalLegible(evento.fechaEvento)}</p>
                             ${evento.tipoEvento == "ENTREGA" ? `<p><strong>Ubicación a la que se destinó:</strong> ${evento.ubicacionDestino}</p>`:``}
+                            ${evento.numSolicitud ? `<p><strong>Nro. de solicitud asociado:</strong> ${evento.numSolicitud}</p>`:``}
                             <p><strong>Detalle:</strong> ${evento.detalle || "(Sin detalle adicional)"}</p>
                         </td>
                         <td colspan="1" class="detalle-contenido">
