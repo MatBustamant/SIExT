@@ -18,7 +18,7 @@ import java.util.NoSuchElementException;
  *
  * @author geroj
  */
-public class BienService implements ServiceGenerico<BienDTO, Integer> {
+public class BienService implements ServiceGenerico<BienDTO> {
     private final BienDAOImpl bienDAO; //acceso a la BD
     private final CategoriaDAOImpl catDAO;
     private final UbicacionDAOImpl ubiDAO;
@@ -43,7 +43,7 @@ public class BienService implements ServiceGenerico<BienDTO, Integer> {
     }
     
     @Override
-    public BienDTO buscar(Integer idBien) throws NoSuchElementException {
+    public BienDTO buscar(int idBien) throws NoSuchElementException {
         return this.buscar(idBien, true);
     }
     
@@ -90,7 +90,7 @@ public class BienService implements ServiceGenerico<BienDTO, Integer> {
     } 
     
     @Override
-    public void modificar(BienDTO dto, Integer id) throws NoSuchElementException {
+    public void modificar(BienDTO dto, int id) throws NoSuchElementException {
         BienDTO bienOriginal = this.buscar(id);
         
         String nombre = dto.getNombre().toUpperCase();
@@ -151,7 +151,7 @@ public class BienService implements ServiceGenerico<BienDTO, Integer> {
     }
    
     @Override
-    public void eliminar(Integer idBien) throws NoSuchElementException {
+    public void eliminar(int idBien) throws NoSuchElementException {
         this.buscar(idBien);
         this.actualizarEstadoEliminado(idBien, true);
         

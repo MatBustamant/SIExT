@@ -13,7 +13,7 @@ import jakarta.ws.rs.Path;
  * @author Matias
  */
 @Path("categoria")
-public class CategoriaController extends AbstractController<CategoriaBienDTO, Integer>{
+public class CategoriaController extends AbstractController<CategoriaBienDTO>{
 
     public CategoriaController() {
         this.servicio = new CategoriaBienServices(); //CategoriaBienService y CategoriaInsumoService. O capaz un solo service a dos daos? ya veremos.
