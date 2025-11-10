@@ -288,6 +288,12 @@
                                 <i class="bi bi-pencil-fill"></i>
                             </button>
                         </td>`;
+                    } else if (evento.tipoEvento === "ENTREGA" && evento.numSolicitud != null) {
+                        tr.innerHTML += `                        <td>
+                            <button class="btn btn-editar btn-icon-table" title="No se puede editar una ENTREGA POR SOLICITUD" disabled>
+                                <i class="bi bi-pencil-fill"></i>
+                            </button>
+                        </td>`;
                     } else {
                         tr.innerHTML += `                        <td>
                             <button class="btn btn-editar btn-icon-table" data-id="${evento.id_Evento}" title="Editar evento">
