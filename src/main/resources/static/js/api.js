@@ -153,21 +153,21 @@ async function eliminarUbicacion(id) {
 
 // funciones con el crud de solicitantes
 async function leerSolicitantes() {
-    return fetch(`${API_BASE}/solicitante/leer`);
+    return fetch(`${API_BASE}/responsable/leer`);
 }
 
 async function leerSolicitante(id) {
-    return fetch(`${API_BASE}/solicitante/leer/${id}`);
+    return fetch(`${API_BASE}/responsable/leer/${id}`);
 }
 
 async function crearSolicitante(ubicacion) {
-    return fetch(`${API_BASE}/solicitante/crear`, POST(ubicacion));
+    return fetch(`${API_BASE}/responsable/crear`, POST(ubicacion));
 }
 
 async function modificarSolicitante(ubicacion, id) {
-    return fetch(`${API_BASE}/solicitante/modificar/${id}`, PUT(ubicacion));
+    return fetch(`${API_BASE}/responsable/modificar/${id}`, PUT(ubicacion));
 }
 
 async function eliminarSolicitante(id) {
-    return fetch(`${API_BASE}/solicitante/eliminar/${id}`, DELETE);
+    return fetch(`${API_BASE}/responsable/eliminar/${id}`, DELETE);
 }

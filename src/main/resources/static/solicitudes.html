@@ -78,7 +78,7 @@
             <ul>
                 <li><a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver al Panel</a></li>
                 <li><a href="ubicaciones.html" class="btn"><i class="bi bi-geo-alt"></i>Editar Ubicaciones</a></li>
-                <li><a href="solicitantes.html" class="btn"><i class="bi bi-person-badge"></i></i>Editar Solicitantes</a></li>
+                <li id="supervisor-only-accion" class="hidden"><a href="solicitantes.html" class="btn"><i class="bi bi-person-badge"></i></i>Editar Solicitantes</a></li>
                 <li><a href="bienes.html" class="btn"><i class="bi bi-box-seam"></i>Gestionar Bienes</a></li>
                 <li id="supervisor-only-accion" class="hidden"><a href="informes.html" class="btn"><i
                             class="bi bi-file-earmark-text"></i>Generar Informes</a></li>
@@ -190,7 +190,7 @@
                 <input list="ubicacionesSugeridas" type="text" id="modUbicacion" placeholder="BEDELÍA" required>
                 <label for="modEstado">Estado</label>
                 <select id="modEstado" required>
-                    <option value="POR_REVISAR" disabled>Pendiente de aprobación</option>
+                    <option value="POR_REVISAR">Pendiente de aprobación</option>
                     <option value="APROBADA">Aprobada</option>
                     <option value="DESAPROBADA">No aprobada</option>
                     <option value="SATISFECHA">Completada</option>
@@ -231,6 +231,7 @@
     <script>
         recargarSolicitudes();
         recargarUbicaciones();
+        recargarCategorias();
 
         let itemsSolicitados = [];
         let modItemsSolicitados = [];
@@ -365,10 +366,10 @@
         let totalPages = 1;
 
         function renderSolicitudes() {
-            const solicitudes = JSON.parse(localStorage.getItem("mockSolicitudes")) || []; //QUITAR
+            const solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
             const solicitudesHabilitadas = solicitudes.filter(s => !s.eliminado);
 
-            const solicitantes = JSON.parse(localStorage.getItem("mockSolicitantes")) || []; //QUITAR
+            const solicitantes = JSON.parse(localStorage.getItem("solicitantes")) || [];
 
             const filterNroSolicitud = document.getElementById("filterNroSolicitud").value;
             const filterUbicacion = document.getElementById("filterUbicacion").value.toUpperCase().trim();
@@ -525,37 +526,30 @@
                 solicitante,
                 ubicacionBienes: ubicacion,
                 bienesPedidos: itemsSolicitados,
-                ...(descripcion ? {descripcion} : {}),
-                numSolicitud: Date.now(), //QUITAR
-                fechaInicioSolicitud: new Date(Math.floor(Math.random() * Date.now())), //QUITAR
-                estado: "POR_REVISAR", //QUITAR
-                eliminado: false //QUITAR
+                ...(descripcion ? {descripcion} : {})
             }
 
-            // try {
-            //     const response = await crearSolicitud(solicitud);
-            //     if (!response.ok) {
-            //         const errorData = await response.json();
-            //         if (response.status == 422) {
-            //             alert(errorData.error);
-            //             return;
-            //         }
-            //         else {
-            //             alert(`El servidor no pudo realizar el registro de la solicitud. Código: ${response.status}`);
-            //             return;
-            //         }
-            //     }
-            // } catch (error) {
-            //     alert("No se pudo conectar con el servidor.");
-            //     return;
-            // }
-            // alert("Solicitud registrada.");
-            // await recargarSolicitudes();
-            // await recargarUbicaciones();
-
-            const solicitudes = JSON.parse(localStorage.getItem("mockSolicitudes")) || []; //QUITAR
-            solicitudes.push(solicitud); //QUITAR
-            localStorage.setItem("mockSolicitudes", JSON.stringify(solicitudes)); //QUITAR
+            try {
+                const response = await crearSolicitud(solicitud);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
+                    else {
+                        alert(`El servidor no pudo realizar el registro de la solicitud. Código: ${response.status}`);
+                        return;
+                    }
+                }
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
+            alert("Solicitud registrada.");
+            await recargarSolicitudes();
+            await recargarUbicaciones();
+            await recargarCategorias();
 
             cargarOpciones("ubicacionesSugeridas", "ubicaciones", false);
             renderSolicitudes();
@@ -565,7 +559,7 @@
         });
 
         function editarSolicitud(id) {
-            const solicitudes = JSON.parse(localStorage.getItem("mockSolicitudes")) || []; //QUITAR
+            const solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
             const sol = solicitudes.find(s => s.numSolicitud === id);
             if (!sol) return;
 
@@ -636,38 +630,35 @@
                 bienesPedidos: modItemsSolicitados
             }
 
-            // try {
-            //     const response = await modificarSolicitud(solicitudModificada, id);
-            //     if (!response.ok) {
-            //         const errorData = await response.json();
-            //         if (response.status == 422) {
-            //             alert(errorData.error);
-            //             return;
-            //         }
-            //         if (response.status == 404) {
-            //             alert("Solicitud no encontrada.");
-            //             return;
-            //         }
-            //         if (response.status == 500) {
-            //             alert("El servidor no pudo realizar la modificación de la solicitud. Código: 500");
-            //             return;
-            //         } else {
-            //             alert(`El servidor no pudo realizar la modificación de la solicitud. Código: ${response.status}`);
-            //             return;
-            //         }
-            //     }
-            // } catch (error) {
-            //     alert("No se pudo conectar con el servidor.");
-            //     return;
-            // }
+            try {
+                const response = await modificarSolicitud(solicitudModificada, id);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
+                    if (response.status == 404) {
+                        alert("Solicitud no encontrada.");
+                        return;
+                    }
+                    if (response.status == 500) {
+                        alert("El servidor no pudo realizar la modificación de la solicitud. Código: 500");
+                        return;
+                    } else {
+                        alert(`El servidor no pudo realizar la modificación de la solicitud. Código: ${response.status}`);
+                        return;
+                    }
+                }
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
 
-            // alert("Solicitud actualizada.");
-            // await recargarSolicitudes();
-            // await recargarUbicaciones();
-
-            let solicitudes = JSON.parse(localStorage.getItem("mockSolicitudes")) || []; //QUITAR
-            solicitudes = solicitudes.map(sol => sol.numSolicitud == id ? {...sol, ...solicitudModificada} : sol); //QUITAR
-            localStorage.setItem("mockSolicitudes", JSON.stringify(solicitudes)); //QUITAR
+            alert("Solicitud actualizada.");
+            await recargarSolicitudes();
+            await recargarUbicaciones();
+            await recargarCategorias();
 
             cargarOpciones("ubicacionesSugeridas", "ubicaciones", false);
             renderSolicitudes();
@@ -683,33 +674,29 @@
             const id = +document.getElementById("modSolicitudId").value;
             if (!confirm("¿Eliminar esta solicitud?")) return;
 
-            let solicitudes = JSON.parse(localStorage.getItem("mockSolicitudes")) || []; //QUITAR
-            solicitudes = solicitudes.map(sol => sol.numSolicitud == id ? {...sol, eliminado: true} : sol); //QUITAR
-            localStorage.setItem("mockSolicitudes", JSON.stringify(solicitudes)); //QUITAR
-
-            // try {
-            //     const response = await eliminarSolicitud(id);
-            //     if (!response.ok) {
-            //         const errorData = await response.json();
-            //         if (response.status == 422) {
-            //             alert(errorData.error);
-            //             return;
-            //         }
-            //         if (response.status == 500) {
-            //             alert("El servidor no pudo realizar la eliminación de la solicitud. Código: 500");
-            //             return;
-            //         }
-            //         else {
-            //             alert(`El servidor no pudo realizar la eliminación de la solicitud. Código: ${response.status}`);
-            //             return;
-            //         }
-            //     }
-            // } catch (error) {
-            //     alert("No se pudo conectar con el servidor.");
-            //     return;
-            // }
-            // alert("Solicitud eliminada.");
-            // await recargarSolicitudes();
+            try {
+                const response = await eliminarSolicitud(id);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 422) {
+                        alert(errorData.error);
+                        return;
+                    }
+                    if (response.status == 500) {
+                        alert("El servidor no pudo realizar la eliminación de la solicitud. Código: 500");
+                        return;
+                    }
+                    else {
+                        alert(`El servidor no pudo realizar la eliminación de la solicitud. Código: ${response.status}`);
+                        return;
+                    }
+                }
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
+            alert("Solicitud eliminada.");
+            await recargarSolicitudes();
             renderSolicitudes();
             document.getElementById("modificarSolicitudSection").classList.add("hidden");
             document.getElementById("modificarSolicitudForm").reset();
