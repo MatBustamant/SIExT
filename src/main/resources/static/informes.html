@@ -7,7 +7,7 @@
   <title>Generar informes - SIExT</title>
   <link href="icons/bootstrap-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="css/global.css">
-  <link rel="icon" href="images\icon.png">
+  <link rel="icon" href="images/icon.png">
 
   <style>
     ul li>* {
@@ -26,7 +26,19 @@
 
 <body>
 
-  <header>SIExT | Generar informes</header>
+  <header>
+    <span>SIExT | Generar informes</span>
+    <div id="userInfo" class="user-info">
+      <span id="username"></span>
+      <i class="bi bi-person-circle"></i>
+      <div id="userMenu" class="user-menu hidden">
+        <p id="userRole"><i id="rolIcon" class="bi bi-person-circle"></i></p>
+        <button id="logoutBtn" class="btn btn-danger">
+          <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+        </button>
+      </div>
+    </div>
+  </header>
 
   <div class="default-block-container">
     <nav>
@@ -40,36 +52,41 @@
   <main class="default-block-container">
     <section>
       <ul class="btn-row" style="flex-direction: column;">
-        <!-- <li><a href="#" class="btn"><i class="bi bi-card-list"></i>Listado completo de inventario</a></li> -->
         <li>
           <button class="btn" id="btnIngresos" type="button"><i class="bi bi-box-arrow-in-down-left"></i></i>Total de
-            ingresos
+            eventos
             en
             un
             período</button>
           <form id="formIngresos" class="hidden">
-            <label>Desde</label>
+            <label for="tipoEvento">Tipo de evento</label>
+            <select id="tipoEvento" required>
+                <option value="">Seleccionar</option>
+                <option value="REGISTRO">Registro</option>
+                <option value="ENTREGA">Entrega</option>
+                <option value="DEVOLUCION">Devolución</option>
+                <option value="AVERIO">Averío</option>
+                <option value="REPARACION">Reparación</option>
+                <option value="BAJA">Baja</option>
+            </select>
+            <label for="desde">Desde</label>
             <input type="date" id="desde" required>
-            <label>Hasta</label>
+            <label for="hasta">Hasta</label>
             <input type="date" id="hasta" required>
             <button type="submit" class="btn"><i class="bi bi-search"></i>Ver Informe</button>
           </form>
         </li>
-        <!-- <li><a href="informe_minimo.html" class="btn"><i class="bi bi-exclamation-triangle"></i>Inventario bajo mínimo
-            de
-            reposición</a></li> -->
         <li>
           <button class="btn" id="btnSolicitudes" type="button"><i class="bi bi-file-bar-graph"></i>Total de solicitudes
             en un período</button>
           <form id="formSolicitudes" class="hidden">
-            <label>Desde</label>
+            <label for="desdeSolicitudes">Desde</label>
             <input type="date" id="desdeSolicitudes" required>
-            <label>Hasta</label>
+            <label for="hastaSolicitudes">Hasta</label>
             <input type="date" id="hastaSolicitudes" required>
             <button type="submit" class="btn"><i class="bi bi-search"></i>Ver Informe</button>
           </form>
         </li>
-        <!-- <li><a href="#" class="btn"><i class="bi bi-box-arrow-up-right"></i>Total de salidas por departamento</a></li> -->
       </ul>
     </section>
 
@@ -77,24 +94,45 @@
 
   <footer>SIExT | 2025</footer>
 
+  <script src="js/auth.js"></script>
   <script>
+      verificarAuth("SUPERVISOR");
+  </script>
+  <script src="js/fechas.js"></script>
+  <script>
+    // Fecha actual local en formato YYYY-MM-DD
+    const hoy = obtenerFechaHoy();
+
+    // Establecer máximo (hoy) para todos los inputs tipo date
+    document.querySelectorAll('input[type="date"]').forEach(input => input.setAttribute("max", hoy));
+
+    // ----- FORMULARIO DE EVENTOS -----
     const btnIngresos = document.getElementById("btnIngresos");
     const formIngresos = document.getElementById("formIngresos");
+    const desdeIngresos = document.getElementById("desde");
+    const hastaIngresos = document.getElementById("hasta");
+    const tipoEventoSelect = document.getElementById("tipoEvento");
 
     btnIngresos.addEventListener("click", () => {
       formIngresos.classList.toggle("hidden");
       btnIngresos.style.backgroundColor = formIngresos.classList.contains("hidden") ? "" : "var(--azul-profundo)";
     });
 
-    document.getElementById("formIngresos").onsubmit = e => {
+    // Ajustar el min de "hasta" al seleccionar "desde"
+    desdeIngresos.addEventListener("change", () => {
+      hastaIngresos.setAttribute("min", desdeIngresos.value);
+    });
+
+    formIngresos.onsubmit = e => {
       e.preventDefault();
-      const desde = document.getElementById("desde").value;
-      const hasta = document.getElementById("hasta").value;
-      if (!desde || !hasta) {
-        alert("Seleccioná ambas fechas.");
-        return;
-      }
-      window.location.href = `informe_ingresos.html?desde=${desde}&hasta=${hasta}`;
+      const desde = desdeIngresos.value;
+      const hasta = hastaIngresos.value;
+      const tipoEvento = tipoEventoSelect.value;
+
+      const error = validarRangoFechas(desde, hasta, hoy);
+      if (error) return alert(error);
+
+      window.location.href = `informe_eventos.html?desde=${desde}&hasta=${hasta}&tipoEvento=${tipoEvento}`;
     };
   </script>
 
@@ -102,20 +140,27 @@
   <script>
     const btnSolicitudes = document.getElementById("btnSolicitudes");
     const formSolicitudes = document.getElementById("formSolicitudes");
+    const desdeSolicitudes = document.getElementById("desdeSolicitudes");
+    const hastaSolicitudes = document.getElementById("hastaSolicitudes");
 
     btnSolicitudes.addEventListener("click", () => {
       formSolicitudes.classList.toggle("hidden");
       btnSolicitudes.style.backgroundColor = formSolicitudes.classList.contains("hidden") ? "" : "var(--azul-profundo)";
     });
 
-    document.getElementById("formSolicitudes").onsubmit = e => {
+    // Ajustar el min de "hasta" al seleccionar "desde"
+    desdeSolicitudes.addEventListener("change", () => {
+      hastaSolicitudes.setAttribute("min", desdeSolicitudes.value);
+    });
+
+    formSolicitudes.onsubmit = e => {
       e.preventDefault();
-      const desde = document.getElementById("desdeSolicitudes").value;
-      const hasta = document.getElementById("hastaSolicitudes").value;
-      if (!desde || !hasta) {
-        alert("Seleccioná ambas fechas.");
-        return;
-      }
+      const desde = desdeSolicitudes.value;
+      const hasta = hastaSolicitudes.value;
+
+      const error = validarRangoFechas(desde, hasta, hoy);
+      if (error) return alert(error);
+
       window.location.href = `informe_solicitudes_dpto.html?desde=${desde}&hasta=${hasta}`;
     };
   </script>

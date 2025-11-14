@@ -7,6 +7,8 @@ package com.grupocapa8.siext.DAO;
 import com.grupocapa8.siext.Enums.EstadoBien;
 import com.grupocapa8.siext.ConexionBD.BasedeDatos;
 import com.grupocapa8.siext.DTO.BienDTO;
+import com.grupocapa8.siext.DTO.EventoTrazabilidadDTO;
+import com.grupocapa8.siext.Enums.TipoEvento;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,7 +20,7 @@ import java.util.List;
  *
  * @author oveja
  */
-public class BienDAOImpl implements DAOGenerica<BienDTO> {
+public class BienDAOImpl implements DAOGenerica<BienDTO, Integer> {
 
     private final CategoriaDAOImpl categoriaDAO;
     private final UbicacionDAOImpl ubicacionDAO;
@@ -30,29 +32,30 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
         this.ubicacionDAO = new UbicacionDAOImpl();
     }
 
-    @Override
-    public BienDTO buscar(int id) {
+    public BienDTO buscar(Integer id, Connection con) {
 
         BienDTO bien = null;
-        String sql = "SELECT * FROM Bien WHERE ID_Bien = ? AND Eliminado = ?";
+        String sql = "SELECT b.*, c.Nombre AS CategoriaNombre, u.Nombre AS UbicacionNombre " +
+                     "FROM Bien b " +
+                     "JOIN Categoria c ON b.ID_Categoria = c.ID_Categoria " +
+                     "JOIN Ubicacion u ON b.ID_Ubicacion = u.ID_Ubicacion " +
+                     "WHERE b.ID_Bien = ?";
 
-        try (Connection con = BasedeDatos.getConnection();
-                PreparedStatement ps = con.prepareStatement(sql)) {
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, id);
-            ps.setInt(2, 0);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     bien = new BienDTO();
                     bien.setID_Bien(rs.getInt("ID_Bien"));
                     bien.setNombre(rs.getString("Nombre"));
                     bien.setEstadoBien(EstadoBien.valueOf(rs.getString("Estado")));
+                    bien.setDetalle(rs.getString("Detalle"));
+                    bien.setUbicacionBien(rs.getString("UbicacionNombre"));
+                    bien.setNombreCatBienes(rs.getString("CategoriaNombre"));
                     
-                    int ubicacionID = rs.getInt("ID_Ubicacion");
-                    bien.setUbicacionBien(ubicacionDAO.buscar(ubicacionID).getNombre());
-
-                    int categoriaID = rs.getInt("ID_Categoria");
-                    bien.setNombreCatBienes(categoriaDAO.buscar(categoriaID).getNombre());
+                    bien.setCantBienes(null);
+                    bien.setEliminado(rs.getInt("Eliminado") != 0);
                 }
             }
         } catch (SQLException ex) {
@@ -61,31 +64,42 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
 
         return bien;
     }
+    
+    @Override
+    public BienDTO buscar(Integer id) {
+        try (Connection con = BasedeDatos.getConnection()) {
+            return buscar(id, con);
+        } catch (SQLException ex) {
+            System.getLogger(BienDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+        return null;
+    }
 
     @Override
     public List<BienDTO> buscarTodos() {
         List<BienDTO> bienes = new ArrayList<>();
 
-        String sql = "SELECT * FROM Bien WHERE Eliminado = ?";
+        String sql = "SELECT b.*, c.Nombre AS CategoriaNombre, u.Nombre AS UbicacionNombre " +
+                     "FROM Bien b " +
+                     "JOIN Categoria c ON b.ID_Categoria = c.ID_Categoria " +
+                     "JOIN Ubicacion u ON b.ID_Ubicacion = u.ID_Ubicacion";
+
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
-            ps.setInt(1, 0);
-        
             try (ResultSet rs = ps.executeQuery()) {
 
                 while (rs.next()) {
                     BienDTO bien = new BienDTO();
                     bien.setID_Bien(rs.getInt("ID_Bien"));
                     bien.setNombre(rs.getString("Nombre"));
-                    int categoriaID = rs.getInt("ID_Categoria");
-                    bien.setNombreCatBienes(categoriaDAO.buscar(categoriaID).getNombre());  //Ocurre que ID_Categoria es clave foranea, NO tengo el nombre de la cat
-                    //llamo a una busqueda en la tabla Categoria, enviandole el id que tengo desde tabla Bien
-                    //Porque en el DTO no me interesa el idcat, sino nombre de categoria, entonces debo buscarlo 
-                    //para ponerlo en la lista y sea compatible con BienDTO
-                    int ubicacionID = rs.getInt("ID_Ubicacion");
-                    bien.setUbicacionBien(ubicacionDAO.buscar(ubicacionID).getNombre());
+                    bien.setNombreCatBienes(rs.getString("CategoriaNombre"));
+                    bien.setUbicacionBien(rs.getString("UbicacionNombre"));
                     bien.setEstadoBien(EstadoBien.valueOf(rs.getString("Estado")));
+                    bien.setDetalle(rs.getString("Detalle"));
+                    
+                    bien.setCantBienes(null);
+                    bien.setEliminado(rs.getInt("Eliminado") != 0);
 
                     bienes.add(bien);
                 }
@@ -98,10 +112,10 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
 
     @Override
     public int insertar(BienDTO bien) {
-        String sql = "INSERT INTO Bien (Nombre, ID_Categoria, Estado, ID_Ubicacion) VALUES (?,?,?,?)";
+        String sql = "INSERT INTO Bien (Nombre, ID_Categoria, Estado, ID_Ubicacion, Detalle) VALUES (?,?,?,?,?)";
         int resultado = 0;
         int idCategoria = categoriaDAO.buscar(bien.getNombreCatBienes()).getID_Categoria();
-        int idUbicacion = ubicacionDAO.buscar(bien.getUbicacionBien()).getID_Ubicacion();
+        int idUbicacion = 0; //Id de la ubicación por defecto SIN ASIGNAR
 
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
@@ -110,15 +124,19 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
             ps.setInt(2, idCategoria); //el id de categoria que mande a buscar antes
             ps.setString(3, bien.getEstadoBien().name());
             ps.setInt(4, idUbicacion);
+            ps.setString(5, bien.getDetalle()); // puede ser nulo
             
             resultado = ps.executeUpdate();
             
-            // Se crea un evento de ENTREGA junto a la creación de un nuevo bien. Básicamente para tener la fecha y hora de cuando pasa esto
+            // Se crea un evento de REGISTRO junto a la creación de un nuevo bien. Básicamente para tener la fecha y hora de cuando pasa esto
             if (resultado > 0) {
                 try (ResultSet rs = ps.getGeneratedKeys()) {
                     if (rs.next()) {
                         int claveGenerada = rs.getInt(1);
-                        eventoDAO.insertarNuevoIngreso(claveGenerada);
+                        EventoTrazabilidadDTO registro = new EventoTrazabilidadDTO();
+                        registro.setBienAsociado(claveGenerada);
+                        registro.setTipoEvento(TipoEvento.REGISTRO);
+                        eventoDAO.insertar(registro);
                     }
                 }
             }
@@ -131,7 +149,7 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
 
     @Override
     public int actualizar(BienDTO bien) {
-        String sql = "UPDATE Bien SET Nombre = ?, ID_Categoria = ?, ID_Ubicacion = ? WHERE ID_Bien = ?";
+        String sql = "UPDATE Bien SET Nombre = ?, ID_Categoria = ?, ID_Ubicacion = ?, Detalle = ? WHERE ID_Bien = ? AND Eliminado = ?";
         int idCategoria = categoriaDAO.buscar(bien.getNombreCatBienes()).getID_Categoria();
         int idUbicacion = ubicacionDAO.buscar(bien.getUbicacionBien()).getID_Ubicacion();
         int resultado = 0;
@@ -142,7 +160,9 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
             ps.setString(1, bien.getNombre());
             ps.setInt(2, idCategoria);  //use lo mismo en insertar ya que buscamos el id antes de actualizar, si existe, lo setea
             ps.setInt(3, idUbicacion);
-            ps.setInt(4, bien.getID_Bien());
+            ps.setString(4, bien.getDetalle()); // puede ser nulo
+            ps.setInt(5, bien.getID_Bien());
+            ps.setInt(6, 0);
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
@@ -166,10 +186,33 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
             System.getLogger(BienDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
     }
+    
+    public void cambiarUbicacion(BienDTO bien, String nombreUbicacion, Connection con) {
+        String sql = "UPDATE Bien SET ID_Ubicacion = ? WHERE ID_Bien = ?";
+        int idUbicacion = ubicacionDAO.buscar(nombreUbicacion, con).getID_Ubicacion();
+        
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setInt(1, idUbicacion);
+            ps.setInt(2, bien.getID_Bien());
+            
+            ps.executeUpdate();
+        } catch (SQLException ex) {
+            System.getLogger(BienDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+    }
+    
+    public void cambiarUbicacion(BienDTO bien, String nombreUbicacion) {
+        try (Connection con = BasedeDatos.getConnection()) {
+            this.cambiarUbicacion(bien, nombreUbicacion, con);
+        } catch (SQLException ex) {
+            System.getLogger(BienDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+    }
 
     @Override
-    public int eliminar(int id) {
-        String sql = "UPDATE Bien SET Eliminado = ? WHERE ID_Bien = ?";
+    public int eliminar(Integer id) {
+        String sql = "UPDATE Bien SET Eliminado = ? WHERE ID_Bien = ? AND Eliminado = ?";
         int resultado = 0;
         
         try (Connection con = BasedeDatos.getConnection();
@@ -177,6 +220,26 @@ public class BienDAOImpl implements DAOGenerica<BienDTO> {
             
             ps.setInt(1, 1);
             ps.setInt(2, id);
+            ps.setInt(3, 0);
+            
+            resultado = ps.executeUpdate();
+        } catch (SQLException ex) {
+            System.getLogger(BienDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+
+        return resultado;
+    }
+    
+    public int rehabilitar(int id) {
+        String sql = "UPDATE Bien SET Eliminado = ? WHERE ID_Bien = ? AND Eliminado = ?";
+        int resultado = 0;
+        
+        try (Connection con = BasedeDatos.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setInt(1, 0);
+            ps.setInt(2, id);
+            ps.setInt(3, 1);
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {

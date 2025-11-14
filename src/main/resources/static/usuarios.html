@@ -8,12 +8,26 @@
     <link href="icons/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/tablas.css">
-    <link rel="icon" href="images\icon.png">
+    <link rel="icon" href="images/icon.png">
 </head>
 
 <body>
 
-    <header>SIExT | Gestionar usuarios</header>
+    <header>
+        <span>
+            SIExT | Gestionar usuarios
+        </span>
+        <div id="userInfo" class="user-info">
+            <span id="username"></span>
+            <i class="bi bi-person-circle"></i>
+            <div id="userMenu" class="user-menu hidden">
+                <p id="userRole"><i id="rolIcon" class="bi bi-person-circle"></i></p>
+                <button id="logoutBtn" class="btn btn-danger">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                </button>
+            </div>
+        </div>
+    </header>
 
     <div class="default-block-container">
         <nav>
@@ -30,13 +44,13 @@
         <section>
             <h2>Registrar nuevo usuario</h2>
             <form id="formNuevoUsuario">
-                <label>Nombre de usuario</label>
-                <input type="text" id="nuevoUsuario" required>
+                <label for="nuevoUsuario">Nombre de usuario</label>
+                <input type="text" id="nuevoUsuario" placeholder="GARDEL" required>
 
-                <label>Contraseña</label>
-                <input type="password" id="nuevoPassword" required>
+                <label for="nuevoPassword">Contraseña</label>
+                <input type="password" id="nuevoPassword" placeholder="A?bBD34!" required>
 
-                <label>Rol</label>
+                <label for="nuevoRol">Rol</label>
                 <select id="nuevoRol" required>
                     <option value="">Seleccionar</option>
                     <option value="ADMINISTRATIVO">Administrativo</option>
@@ -53,9 +67,15 @@
             <!-- Filtros -->
             <div class="form-grid">
                 <div>
-                    <input type="text" id="filterUsuario" placeholder="Filtrar por nombre o ID...">
+                    <label for="filterIdUsuario">Id. de usuario</label>
+                    <input type="number" id="filterIdUsuario" placeholder="Filtrar por id...">
                 </div>
                 <div>
+                    <label for="filterUsuario">Nombre</label>
+                    <input type="text" id="filterUsuario" placeholder="Filtrar por nombre...">
+                </div>
+                <div>
+                    <label for="filterRol">Rol</label>
                     <select id="filterRol">
                         <option value="">Todos los roles</option>
                         <option value="ADMINISTRATIVO">Administrativo</option>
@@ -64,19 +84,35 @@
                 </div>
             </div>
 
-            <table>
+            <table id="tablaUsuarios">
                 <thead>
                     <tr>
+                        <th></th>
                         <th>ID</th>
                         <th>Usuario</th>
                         <th>Rol</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
-                <tbody id="tablaUsuarios">
+                <tbody>
                 </tbody>
             </table>
 
+            <div class="pagination-controls">
+                <button id="prevPage" class="btn"><i class="bi bi-chevron-left"></i> Anterior</button>
+                <span id="pageInfo">Página 1 de 1</span>
+                <button id="nextPage" class="btn">Siguiente <i class="bi bi-chevron-right"></i></button>
+                <select id="rowsPerPageSelect">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="15" selected>15</option>
+                    <option value="20">20</option>
+                    <option value="25">25</option>
+                    <option value="30">30</option>
+                </select>
+                <label for="rowsPerPageSelect">por página</label>
+            </div>
+            
             <div class="informativo" id="counterUsuarios"></div>
         </section>
 
@@ -84,15 +120,16 @@
         <section id="modificarUsuarioSection" class="hidden">
             <h2>Modificar usuario</h2>
             <form id="formModificarUsuario">
-                <input type="hidden" id="modUsuarioId">
+                <label for="modUsuarioId">Identificador de usuario</label>
+                <input type="number" id="modUsuarioId" disabled>
 
-                <label>Nombre de usuario</label>
+                <label for="modNombreUsuario">Nombre de usuario</label>
                 <input type="text" id="modNombreUsuario" required>
 
-                <label>Contraseña</label>
+                <label for="modPasswordUsuario">Contraseña</label>
                 <input type="password" id="modPasswordUsuario" required>
 
-                <label>Rol</label>
+                <label for="modRolUsuario">Rol</label>
                 <select id="modRolUsuario" required>
                     <option value="">Seleccionar</option>
                     <option value="ADMINISTRATIVO">Administrativo</option>
@@ -113,51 +150,120 @@
 
     <footer>SIExT | 2025</footer>
 
+    <script src="js/auth.js"></script>
+    <script>
+        verificarAuth("SUPERVISOR");
+    </script>
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/forms.js"></script>
     <script>
+
+        let currentPage = 1;
+        let rowsPerPage = parseInt(document.getElementById("rowsPerPageSelect").value, 10);
+        let totalPages = 1;
+
         recargarUsuarios();
         function renderUsuarios() {
             const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+            const usuariosHabilitados = usuarios.filter(u => !u.eliminado);
 
-            const filtroUsuario = document.getElementById("filterUsuario").value.toUpperCase();
+            const filtroIdUsuario = document.getElementById("filterIdUsuario").value;
+            const filtroUsuario = document.getElementById("filterUsuario").value.toUpperCase().trim();
             const filtroRol = document.getElementById("filterRol").value.toUpperCase();
 
-            const tabla = document.getElementById("tablaUsuarios");
-            tabla.innerHTML = "";
-            let count = 0;
+            const tbody = document.querySelector("#tablaUsuarios tbody");
+            tbody.innerHTML = "";
 
-            usuarios.forEach(usuario => {
-                const matchUsuario = txt => usuario.nombre.toUpperCase().includes(txt) || String(usuario.id_Usuario).includes(txt);
-                const matchRol = (rol, filtro) => !filtro || rol === filtro;
+            // Filtrado
+            const filtradas = usuariosHabilitados.filter(usuario =>
+                matchTexto(usuario.nombre, filtroUsuario) && matchNumero(usuario.id_Usuario, filtroIdUsuario)
+                && matchValor(usuario.rol, filtroRol)
+            );
 
-                if (matchUsuario(filtroUsuario) && matchRol(usuario.rol, filtroRol)
-                ) {
+            // Paginación
+            const totalRows = filtradas.length;
+            totalPages = Math.ceil(totalRows / rowsPerPage);
+            if (currentPage > totalPages) currentPage = totalPages || 1;
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const paginadas = filtradas.slice(startIndex, endIndex);
+
+            if (paginadas.length === 0) {
+                const filaVacia = document.createElement("tr");
+                filaVacia.innerHTML = `<td colspan="4" class="text-center">(No hay resultados que coincidan)</td>`;
+                tbody.appendChild(filaVacia);
+            }
+
+            paginadas.forEach(usuario => {
                     const fila = document.createElement("tr");
                     fila.innerHTML = `
+                    <td></td>
                     <td>${usuario.id_Usuario}</td>
                     <td>${usuario.nombre}</td>
                     <td>${usuario.rol}</td>
                     <td>
-                        <button class="btn" onclick='editarUsuario(${usuario.id_Usuario})'><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-editar btn-icon-table" data-id="${usuario.id_Usuario}" title="Editar usuario">
+                            <i class="bi bi-pencil-fill"></i>
+                        </button>
                     </td>
                     `;
-                    tabla.appendChild(fila);
-                    count++;
-                }
+                    tbody.appendChild(fila);
             });
 
-            document.getElementById("counterUsuarios").textContent = `Mostrando ${count} usuario(s).`;
+            document.getElementById("counterUsuarios").textContent = `Mostrando ${paginadas.length} de ${totalRows} usuario(s).`;
+            document.getElementById("pageInfo").textContent = `Página ${currentPage} de ${totalPages || 1}`;
+
+            document.getElementById("prevPage").disabled = (currentPage === 1);
+            document.getElementById("nextPage").disabled = (currentPage === totalPages || totalPages === 0);
         }
-        document.getElementById("filterUsuario").addEventListener("input", renderUsuarios);
-        document.getElementById("filterRol").addEventListener("change", renderUsuarios);
+
+        // Controles de paginación
+        document.getElementById("prevPage").addEventListener("click", () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderUsuarios();
+        }
+        });
+        document.getElementById("nextPage").addEventListener("click", () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderUsuarios();
+            }
+        });
+        document.getElementById("rowsPerPageSelect").addEventListener("change", (e) => {
+            rowsPerPage = parseInt(e.target.value);
+            currentPage = 1;
+            renderUsuarios();
+        });
+
+        document.querySelector("#tablaUsuarios tbody").addEventListener("click", (e) => {
+            // Buscamos si el clic fue en un botón de editar
+            const btnEditar = e.target.closest(".btn-editar");
+            if (btnEditar) {
+                const id = Number(btnEditar.dataset.id);
+                editarUsuario(id);
+                return;
+            }
+        });
+
+        // Filtros
+        document.querySelectorAll("#filterUsuario, #filterRol, #filterIdUsuario")
+            .forEach(input => {
+                const eventType = (input.tagName === "SELECT" || input.type === "date") ? "change" : "input";
+                input.addEventListener(eventType, () => {
+                    currentPage = 1;
+                    renderUsuarios();
+                });
+        });
         renderUsuarios();
 
         document.getElementById("formNuevoUsuario").addEventListener("submit", async (e) => {
             e.preventDefault();
+            if (!confirm("¿Crear este usuario?")) return;
 
-            const nombre = document.getElementById("nuevoUsuario").value.toUpperCase();
-            const contraseña = document.getElementById("nuevoPassword").value;
+            const nombre = document.getElementById("nuevoUsuario").value.trim().toUpperCase();
+            const contraseña = document.getElementById("nuevoPassword").value.trim();
             const rol = document.getElementById("nuevoRol").value.toUpperCase();
             if (!nombre || !contraseña || !rol) {
                 alert("Datos incompletos.");
@@ -199,50 +305,48 @@
             const usuario = usuarios.find(u => u.id_Usuario === id);
             if (!usuario) return;
 
+            const form = document.getElementById("formModificarUsuario");
+            form.dataset.originalNombre = usuario.nombre.trim().toUpperCase();
+            form.dataset.originalRol = usuario.rol.trim().toUpperCase();
+
             document.getElementById("modUsuarioId").value = usuario.id_Usuario;
             document.getElementById("modNombreUsuario").value = usuario.nombre;
             document.getElementById("modPasswordUsuario").value = "";
             document.getElementById("modRolUsuario").value = usuario.rol;
 
             document.getElementById("modificarUsuarioSection").classList.remove("hidden");
+
+            document.getElementById("modificarUsuarioSection").scrollIntoView({ behavior: "smooth" });
+            document.getElementById("modNombreUsuario").focus({ preventScroll: true });
         }
 
         document.getElementById("formModificarUsuario").addEventListener("submit", async (e) => {
             e.preventDefault();
+            if (!confirm("¿Modificar este usuario?")) return;
+
             const id = +document.getElementById("modUsuarioId").value;
-            let usuario;
-            try {
-                const response = await leerUsuario(id);
-                if (!response.ok) {
-                    document.getElementById("modificarUsuarioSection").classList.add("hidden");
-                    const errorData = await response.json();
-                    if (response.status == 422) {
-                        alert(errorData.error);
-                        return;
-                    }
-                    if (response.status == 404) {
-                        alert("Usuario no encontrado.");
-                        return;
-                    }
-                    else if (response.status == 500) {
-                        alert("El servidor no pudo realizar la búsqueda del usuario. Código: 500");
-                        return;
-                    }
-                    else {
-                        alert(`El servidor no pudo realizar la búsqueda del usuario. Código: ${response.status}`);
-                        return;
-                    }
-                }
-                usuario = await response.json();
-            } catch (error) {
-                alert("No se pudo conectar con el servidor.");
+            const form = e.target;
+            const originalNombre = form.dataset.originalNombre;
+            const originalRol = form.dataset.originalRol;
+            const nombreInput = document.getElementById("modNombreUsuario").value.toUpperCase().trim();
+            const rolInput = document.getElementById("modRolUsuario").value.toUpperCase().trim();
+            const contraseñaInput = document.getElementById("modPasswordUsuario").value.trim();
+
+            if (nombreInput === originalNombre && rolInput === originalRol &&
+                contraseñaInput === "") {
+                alert("No se detectaron cambios en los datos.");
+                return;
+            }
+
+            if (!nombreInput || !rolInput) {
+                alert("Datos incompletos.");
                 return;
             }
 
             const usuarioModificado = {
-                nombre: document.getElementById("modNombreUsuario").value.toUpperCase(),
-                contraseña: document.getElementById("modPasswordUsuario").value,
-                rol: document.getElementById("modRolUsuario").value.toUpperCase()
+                nombre: nombreInput,
+                contraseña: contraseñaInput,
+                rol: rolInput
             }
 
             try {
@@ -251,6 +355,10 @@
                     const errorData = await response.json();
                     if (response.status == 422) {
                         alert(errorData.error);
+                        return;
+                    }
+                    if (response.status == 404) {
+                        alert("Usuario no encontrado.");
                         return;
                     }
                     if (response.status == 500) {
@@ -272,13 +380,17 @@
             renderUsuarios();
             document.getElementById("modificarUsuarioSection").classList.add("hidden");
             e.target.reset();
+
+            document.getElementById("tablaUsuarios").parentElement.scrollIntoView({ behavior: "smooth" });
         });
 
         // Cancelar edición de datos
         document.getElementById("btnCancelarEdicion").onclick = () => {
             if (confirm("¿Deseás cancelar la edición? Se perderán los cambios no guardados.")) {
                 document.getElementById("modificarUsuarioSection").classList.add("hidden");
-                document.getElementById("modificarUsuarioSection").reset();
+                document.getElementById("formModificarUsuario").reset();
+
+                document.getElementById("tablaUsuarios").parentElement.scrollIntoView({ behavior: "smooth" });
             }
         };
 
@@ -311,7 +423,9 @@
             await recargarUsuarios();
             renderUsuarios();
             document.getElementById("modificarUsuarioSection").classList.add("hidden");
-            document.getElementById("modificarUsuarioSection").reset();
+            document.getElementById("formModificarUsuario").reset();
+
+            document.getElementById("tablaUsuarios").parentElement.scrollIntoView({ behavior: "smooth" });
         });
     </script>
 </body>

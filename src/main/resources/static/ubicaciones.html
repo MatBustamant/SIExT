@@ -12,16 +12,28 @@
 </head>
 
 <body>
-    <header>SIExT | Editar ubicaciones</header>
+    <header>
+        <span>SIExT | Editar ubicaciones</span>
+        <div id="userInfo" class="user-info">
+            <span id="username"></span>
+            <i class="bi bi-person-circle"></i>
+            <div id="userMenu" class="user-menu hidden">
+                <p id="userRole"><i id="rolIcon" class="bi bi-person-circle"></i></p>
+                <button id="logoutBtn" class="btn btn-danger">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                </button>
+            </div>
+        </div>
+    </header>
 
     <div class="default-block-container">
         <nav>
             <h2>Acciones rápidas</h2>
             <ul>
                 <li><a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver a Panel</a></li>
-                <li><a href="inventario.html" class="btn"><i class="bi bi-card-list"></i></i>Ver Inventario</a></li>
                 <li><a href="bienes.html" class="btn"><i class="bi bi-box-seam"></i>Gestionar Bienes</a></li>
-                <li><a href="solicitudes.html" class="btn"><i class="bi bi-card-checklist"></i>Gestionar Solicitudes</a></li>
+                <li><a href="solicitudes.html" class="btn"><i class="bi bi-card-checklist"></i>Gestionar Solicitudes</a>
+                </li>
             </ul>
         </nav>
     </div>
@@ -31,8 +43,8 @@
         <section>
             <h2>Agregar nueva ubicación</h2>
             <form id="ubicacionForm">
-                <label>Nombre de Ubicación</label>
-                <input list="ubicacionesExistentes" type="text" id="nombreUbicacion" required>
+                <label for="nombreUbicacion">Nombre de Ubicación</label>
+                <input list="ubicacionesExistentes" type="text" id="nombreUbicacion" placeholder="BEDELÍA" required>
                 <datalist id="ubicacionesExistentes"></datalist>
                 <button type="submit" class="btn"><i class="bi bi-plus-circle"></i>Registrar</button>
             </form>
@@ -44,13 +56,19 @@
             <!-- Filtros -->
             <div class="form-grid">
                 <div>
-                    <input type="text" id="filterNombreCat" placeholder="Filtrar por nombre o ID...">
+                    <label for="filterIdUbi">Id. de ubicación</label>
+                    <input type="number" id="filterIdUbi" placeholder="Filtrar por id...">
+                </div>
+                <div>
+                    <label for="filterNombreCat">Nombre</label>
+                    <input type="text" id="filterNombreCat" placeholder="Filtrar por nombre...">
                 </div>
             </div>
 
             <table id="tablaUbicaciones">
                 <thead>
                     <tr>
+                        <th></th>
                         <th>ID</th>
                         <th>Ubicación</th>
                         <th>Acciones</th>
@@ -59,6 +77,21 @@
                 <tbody></tbody>
             </table>
 
+            <div class="pagination-controls">
+                <button id="prevPage" class="btn"><i class="bi bi-chevron-left"></i> Anterior</button>
+                <span id="pageInfo">Página 1 de 1</span>
+                <button id="nextPage" class="btn">Siguiente <i class="bi bi-chevron-right"></i></button>
+                <select id="rowsPerPageSelect">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="15" selected>15</option>
+                    <option value="20">20</option>
+                    <option value="25">25</option>
+                    <option value="30">30</option>
+                </select>
+                <label for="rowsPerPageSelect">por página</label>
+            </div>
+            
             <div class="informativo" id="contadorUbicaciones"></div>
         </section>
 
@@ -66,10 +99,10 @@
         <section id="modificarUbicacionSection" class="hidden">
             <h2>Actualizar ubicación</h2>
             <form id="modificarUbicacionForm">
-                <input type="hidden" id="modUbicacionId">
-                <label>Nombre de Ubicación</label>
-                <input list="modUbicacionesExistentes" type="text" id="modNombreUbicacion" required>
-                <datalist id="modUbicacionesExistentes"></datalist>
+                <label for="modUbicacionId">Identificador de ubicación</label>
+                <input type="number" id="modUbicacionId" disabled>
+                <label for="modNombreUbicacion">Nombre de Ubicación</label>
+                <input list="ubicacionesExistentes" type="text" id="modNombreUbicacion" placeholder="BEDELÍA" required>
                 <div class="btn-row">
                     <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
                     <button type="button" class="btn" id="cancelarBtn"><i class="bi bi-x-circle"></i>Cancelar</button>
@@ -83,69 +116,118 @@
 
     <footer>SIExT | 2025</footer>
 
+    <script src="js/auth.js"></script>
+    <script>
+        verificarAuth();
+    </script>
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/forms.js"></script>
     <script>
         function ubicacionExiste(nombre) {
             const ubicaciones = JSON.parse(localStorage.getItem("ubicaciones")) || [];
 
-            if (ubicaciones.some(c => c.nombre === nombre)) {
+            if (ubicaciones.some(c => c.nombre === nombre && !c.eliminado) || nombre === "SIN ASIGNAR") {
                 alert("Esa ubicación ya existe.");
                 return true;
             }
             return false;
         }
 
-        function cargarUbicacionesExistentes(idSelect) {
-            const sel = document.getElementById(idSelect);
-            sel.innerHTML = "";
-            const cats = JSON.parse(localStorage.getItem("ubicaciones")) || [];
-            if (cats.length === 0) {
-                sel.disabled = true;
-                sel.innerHTML = "<option>Sin ubicaciones</option>";
-                return;
-            }
-            cats.forEach(c => {
-                const o = document.createElement("option");
-                o.textContent = c.nombre;
-                sel.appendChild(o);
-            });
-            sel.disabled = false;
-        }
+        let currentPage = 1;
+        let rowsPerPage = parseInt(document.getElementById("rowsPerPageSelect").value, 10);
+        let totalPages = 1;
 
         function renderizarUbicaciones() {
             const ubicaciones = JSON.parse(localStorage.getItem("ubicaciones")) || [];
-            const filtroNombreId = document.getElementById("filterNombreCat").value.toUpperCase();
+            const ubicacionesHabilitadas = ubicaciones.filter(u => !u.eliminado);
+
+            const filtroIdUbi = document.getElementById("filterIdUbi").value;
+            const filtroNombre = document.getElementById("filterNombreCat").value.toUpperCase().trim();
             const tbody = document.querySelector("#tablaUbicaciones tbody");
             tbody.innerHTML = "";
-            let count = 0;
 
-            ubicaciones.forEach(cat => {
-                if (
-                    (cat.nombre.toUpperCase().includes(filtroNombreId) || String(cat.id_Ubicacion).includes(filtroNombreId))
-                ) {
+            // Filtrado
+            const filtradas = ubicacionesHabilitadas.filter(ubi =>
+                (matchTexto(ubi.nombre, filtroNombre) && matchNumero(ubi.id_Ubicacion, filtroIdUbi))
+            );
+
+            // Paginación
+            const totalRows = filtradas.length;
+            totalPages = Math.ceil(totalRows / rowsPerPage);
+            if (currentPage > totalPages) currentPage = totalPages || 1;
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const paginadas = filtradas.slice(startIndex, endIndex);
+
+            if (paginadas.length === 0) {
+                const filaVacia = document.createElement("tr");
+                filaVacia.innerHTML = `<td colspan="4" class="text-center">(No hay resultados que coincidan)</td>`;
+                tbody.appendChild(filaVacia);
+            }
+
+            paginadas.forEach(ubi => {
                     const fila = document.createElement("tr");
                     fila.innerHTML = `
-                <td>${cat.id_Ubicacion}</td>
-                <td>${cat.nombre}</td>
-                <td>
-                    <button class='btn' onclick='editarUbicacion(${cat.id_Ubicacion})'><i class='bi bi-pencil'></i></button>
-                </td>`;
+                        <td></td>
+                        <td>${ubi.id_Ubicacion}</td>
+                        <td>${ubi.nombre}</td>
+                        <td>
+                            <button class="btn btn-editar btn-icon-table" data-id="${ubi.id_Ubicacion}" title="Editar ubicación">
+                                <i class='bi bi-pencil-fill'></i>
+                            </button>
+                        </td>`;
                     tbody.appendChild(fila);
-                    count++;
-                }
             });
-            document.getElementById("contadorUbicaciones").textContent = `Mostrando ${count} ubicación(s).`;
+            document.getElementById("contadorUbicaciones").textContent = `Mostrando ${paginadas.length} de ${totalRows} ubicación(s).`;
+            document.getElementById("pageInfo").textContent = `Página ${currentPage} de ${totalPages || 1}`;
+
+            document.getElementById("prevPage").disabled = (currentPage === 1);
+            document.getElementById("nextPage").disabled = (currentPage === totalPages || totalPages === 0);
         }
         recargarUbicaciones();
-        cargarUbicacionesExistentes("ubicacionesExistentes");
-        cargarUbicacionesExistentes("modUbicacionesExistentes");
+        cargarOpciones("ubicacionesExistentes", "ubicaciones");
         renderizarUbicaciones();
 
-        document.getElementById("filterNombreCat").addEventListener("input", renderizarUbicaciones);
+        // Controles de paginación
+        document.getElementById("prevPage").addEventListener("click", () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderizarUbicaciones();
+        }
+        });
+        document.getElementById("nextPage").addEventListener("click", () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderizarUbicaciones();
+            }
+        });
+        document.getElementById("rowsPerPageSelect").addEventListener("change", (e) => {
+            rowsPerPage = parseInt(e.target.value);
+            currentPage = 1;
+            renderizarUbicaciones();
+        });
+
+        document.querySelector("#tablaUbicaciones tbody").addEventListener("click", (e) => {
+            // Buscamos si el clic fue en un botón de editar
+            const btnEditar = e.target.closest(".btn-editar");
+            if (btnEditar) {
+                const id = Number(btnEditar.dataset.id);
+                editarUbicacion(id);
+                return;
+            }
+        });
+        document.querySelectorAll("#filterNombreCat, #filterIdUbi").forEach(input => {
+            const eventType = (input.tagName === "SELECT" || input.type === "date") ? "change" : "input";
+            input.addEventListener(eventType, () => {
+                currentPage = 1;
+                renderizarUbicaciones();
+            });
+        });
 
         document.getElementById("ubicacionForm").addEventListener("submit", async (e) => {
             e.preventDefault();
+            if (!confirm("¿Crear esta ubicación?")) return;
 
             const nombre = document.getElementById("nombreUbicacion").value.trim().toUpperCase();
             if (!nombre) {
@@ -168,8 +250,8 @@
                         return;
                     }
                     else {
-                    alert(`El servidor no pudo realizar el registro de la ubicación. Código: ${response.status}`);
-                    return;
+                        alert(`El servidor no pudo realizar el registro de la ubicación. Código: ${response.status}`);
+                        return;
                     }
                 }
             } catch (error) {
@@ -180,8 +262,7 @@
             await recargarUbicaciones();
 
             renderizarUbicaciones();
-            cargarUbicacionesExistentes("ubicacionesExistentes");
-            cargarUbicacionesExistentes("modUbicacionesExistentes");
+            cargarOpciones("ubicacionesExistentes", "ubicaciones");
             e.target.reset();
         });
 
@@ -190,47 +271,40 @@
             const cat = ubicaciones.find(c => c.id_Ubicacion === id);
             if (!cat) return;
 
+            const form = document.getElementById("modificarUbicacionForm");
+            form.dataset.originalNombre = cat.nombre.trim().toUpperCase();
+
             document.getElementById("modUbicacionId").value = cat.id_Ubicacion;
             document.getElementById("modNombreUbicacion").value = cat.nombre;
 
             document.getElementById("modificarUbicacionSection").classList.remove("hidden");
+
+            document.getElementById("modificarUbicacionSection").scrollIntoView({ behavior: "smooth" });
+            document.getElementById("modNombreUbicacion").focus({ preventScroll: true });
         }
 
         document.getElementById("modificarUbicacionForm").addEventListener("submit", async (e) => {
             e.preventDefault();
+            if (!confirm("¿Modificar esta ubicación?")) return;
+            
             const id = +document.getElementById("modUbicacionId").value;
+            const form = e.target;
+            const originalNombre = form.dataset.originalNombre;
 
-            let ubicacion;
-            try {
-                const response = await leerUbicacion(id);
-                if (!response.ok) {
-                    document.getElementById("modificarUbicacionSection").classList.add("hidden");
-                    const errorData = await response.json();
-                    if (response.status == 422) {
-                        alert(errorData.error);
-                        return;
-                    }
-                    if (response.status == 404) {
-                        alert("Ubicación no encontrada.");
-                        return;
-                    }
-                    else if (response.status == 500) {
-                        alert("El servidor no pudo realizar la búsqueda de la ubicación. Código: 500");
-                        return;
-                    }
-                    else {
-                        alert(`El servidor no pudo realizar la búsqueda de la ubicación. Código: ${response.status}`);
-                        return;
-                    }
-                }
-                ubicacion = await response.json();
-            } catch (error) {
-                alert("No se pudo conectar con el servidor.");
+            const nombreInput = document.getElementById("modNombreUbicacion").value.trim().toUpperCase();
+
+            if (originalNombre === nombreInput) {
+                alert("No se detectaron cambios en los datos.");
+                return;
+            }
+
+            if (!nombreInput) {
+                alert("Datos incompletos.");
                 return;
             }
 
             const ubicacionModificada = {
-                nombre: document.getElementById("modNombreUbicacion").value.trim().toUpperCase(),
+                nombre: nombreInput,
             }
 
             if (ubicacionExiste(ubicacionModificada.nombre)) return;
@@ -243,12 +317,16 @@
                         alert(errorData.error);
                         return;
                     }
+                    if (response.status == 404) {
+                        alert("Ubicación no encontrada.");
+                        return;
+                    }
                     if (response.status == 500) {
                         alert("El servidor no pudo realizar la modificación de la ubicación. Código: 500");
                         return;
                     } else {
-                    alert(`El servidor no pudo realizar la modificación de la ubicación. Código: ${response.status}`);
-                    return;
+                        alert(`El servidor no pudo realizar la modificación de la ubicación. Código: ${response.status}`);
+                        return;
                     }
                 }
             } catch (error) {
@@ -260,17 +338,20 @@
             await recargarUbicaciones();
 
             renderizarUbicaciones();
-            cargarUbicacionesExistentes("ubicacionesExistentes");
-            cargarUbicacionesExistentes("modUbicacionesExistentes");
+            cargarOpciones("ubicacionesExistentes", "ubicaciones");
             document.getElementById("modificarUbicacionSection").classList.add("hidden");
             e.target.reset();
+
+            document.getElementById("tablaUbicaciones").parentElement.scrollIntoView({ behavior: "smooth" });
         });
 
         // Cancelar edición de datos
         document.getElementById("cancelarBtn").onclick = () => {
             if (confirm("¿Deseás cancelar la edición? Se perderán los cambios no guardados.")) {
                 document.getElementById("modificarUbicacionSection").classList.add("hidden");
-                document.getElementById("modificarUbicacionSection").reset();
+                document.getElementById("modificarUbicacionForm").reset();
+
+                document.getElementById("tablaUbicaciones").parentElement.scrollIntoView({ behavior: "smooth" });
             }
         };
 
@@ -302,10 +383,11 @@
             alert("Ubicación eliminada.");
             await recargarUbicaciones();
             renderizarUbicaciones();
-            cargarUbicacionesExistentes("ubicacionesExistentes");
-            cargarUbicacionesExistentes("modUbicacionesExistentes");
+            cargarOpciones("ubicacionesExistentes", "ubicaciones");
             document.getElementById("modificarUbicacionSection").classList.add("hidden");
-            document.getElementById("modificarUbicacionSection").reset();
+            document.getElementById("modificarUbicacionForm").reset();
+
+            document.getElementById("tablaUbicaciones").parentElement.scrollIntoView({ behavior: "smooth" });
         });
 
         renderizarUbicaciones();

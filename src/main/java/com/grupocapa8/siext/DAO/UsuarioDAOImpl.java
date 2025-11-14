@@ -14,17 +14,42 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
+public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO, Integer>{
 
     @Override
-    public UsuarioDTO buscar(int id) {
+    public UsuarioDTO buscar(Integer id) {
         UsuarioDTO usuario = null;
-        String sql = "SELECT ID_Usuario, Nombre_Usuario, Contraseña, Rol FROM Usuario WHERE ID_Usuario = ? AND Eliminado = ?";
+        String sql = "SELECT * FROM Usuario WHERE ID_Usuario = ?";
         
         try(Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, id);
+            try(ResultSet rs = ps.executeQuery()) {
+                if(rs.next()){
+                    usuario = new UsuarioDTO();
+                    usuario.setID_Usuario(rs.getInt("ID_Usuario"));
+                    usuario.setNombre(rs.getString("Nombre_Usuario"));
+                    usuario.setContraseña(rs.getString("Contraseña"));
+                    usuario.setRol(RolUsuario.valueOf(rs.getString("Rol")));
+                    usuario.setEliminado(rs.getInt("Eliminado") != 0);
+                }
+            }
+            
+        } catch (SQLException ex) {
+            System.getLogger(UsuarioDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+        return usuario;
+    }
+    
+    public UsuarioDTO buscar(String nombreUsuario) {
+        UsuarioDTO usuario = null;
+        String sql = "SELECT * FROM Usuario WHERE Nombre_Usuario = ? AND Eliminado = ?";
+        
+        try(Connection con = BasedeDatos.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setString(1, nombreUsuario);
             ps.setInt(2,0);
             try(ResultSet rs = ps.executeQuery()) {
                 if(rs.next()){
@@ -45,11 +70,10 @@ public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
     @Override
     public List<UsuarioDTO> buscarTodos() {
         List<UsuarioDTO> usuarios = new ArrayList<>();
-        String sql = "SELECT * FROM Usuario WHERE Eliminado = ?";
+        String sql = "SELECT * FROM Usuario";
         
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1,0);
         
             try(ResultSet rs = ps.executeQuery()) {
 
@@ -59,6 +83,7 @@ public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
                 usuario.setNombre(rs.getString("Nombre_Usuario"));
                 usuario.setContraseña(rs.getString("Contraseña"));
                 usuario.setRol(RolUsuario.valueOf(rs.getString("Rol")));
+                usuario.setEliminado(rs.getInt("Eliminado") != 0);
 
                 usuarios.add(usuario);
             }
@@ -90,7 +115,7 @@ public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
 
     @Override
     public int actualizar(UsuarioDTO Usuario) {
-        String sql = "UPDATE Usuario SET Nombre_Usuario = ?, Contraseña = ?, Rol = ? WHERE ID_Usuario = ?";
+        String sql = "UPDATE Usuario SET Nombre_Usuario = ?, Contraseña = ?, Rol = ? WHERE ID_Usuario = ? AND Eliminado = ?";
         int resultado = 0;
         
         try (Connection con = BasedeDatos.getConnection();
@@ -100,6 +125,7 @@ public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
             ps.setString(2, Usuario.getContraseña());
             ps.setString(3, Usuario.getRol().name());
             ps.setInt(4, Usuario.getID_Usuario());
+            ps.setInt(5, 0);
 
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
@@ -110,8 +136,8 @@ public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
     }
 
     @Override
-    public int eliminar(int id) {
-        String sql = "UPDATE Usuario SET Eliminado = ? WHERE ID_Usuario = ?";
+    public int eliminar(Integer id) {
+        String sql = "UPDATE Usuario SET Eliminado = ? WHERE ID_Usuario = ? AND Eliminado = ?";
         int resultado = 0;
         
         try (Connection con = BasedeDatos.getConnection();
@@ -119,6 +145,7 @@ public class UsuarioDAOImpl implements DAOGenerica <UsuarioDTO>{
             
             ps.setInt(1, 1);
             ps.setInt(2, id);
+            ps.setInt(3, 0);
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {

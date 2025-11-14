@@ -7,11 +7,12 @@ package com.grupocapa8.siext.DTO;
 public class CategoriaBienDTO {
     private int ID_Categoria;
     private String Nombre;
-    
+    private boolean eliminado;
 
-    public CategoriaBienDTO(int ID_Categoria, String Nombre) {
+    public CategoriaBienDTO(int ID_Categoria, String Nombre, boolean eliminado) {
         this.ID_Categoria = ID_Categoria;
         this.Nombre = Nombre;
+        this.eliminado = eliminado;
     }
     
     public CategoriaBienDTO(){
@@ -32,6 +33,14 @@ public class CategoriaBienDTO {
 
     public void setID_Categoria(int ID_Categoria) {
         this.ID_Categoria = ID_Categoria;
+    }
+
+    public boolean isEliminado() {
+        return eliminado;
+    }
+
+    public void setEliminado(boolean eliminado) {
+        this.eliminado = eliminado;
     }
     
 }

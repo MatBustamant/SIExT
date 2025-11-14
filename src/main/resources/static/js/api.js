@@ -84,6 +84,10 @@ async function eliminarUsuario(id) {
     return fetch(`${API_BASE}/usuario/eliminar/${id}`, DELETE);
 }
 
+async function loginUsuario(credentials) {
+    return fetch(`${API_BASE}/usuario/login`, POST(credentials));
+}
+
 // funciones con el crud de categorias
 async function leerCategorias() {
     return fetch(`${API_BASE}/categoria/leer`);
@@ -145,4 +149,25 @@ async function modificarUbicacion(ubicacion, id) {
 
 async function eliminarUbicacion(id) {
     return fetch(`${API_BASE}/ubicacion/eliminar/${id}`, DELETE);
+}
+
+// funciones con el crud de solicitantes
+async function leerSolicitantes() {
+    return fetch(`${API_BASE}/responsable/leer`);
+}
+
+async function leerSolicitante(id) {
+    return fetch(`${API_BASE}/responsable/leer/${id}`);
+}
+
+async function crearSolicitante(ubicacion) {
+    return fetch(`${API_BASE}/responsable/crear`, POST(ubicacion));
+}
+
+async function modificarSolicitante(ubicacion, id) {
+    return fetch(`${API_BASE}/responsable/modificar/${id}`, PUT(ubicacion));
+}
+
+async function eliminarSolicitante(id) {
+    return fetch(`${API_BASE}/responsable/eliminar/${id}`, DELETE);
 }

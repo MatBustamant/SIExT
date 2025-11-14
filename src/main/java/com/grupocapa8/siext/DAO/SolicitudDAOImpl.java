@@ -1,12 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.grupocapa8.siext.DAO;
 
 import com.grupocapa8.siext.Enums.EstadoSolicitud;
 import com.grupocapa8.siext.ConexionBD.BasedeDatos;
 import static com.grupocapa8.siext.ConexionBD.BasedeDatos.getConnection;
+import com.grupocapa8.siext.DTO.Bienes_por_SolicitudDTO;
 import com.grupocapa8.siext.DTO.SolicitudDTO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,42 +16,49 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
-    
+public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO, Integer> {
+
     private final UbicacionDAOImpl ubicacionDAO;
+    private final Bienes_por_SolicitudDAOImpl bienesDAO;
 
     public SolicitudDAOImpl() {
         this.ubicacionDAO = new UbicacionDAOImpl();
+        this.bienesDAO = new Bienes_por_SolicitudDAOImpl();
     }
 
     @Override
-    public SolicitudDTO buscar(int id) {
+    public SolicitudDTO buscar(Integer id) {
         SolicitudDTO soli = null;
-        String sql = "SELECT * FROM Solicitud WHERE Num_Solicitud = ? AND Eliminado = ?";
-        try (Connection con = getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
-            
+        String sql = "SELECT s.*, u.Nombre AS UbicacionNombre "
+                + "FROM Solicitud s "
+                + "JOIN Ubicacion u ON s.Destino = u.ID_Ubicacion "
+                + "WHERE Num_Solicitud = ?";
+
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
             ps.setInt(1, id);
-            ps.setInt(2, 0);
-            try (ResultSet rs = ps.executeQuery()){
-                if (rs.next()){
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
                     soli = new SolicitudDTO();
                     soli.setNumSolicitud(rs.getInt("Num_Solicitud"));
-                    
+                    soli.setSolicitante(rs.getInt("Legajo"));
                     String fechaString = rs.getString("Fecha_Solicitud");
-                    Instant fecha = LocalDateTime.parse(fechaString, 
-                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toInstant(ZoneOffset.UTC);
+                    Instant fecha = LocalDateTime.parse(fechaString,
+                            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toInstant(ZoneOffset.UTC);
                     soli.setFechaInicioSolicitud(fecha);
-                    
-                    int ubicacionID = rs.getInt("Destino");
-                    soli.setUbicacionBienes(ubicacionDAO.buscar(ubicacionID).getNombre());
-                    
+                    soli.setUbicacionBienes(rs.getString("UbicacionNombre"));
+
                     soli.setEstado(EstadoSolicitud.valueOf(rs.getString("Estado")));
                     soli.setDescripcion(rs.getString("Descripcion"));
+                    soli.setEliminado(rs.getInt("Eliminado") != 0);
+
+                    if (!soli.isEliminado()) {
+                        soli.setBienesPedidos(bienesDAO.buscarPorSolicitud(id));
+                    }
                 }
             }
         } catch (SQLException ex) {
-            System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+            System.getLogger(SolicitudDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
         return soli;
     }
@@ -62,94 +66,129 @@ public class SolicitudDAOImpl implements DAOGenerica<SolicitudDTO>{
     @Override
     public List<SolicitudDTO> buscarTodos() {
         List<SolicitudDTO> solicitudes = new ArrayList<>();
-        String sql = "SELECT * FROM Solicitud WHERE Eliminado = ?";
-        try (Connection con = getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1,0);
-        
-            try(ResultSet rs = ps.executeQuery()) {
+        String sql = "SELECT s.*, u.Nombre AS UbicacionNombre "
+                + "FROM Solicitud s "
+                + "JOIN Ubicacion u ON s.Destino = u.ID_Ubicacion";
 
-            while (rs.next()) {
-                SolicitudDTO soli = new SolicitudDTO();
-                soli.setNumSolicitud(rs.getInt("Num_Solicitud"));
-                
-                String fechaString = rs.getString("Fecha_Solicitud");
-                Instant fecha = LocalDateTime.parse(fechaString, 
-                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toInstant(ZoneOffset.UTC);
-                soli.setFechaInicioSolicitud(fecha);
-                
-                int ubicacionID = rs.getInt("Destino");
-                soli.setUbicacionBienes(ubicacionDAO.buscar(ubicacionID).getNombre());
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-                soli.setEstado(EstadoSolicitud.valueOf(rs.getString("Estado")));
-                soli.setDescripcion(rs.getString("Descripcion"));
-                
-                solicitudes.add(soli);
-            }
+            try (ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+                    SolicitudDTO soli = new SolicitudDTO();
+                    soli.setNumSolicitud(rs.getInt("Num_Solicitud"));
+                    soli.setSolicitante(rs.getInt("Legajo"));
+                    String fechaString = rs.getString("Fecha_Solicitud");
+                    Instant fecha = LocalDateTime.parse(fechaString,
+                            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toInstant(ZoneOffset.UTC);
+                    soli.setFechaInicioSolicitud(fecha);
+                    soli.setUbicacionBienes(rs.getString("UbicacionNombre"));
+
+                    soli.setEstado(EstadoSolicitud.valueOf(rs.getString("Estado")));
+                    soli.setDescripcion(rs.getString("Descripcion"));
+                    soli.setEliminado(rs.getInt("Eliminado") != 0);
+
+                    if (!soli.isEliminado()) {
+                        soli.setBienesPedidos(bienesDAO.buscarPorSolicitud(soli.getNumSolicitud()));
+                    }
+
+                    solicitudes.add(soli);
+                }
             }
         } catch (SQLException ex) {
-            System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+            System.getLogger(SolicitudDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
         return solicitudes;
     }
 
     @Override
     public int insertar(SolicitudDTO Solicitud) {
-        String sql = "INSERT INTO Solicitud (Estado, Destino, Descripcion) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Solicitud (Estado, Destino, Legajo, Descripcion) VALUES (?, ?, ?, ?)";
         int idUbicacion = ubicacionDAO.buscar(Solicitud.getUbicacionBienes()).getID_Ubicacion();
-        
+
         int resultado = 0;
-        try (Connection con = BasedeDatos.getConnection();
-                PreparedStatement ps = con.prepareStatement(sql)) {
-            
+        try (Connection con = BasedeDatos.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            con.setAutoCommit(false); // <- INICIO DE TRANSACCIÓN
+
             ps.setString(1, Solicitud.getEstado().name());
             ps.setInt(2, idUbicacion);
-            ps.setString(3, Solicitud.getDescripcion());
-            
+            ps.setInt(3, Solicitud.getSolicitante());
+            ps.setString(4, Solicitud.getDescripcion());
+
+            resultado = ps.executeUpdate();
+            // Recuperar el ID generado
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    int claveGenerada = rs.getInt(1);
+                    for (Bienes_por_SolicitudDTO bien : Solicitud.getBienesPedidos()) {
+                        bien.setNumSolicitud(claveGenerada);
+                        bienesDAO.insertar(bien, con);
+                    }
+                }
+            }
+            con.commit(); // <- FIN DE TRANSACCION
+        } catch (SQLException ex) {
+            System.getLogger(SolicitudDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+        return resultado;
+    }
+
+    public int actualizar(SolicitudDTO Solicitud, Connection con) {
+        String sql = "UPDATE Solicitud SET Estado = ?, Destino = ?, Legajo = ?, Descripcion = ? WHERE Num_Solicitud = ? AND Eliminado = ?";
+        int idUbicacion = ubicacionDAO.buscar(Solicitud.getUbicacionBienes()).getID_Ubicacion();
+
+        int resultado = 0;
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, Solicitud.getEstado().name());
+            ps.setInt(2, idUbicacion);
+            ps.setInt(3, Solicitud.getSolicitante());
+            ps.setString(4, Solicitud.getDescripcion());
+            ps.setInt(5, Solicitud.getNumSolicitud());
+            ps.setInt(6, 0);
+
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
-            System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+            System.getLogger(SolicitudDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
-        return resultado;    
+        return resultado;
     }
 
     @Override
     public int actualizar(SolicitudDTO Solicitud) {
-        String sql = "UPDATE Solicitud SET Estado = ?, Destino = ?, Descripcion = ? WHERE Num_Solicitud = ?";
-        int idUbicacion = ubicacionDAO.buscar(Solicitud.getUbicacionBienes()).getID_Ubicacion();
-        
-        int resultado = 0;
-        
-        try (Connection con = BasedeDatos.getConnection();
-                PreparedStatement ps = con.prepareStatement(sql)) {
-            
-            ps.setString(1, Solicitud.getEstado().name());
-            ps.setInt(2, idUbicacion);
-            ps.setString(3, Solicitud.getDescripcion());
-            ps.setInt(4, Solicitud.getNumSolicitud());
-            
-            resultado = ps.executeUpdate();
+        try (Connection con = BasedeDatos.getConnection()) {
+            return this.actualizar(Solicitud, con);
         } catch (SQLException ex) {
-            System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+            System.getLogger(SolicitudDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
-        return resultado;
-    }    
+        return 0;
+    }
 
-    @Override
-    public int eliminar(int id) {
-        String sql = "UPDATE Solicitud SET Eliminado = ? WHERE Num_Solicitud = ?";
+    public int eliminar(Integer id, Connection con) {
+        String sql = "UPDATE Solicitud SET Eliminado = ? WHERE Num_Solicitud = ? AND Eliminado = ?";
         int resultado = 0;
-        try (Connection con = BasedeDatos.getConnection();
-                PreparedStatement ps = con.prepareStatement(sql)) {
-            
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+
             ps.setInt(1, 1);
             ps.setInt(2, id);
-            
+            ps.setInt(3, 0);
+
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
-            System.getLogger(EventoTrazabilidadDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+            System.getLogger(SolicitudDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
         return resultado;
     }
-    
+
+    @Override
+    public int eliminar(Integer id) {
+        try (Connection con = BasedeDatos.getConnection()) {
+            return this.eliminar(id, con);
+        } catch (SQLException ex) {
+            System.getLogger(SolicitudDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+        return 0;
+    }
+
 }

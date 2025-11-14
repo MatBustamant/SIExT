@@ -8,20 +8,33 @@
     <link href="icons/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/tablas.css">
-    <link rel="icon" href="images\icon.png">
+    <link rel="stylesheet" href="css/historial.css">
+    <link rel="icon" href="images/icon.png">
 </head>
 
 <body>
 
-    <header>SIExT | Registrar eventos</header>
+    <header>
+        <span>SIExT | Registrar eventos</span>
+        <div id="userInfo" class="user-info">
+            <span id="username"></span>
+            <i class="bi bi-person-circle"></i>
+            <div id="userMenu" class="user-menu hidden">
+                <p id="userRole"><i id="rolIcon" class="bi bi-person-circle"></i></p>
+                <button id="logoutBtn" class="btn btn-danger">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                </button>
+            </div>
+        </div>
+    </header>
 
     <div class="default-block-container">
         <nav>
             <h2>Acciones rápidas</h2>
             <ul>
                 <li><a href="panel.html" class="btn"><i class="bi bi-house"></i>Volver al Panel</a></li>
-                <li><a href="inventario.html" class="btn"><i class="bi bi-card-list"></i>Ver Inventario</a></li>
-                <li><a href="informes.html" class="btn"><i class="bi bi-file-earmark-text"></i>Generar Informes</a></li>
+                <li><a href="bienes.html" class="btn"><i class="bi bi-box-seam"></i>Gestionar Bienes</a></li>
+                <li id="supervisor-only-accion" class="hidden"><a href="informes.html" class="btn"><i class="bi bi-file-earmark-text"></i>Generar Informes</a></li>
             </ul>
         </nav>
     </div>
@@ -33,20 +46,32 @@
             <form id="registroEventoForm">
                 <div class="form-grid">
                     <div>
-                        <label>ID del bien</label>
-                        <input id="bienAsociado" type="number" required>
+                        <label for="bienAsociado">Nro. de inventario</label>
+                        <div class="input-prefix">
+                            <span>FCE-</span>
+                            <input id="bienAsociado" type="number" placeholder="150" required>
+                        </div>
                     </div>
                     <div>
-                        <label>Tipo de evento</label>
+                        <label for="tipoEvento">Tipo de evento</label>
                         <select id="tipoEvento" required>
                             <option value="">Seleccionar</option>
+                            <option value="ENTREGA">Entrega</option>
+                            <option value="DEVOLUCION">Devolución</option>
                             <option value="AVERIO">Averío</option>
                             <option value="REPARACION">Reparación</option>
-                            <option value="ENTREGA">Entrega</option>
+                            <option value="BAJA">Baja</option>
                         </select>
                     </div>
+                    <div class="hidden" id="campoUbicacionCrear">
+                        <label for="ubicacionEntrega">Ubicación</label>
+                        <input list="ubicacionesSugeridas" type="text" id="ubicacionEntrega" placeholder="BEDELÍA">
+                    </div>
                 </div>
-
+                <div>
+                    <label for="detalleEvento">Detalle</label>
+                    <input type="text" id="detalleEvento" placeholder="Detalles extras opcionales...">
+                </div>
                 <div class="btn-row">
                     <button type="submit" class="btn"><i class="bi bi-plus-circle"></i>Registrar</button>
                 </div>
@@ -59,24 +84,42 @@
             <!-- Filtros -->
             <div class="form-grid">
                 <div>
-                    <input id="filterBienInput" type="number" placeholder="Filtrar por ID de bien">
+                    <label for="filterEstadoId">Id. de estado</label>
+                    <input type="number" id="filterEstadoId" placeholder="Filtrar por ID...">
                 </div>
                 <div>
+                    <label for="filterBienInput">Nro. de inventario</label>
+                    <div class="input-prefix">
+                        <span>FCE-</span>
+                        <input id="filterBienInput" type="number" placeholder="Filtrar por nro...">
+                    </div>
+                </div>
+                <div>
+                    <label for="filterBienNombre">Nombre de bien</label>
+                    <input type="text" id="filterBienNombre" placeholder="Filtrar por nombre...">
+                </div>
+                <div>
+                    <label for="filterTipoEvento">Tipo de evento</label>
                     <select id="filterTipoEvento">
                         <option value="">Todos los eventos</option>
+                        <option value="REGISTRO">Registro</option>
+                        <option value="ENTREGA">Entrega</option>
+                        <option value="DEVOLUCION">Devolución</option>
                         <option value="AVERIO">Averío</option>
                         <option value="REPARACION">Reparación</option>
-                        <option value="ENTREGA">Entrega</option>
+                        <option value="BAJA">Baja</option>
                     </select>
                 </div>
                 <div>
+                    <label for="filterFecha">Fecha del evento</label>
                     <input type="date" id="filterFecha">
                 </div>
             </div>
 
-            <table>
+            <table id="tablaEventos">
                 <thead>
                     <tr>
+                        <th></th>
                         <th>ID</th>
                         <th>Bien</th>
                         <th>Tipo</th>
@@ -88,6 +131,21 @@
                 </tbody>
             </table>
 
+            <div class="pagination-controls">
+                <button id="prevPage" class="btn"><i class="bi bi-chevron-left"></i> Anterior</button>
+                <span id="pageInfo">Página 1 de 1</span>
+                <button id="nextPage" class="btn">Siguiente <i class="bi bi-chevron-right"></i></button>
+                <select id="rowsPerPageSelect">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="15" selected>15</option>
+                    <option value="20">20</option>
+                    <option value="25">25</option>
+                    <option value="30">30</option>
+                </select>
+                <label for="rowsPerPageSelect">por página</label>
+            </div>
+            
             <div class="informativo" id="counterEventos"></div>
         </section>
 
@@ -95,18 +153,35 @@
         <section id="modificarEventoSection" class="hidden">
             <h2>Actualizar evento</h2>
             <form id="modificarEventoForm">
-                <input type="hidden" id="modEventoId">
+                <label for="modEventoId">Identificador de evento</label>
+                <input type="number" id="modEventoId" disabled>
 
-                <label>ID del bien</label>
-                <input type="number" id="modBienId" required>
+                <label for="modBienId">Nro. de inventario</label>
+                <div class="input-prefix">
+                    <span>FCE-</span>
+                    <input type="number" id="modBienId" placeholder="150" required>
+                </div>
 
-                <label>Tipo de evento</label>
+                <label for="modTipoEvento">Tipo de evento</label>
                 <select id="modTipoEvento" required>
                     <option value="">Seleccionar</option>
+                    <option value="ENTREGA">Entrega</option>
+                    <option value="DEVOLUCION">Devolución</option>
                     <option value="AVERIO">Averío</option>
                     <option value="REPARACION">Reparación</option>
-                    <option value="ENTREGA">Entrega</option>
+                    <option value="BAJA">Baja</option>
                 </select>
+
+                <div class="hidden" id="campoUbicacionModificar">
+                    <label for="modUbicacion">Ubicación</label>
+                    <input list="ubicacionesSugeridas" type="text" id="modUbicacion" placeholder="BEDELÍA">
+                    <datalist id="ubicacionesSugeridas"></datalist>
+                </div>
+
+                <div>
+                    <label for="modDetalleEvento">Detalle</label>
+                    <input type="text" id="modDetalleEvento" placeholder="Detalles extras opcionales...">
+                </div>
 
                 <div class="btn-row">
                     <button type="submit" class="btn"><i class="bi bi-save"></i>Guardar</button>
@@ -120,71 +195,273 @@
 
     </main>
 
+    <div id="historialModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitulo">Historial del Bien</h2>
+                <button id="modalCerrarBtn" class="modal-close-btn" title="Cerrar">&times;</button>
+            </div>
+            <div id="historialContenido" class="modal-body">
+            </div>
+        </div>
+    </div>
+
     <footer>SIExT | 2025</footer>
 
+    <script src="js/auth.js"></script>
+    <script>
+        verificarAuth();
+        mostrarSegunRol("SUPERVISOR");
+    </script>
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/formateo.js"></script>
+    <script src="js/fechas.js"></script>
+    <script src="js/forms.js"></script>
+    <script src="js/historial.js"></script>
     <script>
         recargarEventos();
         recargarBienes();
+        
+        let currentPage = 1;
+        let rowsPerPage = parseInt(document.getElementById("rowsPerPageSelect").value, 10);
+        let totalPages = 1;
+
         function renderEventos() {
             const eventos = JSON.parse(localStorage.getItem("eventos")) || [];
+            const eventosHabilitados = eventos.filter(e => !e.eliminado);
 
-            const filterBienInput = document.getElementById("filterBienInput");
-            const filterTipoEvento = document.getElementById("filterTipoEvento");
-            const filterFecha = document.getElementById("filterFecha");
+            const bienes = JSON.parse(localStorage.getItem("bienes")) || [];
 
-            const tbody = document.querySelector("table tbody");
+            const filterEstadoId = document.getElementById("filterEstadoId").value;
+            const filterBienNombre = document.getElementById("filterBienNombre").value.toUpperCase().trim();
+            const filterBienInput = document.getElementById("filterBienInput").value;
+            const filterTipoEvento = document.getElementById("filterTipoEvento").value;
+            const filterFecha = document.getElementById("filterFecha").value;
+
+            const tbody = document.querySelector("#tablaEventos tbody");
             tbody.innerHTML = "";
 
-            let count = 0;
-
-            eventos.forEach(evento => {
-                const matchBienInput = numero => String(evento.bienAsociado).includes(numero);
-                const matchTipoEvento = (tipo, filtro) => !filtro || tipo === filtro;
-                const matchFecha = (fechaEvento, filtro) => !filtro || new Date(fechaEvento).toLocaleDateString("en-CA") === filtro;
-
-                if (matchBienInput(filterBienInput.value) &&
-                    matchTipoEvento(evento.tipoEvento, filterTipoEvento.value) &&
-                    matchFecha(evento.fechaEvento, filterFecha.value)
-                ) {
-                    const tr = document.createElement("tr");
-                    tr.innerHTML = `
-                        <td>${evento.id_Evento}</td>
-                        <td>${evento.bienAsociado}</td>
-                        <td>${evento.tipoEvento}</td>
-                        <td>${new Date(evento.fechaEvento).toLocaleString()}</td>
-                        <td>
-                            <button class="btn" onClick="editarEvento(${evento.id_Evento})"><i class="bi bi-pencil"></i></button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                    count++;
-                }
+            // Filtrado
+            const filtradas = eventosHabilitados.filter(evento => {
+                return matchTexto(formatearNroBien(evento.bienAsociado), filterBienInput) &&
+                matchTexto(
+                    bienes.find(b => b.id_Bien === evento.bienAsociado)?.nombre || "",
+                    filterBienNombre
+                ) &&
+                          matchNumero(evento.id_Evento, filterEstadoId) &&
+                       matchValor(evento.tipoEvento, filterTipoEvento) &&
+                       matchFecha(evento.fechaEvento, filterFecha);
             });
 
-            document.getElementById("counterEventos").textContent = `Mostrando ${count} evento(s).`;
+            // Paginación
+            const totalRows = filtradas.length;
+            totalPages = Math.ceil(totalRows / rowsPerPage);
+            if (currentPage > totalPages) currentPage = totalPages || 1;
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const paginadas = filtradas.slice(startIndex, endIndex);
+
+            if (paginadas.length === 0) {
+                const filaVacia = document.createElement("tr");
+                filaVacia.innerHTML = `<td colspan="6" class="text-center">(No hay resultados que coincidan)</td>`;
+                tbody.appendChild(filaVacia);
+            }
+
+            paginadas.forEach(evento => {
+                    const bien = bienes.find(b => b.id_Bien === evento.bienAsociado);
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>
+                            <button class="btn btn-toggle btn-icon-table" title="Expandir detalles">
+                                <i class="bi bi-caret-down-fill"></i>
+                            </button>
+                        </td>
+                        <td>${evento.id_Evento}</td>
+                        <td>#${formatearNroBien(evento.bienAsociado)} — ${bien.nombre}</td>
+                        <td>${evento.tipoEvento}</td>
+                        <td>${formatearFechaLocalEsp(evento.fechaEvento)}</td>
+                    `;
+                    if (evento.tipoEvento === "REGISTRO") {
+                        tr.innerHTML += `                        <td>
+                            <button class="btn btn-editar btn-icon-table" title="No se puede editar un REGISTRO" disabled>
+                                <i class="bi bi-pencil-fill"></i>
+                            </button>
+                        </td>`;
+                    } else if (evento.tipoEvento === "ENTREGA" && evento.numSolicitud != null) {
+                        tr.innerHTML += `                        <td>
+                            <button class="btn btn-editar btn-icon-table" title="No se puede editar una ENTREGA POR SOLICITUD" disabled>
+                                <i class="bi bi-pencil-fill"></i>
+                            </button>
+                        </td>`;
+                    } else {
+                        tr.innerHTML += `                        <td>
+                            <button class="btn btn-editar btn-icon-table" data-id="${evento.id_Evento}" title="Editar evento">
+                                <i class="bi bi-pencil-fill"></i>
+                            </button>
+                        </td>`;
+                    }
+                    tbody.appendChild(tr);
+
+                    // Fila oculta de detalles
+                    const detalle = document.createElement("tr");
+                    detalle.classList.add("detalle-fila", "hidden");
+                    detalle.innerHTML = `
+                        <td colspan="5" class="detalle-contenido">
+                            <p><strong>Momento en que se registró:</strong> ${formatearFechaLocalLegible(evento.fechaEvento)}</p>
+                            ${evento.tipoEvento == "ENTREGA" ? `<p><strong>Ubicación a la que se destinó:</strong> ${evento.ubicacionDestino}</p>`:``}
+                            ${evento.numSolicitud ? `<p><strong>Nro. de solicitud asociado:</strong> ${evento.numSolicitud}</p>`:``}
+                            <p><strong>Detalle:</strong> ${evento.detalle || "(Sin detalle adicional)"}</p>
+                        </td>
+                        <td colspan="1" class="detalle-contenido">
+                            <button class="btn btn-historial btn-icon-table" data-id="${evento.bienAsociado}" title="Ver historial">
+                                <i class="bi bi-clock-fill"></i>
+                            </button>
+                        </td>`;
+                    tbody.appendChild(detalle);
+            });
+
+            document.getElementById("counterEventos").textContent = `Mostrando ${paginadas.length} de ${totalRows} evento(s).`;
+            document.getElementById("pageInfo").textContent = `Página ${currentPage} de ${totalPages || 1}`;
+
+            document.getElementById("prevPage").disabled = (currentPage === 1);
+            document.getElementById("nextPage").disabled = (currentPage === totalPages || totalPages === 0);
         }
 
-        document.getElementById("filterBienInput").addEventListener("input", renderEventos);
-        document.getElementById("filterTipoEvento").addEventListener("change", renderEventos);
-        document.getElementById("filterFecha").addEventListener("change", renderEventos);
+        // Función para expandir/contraer detalle
+        function toggleDetalles(button) {
+            const fila = button.closest("tr");
+            const siguiente = fila.nextElementSibling;
+            if (siguiente && siguiente.classList.contains("detalle-fila")) {
+                siguiente.classList.toggle("hidden");
+                const icono = button.querySelector("i");
+                icono.classList.toggle("bi-caret-down-fill");
+                icono.classList.toggle("bi-caret-up-fill");
+            }
+        }
+
+        // Controles de paginación
+        document.getElementById("prevPage").addEventListener("click", () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderEventos();
+        }
+        });
+        document.getElementById("nextPage").addEventListener("click", () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderEventos();
+            }
+        });
+        document.getElementById("rowsPerPageSelect").addEventListener("change", (e) => {
+            rowsPerPage = parseInt(e.target.value);
+            currentPage = 1;
+            renderEventos();
+        });
+
+        document.querySelector("#tablaEventos tbody").addEventListener("click", (e) => {
+            // Buscamos si el clic fue en un botón de editar
+            const btnEditar = e.target.closest(".btn-editar");
+            if (btnEditar) {
+                const id = Number(btnEditar.dataset.id);
+                editarEvento(id);
+                return;
+            }
+
+            // Buscamos si el clic fue en un botón de toggle detalles
+            const btnToggle = e.target.closest(".btn-toggle");
+            if (btnToggle) {
+                toggleDetalles(btnToggle);
+                return;
+            }
+
+            // Buscamos si el clic fue en un botón de historial
+            const btnHistorial = e.target.closest(".btn-historial");
+            if (btnHistorial) {
+                const id = Number(btnHistorial.dataset.id);
+                mostrarHistorial(id);
+                return;
+            }
+        });
+
+        // Filtros
+        document.querySelectorAll("#filterBienInput, #filterTipoEvento, #filterFecha, #filterEstadoId, #filterBienNombre")
+            .forEach(input => {
+                const eventType = (input.tagName === "SELECT" || input.type === "date") ? "change" : "input";
+                input.addEventListener(eventType, () => {
+                    currentPage = 1;
+                    renderEventos();
+                });
+        });
 
         renderEventos();
 
+        const selectTipoEventoCrear = document.getElementById("tipoEvento");
+        const campoUbicacionCrear = document.getElementById("campoUbicacionCrear");
+        const inputUbicacionCrear = document.getElementById("ubicacionEntrega");
+
+        const selectTipoEventoMod = document.getElementById("modTipoEvento");
+        const campoUbicacionModificar = document.getElementById("campoUbicacionModificar");
+        const inputUbicacionModificar = document.getElementById("modUbicacion");
+
+        // 1. Listener para el formulario de CREAR
+        selectTipoEventoCrear.addEventListener("change", (e) => {
+            // Obtenemos el valor seleccionado
+            const tipo = e.target.value;
+
+            if (tipo === "ENTREGA") {
+                campoUbicacionCrear.classList.remove("hidden");
+                inputUbicacionCrear.required = true;
+            } else {
+                campoUbicacionCrear.classList.add("hidden");
+                inputUbicacionCrear.required = false;
+            }
+        });
+
+        // 2. Listener para el formulario de MODIFICAR
+        selectTipoEventoMod.addEventListener("change", (e) => {
+            const tipo = e.target.value;
+
+            if (tipo === "ENTREGA") {
+                campoUbicacionModificar.classList.remove("hidden");
+                inputUbicacionModificar.required = true;
+            } else {
+                campoUbicacionModificar.classList.add("hidden");
+                inputUbicacionModificar.required = false;
+            }
+        });
+
+        cargarOpciones("ubicacionesSugeridas", "ubicaciones", false);
+
         document.getElementById("registroEventoForm").addEventListener("submit", async (e) => {
             e.preventDefault();
+            if (!confirm("¿Crear este evento?")) return;
 
             const tipoEvento = document.getElementById("tipoEvento").value.toUpperCase();
             const bienAsociado = document.getElementById("bienAsociado").value;
+            const detalleInput = document.getElementById("detalleEvento").value.trim().toUpperCase();
+            const detalle = detalleInput === "" ? null : detalleInput;
+            const ubicacionInput = document.getElementById("ubicacionEntrega").value.trim().toUpperCase();
+            const ubicacion = ubicacionInput === "" ? null : ubicacionInput;
+
             if (!tipoEvento || !bienAsociado) {
                 alert("Datos incompletos.");
+                return;
+            }
+            if (tipoEvento === "BAJA" && !confirm("¿Estás seguro de registrar un evento de BAJA sobre este bien?")) {
+                return;
+            }
+
+            if (tipoEvento === "ENTREGA" && ubicacion === "SIN ASIGNAR") {
+                alert("No puede realizarse una entrega a SIN ASIGNAR");
                 return;
             }
 
             const evento = {
                 tipoEvento,
-                bienAsociado
+                bienAsociado,
+                ...(detalle ? { detalle } : {}),
+                ...(ubicacion ? { ubicacionDestino: ubicacion } : {})
             }
 
             try {
@@ -200,8 +477,8 @@
                         return;
                     }
                     else {
-                    alert(`El servidor no pudo realizar el registro del evento. Código: ${response.status}`);
-                    return;
+                        alert(`El servidor no pudo realizar el registro del evento. Código: ${response.status}`);
+                        return;
                     }
                 }
             } catch (error) {
@@ -212,6 +489,7 @@
             await recargarEventos();
             await recargarBienes();
 
+            cargarOpciones("ubicacionesSugeridas", "ubicaciones", false);
             renderEventos();
             e.target.reset();
         });
@@ -220,47 +498,70 @@
             const eventos = JSON.parse(localStorage.getItem("eventos")) || [];
             const evento = eventos.find(e => e.id_Evento === id);
             if (!evento) return;
+            if (evento.tipoEvento === "ENTREGA") {
+                campoUbicacionModificar.classList.remove("hidden");
+                inputUbicacionModificar.required = true;
+            }
+
+            const form = document.getElementById("modificarEventoForm");
+            form.dataset.originalBienId = evento.bienAsociado.toString();
+            form.dataset.originalTipoEvento = evento.tipoEvento.trim().toUpperCase() || "";
+            form.dataset.originalDetalle = evento.detalle ? evento.detalle.trim().toUpperCase() : "";
+            form.dataset.originalUbicacion = evento.ubicacionDestino ? evento.ubicacionDestino.trim().toUpperCase() : "";
+
             document.getElementById("modEventoId").value = evento.id_Evento;
             document.getElementById("modBienId").value = evento.bienAsociado;
             document.getElementById("modTipoEvento").value = evento.tipoEvento;
+            document.getElementById("modDetalleEvento").value = evento.detalle || "";
+            document.getElementById("modUbicacion").value = evento.ubicacionDestino || "";
+
             document.getElementById("modificarEventoSection").classList.remove("hidden");
+
+            document.getElementById("modificarEventoSection").scrollIntoView({ behavior: "smooth" });
+            document.getElementById("modBienId").focus({ preventScroll: true });
         }
 
         document.getElementById("modificarEventoForm").addEventListener("submit", async (e) => {
             e.preventDefault();
+            if (!confirm("¿Modificar este evento?")) return;
             const id = +document.getElementById("modEventoId").value;
-            let evento;
-            try {
-                const response = await leerEvento(id);
-                if (!response.ok) {
-                    document.getElementById("modificarEventoSection").classList.add("hidden");
-                    const errorData = await response.json();
-                    if (response.status == 422) {
-                        alert(errorData.error);
-                        return;
-                    }
-                    if (response.status == 404) {
-                        alert("Evento no encontrado.");
-                        return;
-                    }
-                    else if (response.status == 500) {
-                        alert("El servidor no pudo realizar la búsqueda del evento. Código: 500");
-                        return;
-                    }
-                    else {
-                        alert(`El servidor no pudo realizar la búsqueda del evento. Código: ${response.status}`);
-                        return;
-                    }
-                }
-                evento = await response.json();
-            } catch (error) {
-                alert("No se pudo conectar con el servidor.");
+            const form = e.target;
+            const originalBienId = form.dataset.originalBienId;
+            const originalTipoEvento = form.dataset.originalTipoEvento;
+            const originalDetalle = form.dataset.originalDetalle;
+            const originalUbicacion = form.dataset.originalUbicacion;
+
+            const idInput = document.getElementById("modBienId").value.toString();
+            const tipoEventoInput = document.getElementById("modTipoEvento").value.trim().toUpperCase();
+            const modDetalleTempInput = document.getElementById("modDetalleEvento").value.trim().toUpperCase();
+            const modDetalleTemp = modDetalleTempInput === "" ? null : modDetalleTempInput;
+            const modUbicacionTempInput = document.getElementById("modUbicacion").value.trim().toUpperCase();
+            const modUbicacionTemp = modUbicacionTempInput === "" ? null : modUbicacionTempInput;
+
+            if (originalBienId === idInput
+                && originalTipoEvento === tipoEventoInput
+                && originalDetalle === modDetalleTempInput
+                && originalUbicacion === modUbicacionTempInput
+                ) {
+                alert("No se detectaron cambios en los datos.");
+                return;
+            }
+
+            if (!tipoEventoInput || !idInput) {
+                alert("Datos incompletos.");
+                return;
+            }
+
+            if (tipoEventoInput === "ENTREGA" && modUbicacionTemp === "SIN ASIGNAR") {
+                alert("No puede realizarse una entrega a SIN ASIGNAR");
                 return;
             }
 
             const eventoModificado = {
-                tipoEvento: document.getElementById("modTipoEvento").value.trim().toUpperCase(),
-                bienAsociado: document.getElementById("modBienId").value
+                tipoEvento: tipoEventoInput,
+                bienAsociado: idInput,
+                ...(modDetalleTemp ? { detalle: modDetalleTemp } : {}),
+                ...(modUbicacionTemp ? { ubicacionDestino: modUbicacionTemp } : {})
             }
 
             try {
@@ -268,7 +569,7 @@
                 if (!response.ok) {
                     const errorData = await response.json();
                     if (response.status == 404) {
-                        alert("Bien no encontrado.");
+                        alert("Evento no encontrado.");
                         return;
                     }
                     if (response.status == 422) {
@@ -279,8 +580,8 @@
                         alert("El servidor no pudo realizar la modificación del evento. Código: 500");
                         return;
                     } else {
-                    alert(`El servidor no pudo realizar la modificación del evento. Código: ${response.status}`);
-                    return;
+                        alert(`El servidor no pudo realizar la modificación del evento. Código: ${response.status}`);
+                        return;
                     }
                 }
             } catch (error) {
@@ -292,16 +593,21 @@
             await recargarEventos();
             await recargarBienes();
 
+            cargarOpciones("ubicacionesSugeridas", "ubicaciones", false);
             renderEventos();
             document.getElementById("modificarEventoSection").classList.add("hidden");
             e.target.reset();
+
+            document.getElementById("tablaEventos").parentElement.scrollIntoView({ behavior: "smooth" });
         });
 
         // Cancelar edición de datos
         document.getElementById("cancelarEdicionBtn").onclick = () => {
             if (confirm("¿Deseás cancelar la edición? Se perderán los cambios no guardados.")) {
                 document.getElementById("modificarEventoSection").classList.add("hidden");
-                document.getElementById("modificarEventoSection").reset();
+                document.getElementById("modificarEventoForm").reset();
+
+                document.getElementById("tablaEventos").parentElement.scrollIntoView({ behavior: "smooth" });
             }
         };
 
@@ -336,6 +642,8 @@
             renderEventos();
             document.getElementById("modificarEventoSection").classList.add("hidden");
             document.getElementById("modificarEventoForm").reset();
+
+            document.getElementById("tablaEventos").parentElement.scrollIntoView({ behavior: "smooth" });
         });
     </script>
 

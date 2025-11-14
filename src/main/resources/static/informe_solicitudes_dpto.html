@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Informe | Solicitudes por Departamento</title>
+  <title>Informe | Solicitudes y Demanda</title>
   <link href="icons/bootstrap-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="css/global.css">
   <link rel="stylesheet" href="css/tablas.css">
@@ -14,20 +14,29 @@
 
 <body>
 
-  <h1>Informe de Solicitudes por Departamento</h1>
+  <h1 id="tituloInforme">Informe de Solicitudes</h1>
   <div class="informativo">Generado: <span id="fechaActual"></span></div>
   <div class="informativo">Período: <span id="periodoSeleccionado"></span></div>
 
   <button class="btn" onclick="window.print()"><i class="bi bi-printer"></i>Imprimir</button>
   <a href="informes.html" class="btn"><i class="bi bi-arrow-left"></i>Volver a Informes</a>
 
+  <fieldset class="grupo-radios">
+    <legend>Tipo de Informe</legend>
+    <div>
+      <input type="radio" name="tipoReporte" id="tipoResumido" value="resumido" checked>
+      <label for="tipoResumido">Resumido (Por categoría)</label>
+    </div>
+    <div>
+      <input type="radio" name="tipoReporte" id="tipoDetallado" value="detallado">
+      <label for="tipoDetallado">Detallado (Una por Una)</label>
+    </div>
+  </fieldset>
+
   <table id="tablaSolicitudes">
     <thead>
       <tr>
-        <th>Fecha</th>
-        <th>Departamento</th>
-        <th>Descripción</th>
-      </tr>
+        </tr>
     </thead>
     <tbody></tbody>
     <tfoot></tfoot>
@@ -35,71 +44,149 @@
 
   <footer>SIExT | 2025</footer>
 
+    <script src="js/auth.js"></script>
+    <script>
+        verificarAuth("SUPERVISOR", false);
+    </script>
+    <script src="js/fechas.js"></script>
+    <script src="js/formateo.js"></script>
   <script>
-    document.getElementById("fechaActual").textContent = new Date().toLocaleString();
+    document.getElementById("fechaActual").textContent = obtenerFechaHoraActual();
 
     const params = new URLSearchParams(window.location.search);
     const desde = params.get("desde");
     const hasta = params.get("hasta");
-    document.getElementById("periodoSeleccionado").textContent = `${desde} a ${hasta}`;
+    document.getElementById("periodoSeleccionado").textContent = `${formatearFechaDeYankeeAEsp(desde)} a ${formatearFechaDeYankeeAEsp(hasta)}`;
 
-    const solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
+    const allSolicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
+    const solicitantes = JSON.parse(localStorage.getItem("solicitantes")) || []; 
 
     const tbody = document.querySelector("#tablaSolicitudes tbody");
     const tfoot = document.querySelector("#tablaSolicitudes tfoot");
+    const thead_tr = document.querySelector("#tablaSolicitudes thead tr");
+    const tituloInforme = document.getElementById("tituloInforme");
 
-    // Filtrar solicitudes en rango de fechas
-    const solicitudesFiltradas = solicitudes
-      .filter(s => s.fechaInicioSolicitud >= desde && s.fechaInicioSolicitud <= hasta)
-      .map(s => ({
-        fecha: s.fechaInicioSolicitud.split("T")[0] + " " + s.fechaInicioSolicitud.split("T")[1].replace("Z", ""),
-        departamento: s.ubicacionBienes,
-        descripcion: s.descripcion
-      }))
-      .sort((a, b) => a.fecha.localeCompare(b.fecha));
-
-    if (solicitudesFiltradas.length === 0) {
-      const fila = document.createElement("tr");
-      fila.innerHTML = `<td colspan="4" style="text-align:center; padding:1rem;">No se registraron solicitudes en ese período.</td>`;
-      tbody.appendChild(fila);
-    } else {
-      solicitudesFiltradas.forEach(dato => {
-        const fila = document.createElement("tr");
-        fila.innerHTML = `
-          <td>${dato.fecha}</td>
-          <td>${dato.departamento}</td>
-          <td>${dato.descripcion}</td>
-        `;
-        tbody.appendChild(fila);
+    const solicitudesFiltradas = allSolicitudes
+      .filter(s => s.eliminado === false)
+      .filter(s => {
+        const fechaSolicitudLocal = formatearFechaLocal(s.fechaInicioSolicitud);
+        return fechaSolicitudLocal >= desde && fechaSolicitudLocal <= hasta;
       });
+
+    function renderizarResumido() {
+      thead_tr.innerHTML = `
+        <th>Ubicación</th>
+        <th>Categoría Pedida</th>
+        <th>Cantidad Total Solicitada</th>
+      `;
+
+      const bienesAgrupados = Object.values(
+        solicitudesFiltradas
+          .flatMap(s => 
+            s.bienesPedidos.map(item => ({
+              ubicacion: s.ubicacionBienes,
+              categoria: item.categoria,
+              cantidad: item.cantidad
+            }))
+          )
+          .reduce((acc, item) => {
+            const clave = `${item.ubicacion}-${item.categoria}`;
+            if (!acc[clave]) {
+              acc[clave] = {
+                ubicacion: item.ubicacion,
+                categoria: item.categoria,
+                cantidad: 0
+              };
+            }
+            acc[clave].cantidad += item.cantidad;
+            return acc;
+          }, {})
+      ).sort((a, b) => a.ubicacion.localeCompare(b.ubicacion) || a.categoria.localeCompare(b.categoria)); // Ordenar
+
+      // 3. Renderizar cuerpo
+      if (bienesAgrupados.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:1rem;">No se registraron solicitudes en ese período.</td></tr>`;
+      } else {
+        bienesAgrupados.forEach(dato => {
+          const fila = document.createElement("tr");
+          fila.innerHTML = `
+            <td>${formatearMayusComoTitulo(dato.ubicacion)}</td>
+            <td>${formatearMayusComoTitulo(dato.categoria)}</td>
+            <td style="text-align:center; font-weight:bold;">${dato.cantidad}</td>
+          `;
+          tbody.appendChild(fila);
+        });
+      }
+
+      const totalGeneral = bienesAgrupados.reduce((sum, i) => sum + i.cantidad, 0);
+      
+      tfoot.innerHTML = `
+        <tr>
+          <td colspan="2" style="text-align:right; font-weight:bold;">TOTAL GENERAL DE BIENES</td>
+          <td style="text-align:center; font-weight:bold;">${totalGeneral}</td>
+        </tr>
+      `;
     }
 
-    // ---- Totales por departamento ----
-    const totalesPorDepto = solicitudesFiltradas.reduce((acc, s) => {
-      acc[s.departamento] = (acc[s.departamento] || 0) + 1;
-      return acc;
-    }, {});
-
-    // ---- Total general ----
-    const totalGeneral = solicitudesFiltradas.length;
-
-    // Renderizar pie de tabla
-    tfoot.innerHTML = "";
-    Object.entries(totalesPorDepto).forEach(([depto, total]) => {
-      const filaDepto = document.createElement("tr");
-      filaDepto.innerHTML = `
-        <td colspan="2" style="text-align:right; font-weight:bold;">TOTAL ${depto}</td>
-        <td style="font-weight:bold;">${total}</td>
+    function renderizarDetallado() {
+      thead_tr.innerHTML = `
+        <th>Fecha</th>
+        <th>N° Sol.</th>
+        <th>Ubicación</th>
+        <th>Solicitante</th>
+        <th>Bienes Pedidos</th>
+        <th>Estado</th>
       `;
-      tfoot.appendChild(filaDepto);
+
+      solicitudesFiltradas.sort((a, b) => a.fechaInicioSolicitud.localeCompare(b.fechaInicioSolicitud));
+
+      if (solicitudesFiltradas.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:1rem;">No se registraron solicitudes en ese período.</td></tr>`;
+      } else {
+        solicitudesFiltradas.forEach(s => {
+          const persona = solicitantes.find(persona => persona.legajo === s.solicitante);
+          const nombreSolicitante = persona ? persona.nombre : s.solicitante;
+          
+          const detalleBienesHtml = s.bienesPedidos
+            .filter(item => !item.eliminado)
+            .map(item => `• ${item.cantidad} x ${formatearMayusComoTitulo(item.categoria)}`)
+            .join('<br>');
+
+          const fila = document.createElement("tr");
+          fila.innerHTML = `
+            <td>${formatearFechaHora(s.fechaInicioSolicitud)}</td>
+            <td style="text-align:center;">#${s.numSolicitud}</td>
+            <td>${formatearMayusComoTitulo(s.ubicacionBienes)}</td>
+            <td>${formatearMayusComoTitulo(nombreSolicitante)}</td>
+            <td class="texto-izquierda">${detalleBienesHtml}</td>
+            <td>${formatearMayusComoTitulo((s.estado).replace("_", " "))}</td>
+          `;
+          tbody.appendChild(fila);
+        });
+      }
+    }
+
+    function generarInforme() {
+      const tipoReporte = document.querySelector('input[name="tipoReporte"]:checked').value;
+      
+      tbody.innerHTML = "";
+      tfoot.innerHTML = "";
+
+      if (tipoReporte === 'resumido') {
+        renderizarResumido();
+        tituloInforme.textContent = "Informe Resumido de Demanda";
+      } else {
+        renderizarDetallado();
+        tituloInforme.textContent = "Informe Detallado de Solicitudes";
+      }
+    }
+
+    document.querySelectorAll('input[name="tipoReporte"]').forEach(radio => {
+      radio.addEventListener('change', generarInforme);
     });
 
-    const filaTotal = document.createElement("tr");
-    filaTotal.innerHTML = `
-      <td colspan="2" style="text-align:right; font-weight:bold;">TOTAL GENERAL</td>
-      <td style="font-weight:bold;">${totalGeneral}</td>
-    `;
-    tfoot.appendChild(filaTotal);
+    generarInforme(); // Carga el informe 'resumido' por defecto
+
   </script>
 
 </body>

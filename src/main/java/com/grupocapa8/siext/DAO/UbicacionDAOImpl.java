@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author oveja
  */
-public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
+public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO, Integer> {
 
     @Override
     public int insertar(UbicacionDTO Ubicacion) {
@@ -40,7 +40,7 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
 
     @Override
     public int actualizar(UbicacionDTO Ubicacion) {
-        String sql = "UPDATE Ubicacion SET Nombre = ? WHERE ID_Ubicacion = ?";
+        String sql = "UPDATE Ubicacion SET Nombre = ? WHERE ID_Ubicacion = ? AND Eliminado = ? AND Es_Editable = ?";
         int resultado = 0;
 
         try (Connection con = BasedeDatos.getConnection();
@@ -48,6 +48,8 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
             
             ps.setString(1, Ubicacion.getNombre());
             ps.setInt(2, Ubicacion.getID_Ubicacion());
+            ps.setInt(3, 0);
+            ps.setInt(4, 1);
 
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
@@ -57,22 +59,20 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
         return resultado;
     }
 
-    @Override
-    public UbicacionDTO buscar(int id) {
+    public UbicacionDTO buscar(Integer id, Connection con) {
 
         UbicacionDTO ubicacionBien = null;
-        String sql = "SELECT * FROM Ubicacion WHERE ID_Ubicacion = ? AND Eliminado = ?";
+        String sql = "SELECT * FROM Ubicacion WHERE ID_Ubicacion = ?";
         
-        try (Connection con = BasedeDatos.getConnection();
-                PreparedStatement ps = con.prepareStatement(sql)) {
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, id);
-            ps.setInt(2,0);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     ubicacionBien = new UbicacionDTO();
                     ubicacionBien.setID_Ubicacion(rs.getInt("ID_Ubicacion"));
                     ubicacionBien.setNombre(rs.getString("Nombre"));
+                    ubicacionBien.setEliminado(rs.getInt("Eliminado") != 0);
                 }
             }
             
@@ -82,15 +82,26 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
         
         return ubicacionBien;
     }
+    
+    @Override
+    public UbicacionDTO buscar(Integer id) {
+        try (Connection con = BasedeDatos.getConnection()) {
+            return this.buscar(id, con);
+        } catch (SQLException ex) {
+            System.getLogger(UbicacionDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+        return null;
+    }
 
     @Override
     public List<UbicacionDTO> buscarTodos() {
         List<UbicacionDTO> ubicaciones = new ArrayList<>();
 
-        String sql = "SELECT * FROM Ubicacion WHERE Eliminado = ?";
+        String sql = "SELECT * FROM Ubicacion WHERE Es_Editable = ?";
         try (Connection con = BasedeDatos.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, 0);
+            
+            ps.setInt(1, 1);
         
             try(ResultSet rs = ps.executeQuery()) {
 
@@ -98,6 +109,7 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
                 UbicacionDTO ubicacion = new UbicacionDTO();
                 ubicacion.setID_Ubicacion(rs.getInt("ID_Ubicacion"));
                 ubicacion.setNombre(rs.getString("Nombre"));
+                ubicacion.setEliminado(rs.getInt("Eliminado") != 0);
 
                 ubicaciones.add(ubicacion);
             }
@@ -110,8 +122,8 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
     }
 
     @Override
-    public int eliminar(int id) {
-        String sql = "UPDATE Ubicacion SET Eliminado = ? WHERE ID_Ubicacion = ?";
+    public int eliminar(Integer id) {
+        String sql = "UPDATE Ubicacion SET Eliminado = ? WHERE ID_Ubicacion = ? AND Eliminado = ? AND Es_Editable = ?";
         int resultado = 0;
         
         try (Connection con = BasedeDatos.getConnection();
@@ -119,6 +131,8 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
             
             ps.setInt(1, 1);
             ps.setInt(2, id);
+            ps.setInt(3, 0);
+            ps.setInt(4, 1);
             
             resultado = ps.executeUpdate();
         } catch (SQLException ex) {
@@ -128,13 +142,12 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
         return resultado;
     }
     
-    public UbicacionDTO buscar(String nombre) {
+    public UbicacionDTO buscar(String nombre, Connection con) {
 
         UbicacionDTO ubicacion = null;
-        String sql = "SELECT ID_Ubicacion, Nombre FROM Ubicacion WHERE Nombre = ?";
+        String sql = "SELECT * FROM Ubicacion WHERE Nombre = ? AND Eliminado = 0";
 
-        try (Connection con = BasedeDatos.getConnection();
-                PreparedStatement ps = con.prepareStatement(sql)) {
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setString(1, nombre);
             try (ResultSet rs = ps.executeQuery()) {
@@ -142,6 +155,7 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
                     ubicacion = new UbicacionDTO();
                     ubicacion.setID_Ubicacion(rs.getInt("ID_Ubicacion"));
                     ubicacion.setNombre(rs.getString("Nombre"));
+                    ubicacion.setEliminado(rs.getInt("Eliminado") != 0);
                 }
             }
             
@@ -150,6 +164,15 @@ public class UbicacionDAOImpl implements DAOGenerica<UbicacionDTO> {
         }
         
         return ubicacion;
+    }
+    
+    public UbicacionDTO buscar(String nombre) {
+        try (Connection con = BasedeDatos.getConnection()) {
+            return this.buscar(nombre, con);
+        } catch (SQLException ex) {
+            System.getLogger(UbicacionDAOImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+        return null;
     }
 
 }

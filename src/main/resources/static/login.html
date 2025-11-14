@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Iniciar sesión - SIExT </title>
-    <link rel="icon" href="images\icon.png">
+    <link rel="icon" href="images/icon.png">
     <link rel="stylesheet" href="css/global.css" />
     <style>
         :root {
@@ -85,12 +85,59 @@
         <div class="footer"> SIExT </div>
     </div>
 
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
     <script>
-        // Simulación de login sin validación real
-        document.getElementById('loginForm').addEventListener('submit', function (e) {
-            e.preventDefault();
+        // Si ya está autenticado, redirigir al panel principal
+        if (obtenerAuth()) {
             window.location.href = 'panel.html';
-        });
+        } else {
+            // Sino, mostramos el contenido
+            document.body.style.display = 'flex';
+        }
+    </script>
+    <script>
+        document.getElementById('loginForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const nombreUsuario = document.getElementById('user').value.trim().toUpperCase();
+            const contraseña = document.getElementById('pass').value.trim();
+
+            // Validación básica
+            if (!nombreUsuario || !contraseña) {
+                alert('Datos incompletos.');
+                return;
+            }
+
+            const usuario = {
+                nombre: nombreUsuario,
+                contraseña: contraseña
+            };
+
+            try {
+                const response = await loginUsuario(usuario);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status == 500) {
+                        alert("El servidor no pudo realizar el inicio de sesión. Intente nuevamente más tarde. Código: 500");
+                        return;
+                    }
+                    else if (response.status == 422 || response.status == 401) {
+                        alert(errorData.error);
+                        return;
+                    } else {
+                        alert(`El servidor no pudo realizar el inicio de sesión. Intente nuevamente más tarde. Código: ${response.status}`);
+                        return;
+                    }
+                }
+                const datosUsuario = await response.json();
+                localStorage.setItem('auth', JSON.stringify(datosUsuario));
+            } catch (error) {
+                alert("No se pudo conectar con el servidor.");
+                return;
+            }
+
+            window.location.href = 'panel.html';
+        };
     </script>
 
 </body>
